@@ -20,13 +20,15 @@ const PlanList: React.FC = () => {
   const [contractFilter, setContractFilter] = useState<number | undefined>(undefined);
   const [selectedPlans, setSelectedPlans] = useState<Plan[]>([]);
 
-  const { data: providers } = useQuery(['providers'], fetchProviders);
-  const { data: plans, refetch } = useQuery([
-    'plans',
-    providerFilter,
-    planTypeFilter,
-    contractFilter,
-  ], () => fetchPlans(providerFilter, planTypeFilter, contractFilter));
+  const { data: providers } = useQuery({
+    queryKey: ['providers'],
+    queryFn: fetchProviders,
+  });
+
+  const { data: plans, refetch } = useQuery({
+    queryKey: ['plans', providerFilter, planTypeFilter, contractFilter],
+    queryFn: () => fetchPlans(providerFilter, planTypeFilter, contractFilter),
+  });
 
   const handleSelect = (plan: Plan) => {
     setSelectedPlans((prev) => {
