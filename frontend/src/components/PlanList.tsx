@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPlans, fetchProviders } from '../services/api';
+import PlanComparison from './PlanComparison';
 
 interface Plan {
   id: number;
@@ -111,15 +112,7 @@ const PlanList: React.FC = () => {
         </tbody>
       </table>
       {selectedPlans.length > 0 && (
-        <div style={{ marginTop: '1rem' }}>
-          <h2>Selected Plans</h2>
-          <ul>
-            {selectedPlans.map((plan) => (
-              <li key={plan.id}>{plan.plan_name}</li>
-            ))}
-          </ul>
-          {/* TODO: integrate PlanComparison component with charts */}
-        </div>
+        <PlanComparison plans={selectedPlans} />
       )}
     </div>
   );

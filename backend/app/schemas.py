@@ -38,7 +38,7 @@ class Plan(PlanBase):
     last_updated: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ProviderBase(BaseModel):
@@ -55,4 +55,4 @@ class Provider(ProviderBase):
     plans: List[Plan] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
