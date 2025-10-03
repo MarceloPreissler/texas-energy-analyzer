@@ -19,6 +19,7 @@ interface Plan {
 interface Provider {
   id: number;
   name: string;
+  website?: string | null;
 }
 
 const EnhancedPlanList: React.FC = () => {
@@ -244,7 +245,27 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
                       onChange={() => handleSelect(plan)}
                     />
                   </td>
-                  <td><strong>{providers?.find((p) => p.id === plan.provider_id)?.name}</strong></td>
+                  <td>
+                    {(() => {
+                      const provider = providers?.find((p) => p.id === plan.provider_id);
+                      return provider?.website ? (
+                        <a
+                          href={provider.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            color: '#2196F3',
+                            textDecoration: 'none',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          {provider.name} 🔗
+                        </a>
+                      ) : (
+                        <strong>{provider?.name}</strong>
+                      );
+                    })()}
+                  </td>
                   <td>{plan.plan_name}</td>
                   <td>{plan.plan_type ?? '-'}</td>
                   <td>{plan.contract_months ?? '-'}</td>
