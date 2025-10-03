@@ -12,6 +12,8 @@ from sqlalchemy.orm import Session
 from .. import crud, models, schemas
 from ..database import get_db
 from ..scraping import scraper
+from ..auth import verify_api_key
+from ..cache import cache_result
 
 router = APIRouter(prefix="/plans", tags=["plans"])
 
@@ -44,7 +46,8 @@ def read_plan(plan_id: int, db: Session = Depends(get_db)):
 @router.post("/scrape", response_model=dict[str, int])
 def scrape_data(
     source: str = Query("legacy", description="Scrape source: 'legacy' or 'powertochoose'"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    api_key: str = Depends(verify_api_key)
 ):
     """
     Trigger a scrape of electricity plans and update the database.

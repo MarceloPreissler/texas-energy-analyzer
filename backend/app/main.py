@@ -1,10 +1,16 @@
 """
-Entry point for the FastAPI application with security hardening.
+Entry point for the FastAPI application with full production features.
 
-This module initializes the database, includes routers, and creates the
-application instance with rate limiting and security middleware.
+Features:
+- Database initialization
+- Rate limiting and security middleware
+- Scheduled background scraping
+- Redis caching layer
+- API key authentication
 """
 from __future__ import annotations
+
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,6 +22,7 @@ from slowapi.errors import RateLimitExceeded
 from .database import engine
 from . import models
 from .api import plans as plans_router
+from .scheduler import start_scheduler, stop_scheduler
 
 # Create database tables on startup
 models.Base.metadata.create_all(bind=engine)
@@ -23,12 +30,25 @@ models.Base.metadata.create_all(bind=engine)
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address, default_limits=["100/hour"])
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan events."""
+    # Startup
+    print("[App] Starting background scheduler...")
+    start_scheduler()
+    yield
+    # Shutdown
+    print("[App] Stopping background scheduler...")
+    stop_scheduler()
+
 app = FastAPI(
     title="Texas Commercial Energy Market Analyzer",
     description="Secure API for Texas electricity plan comparison",
-    version="1.0.0",
+    version="2.0.0",
     docs_url="/docs",  # Can disable in production
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan  # Enable background scheduler
 )
 
 # Add rate limiting
@@ -80,4 +100,4 @@ async def read_root(request: Request):
 @app.get("/health")
 async def health_check():
     """Health check endpoint for monitoring."""
-    return {"status": "healthy", "service": "texas-energy-analyzer"}
+    return {"status": "healthy", "service": "texas-energy-analyzer", "version": "2.0.0"}

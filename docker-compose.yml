@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: texas-energy-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-energyuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-texas_energy}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-energyuser}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - energy-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: texas-energy-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - energy-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: texas-energy-backend
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-energyuser}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-texas_energy}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SECRET_KEY: ${SECRET_KEY:-your-secret-key-change-in-production}
+      API_KEY: ${API_KEY:-your-api-key-change-in-production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    networks:
+      - energy-network
+    restart: unless-stopped
+
+  # Frontend Web App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: texas-energy-frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - energy-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  energy-network:
+    driver: bridge

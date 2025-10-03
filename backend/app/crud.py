@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 
 from . import models, schemas
+from .cache import cache_result
 
 
 def get_provider_by_name(db: Session, name: str) -> Optional[models.Provider]:
@@ -27,10 +28,12 @@ def create_provider(db: Session, provider: schemas.ProviderCreate) -> models.Pro
     return db_provider
 
 
+@cache_result(ttl=1800, key_prefix="providers")
 def get_providers(db: Session, skip: int = 0, limit: int = 100) -> List[models.Provider]:
     return db.execute(select(models.Provider).offset(skip).limit(limit)).scalars().all()
 
 
+@cache_result(ttl=3600, key_prefix="plans")
 def get_plans(
     db: Session,
     provider: Optional[str] = None,
