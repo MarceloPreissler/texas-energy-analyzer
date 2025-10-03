@@ -48,6 +48,7 @@ const PlanComparison: React.FC<{ plans: Plan[] }> = ({ plans }) => {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: true,
     plugins: {
       legend: {
         position: 'top' as const,
@@ -64,14 +65,28 @@ const PlanComparison: React.FC<{ plans: Plan[] }> = ({ plans }) => {
           display: true,
           text: '¢/kWh',
         },
+        grid: {
+          color: '#e0e0e0',
+        },
+      },
+      x: {
+        grid: {
+          color: '#f5f5f5',
+        },
       },
     },
+    layout: {
+      padding: 20,
+    },
+    backgroundColor: '#ffffff',
   };
 
   return (
-    <div style={{ marginTop: '2rem', padding: '1rem', border: '1px solid #ddd' }}>
+    <div style={{ marginTop: '2rem', padding: '1rem', border: '1px solid #ddd', background: '#fff', borderRadius: '10px' }}>
       <h2>Plan Comparison</h2>
-      <Bar data={chartData} options={options} />
+      <div style={{ background: '#ffffff', padding: '20px', borderRadius: '8px' }}>
+        <Bar data={chartData} options={options} />
+      </div>
       <div style={{ marginTop: '1rem' }}>
         <h3>Details</h3>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>

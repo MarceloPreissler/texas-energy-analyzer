@@ -42,13 +42,28 @@ def read_plan(plan_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/scrape", response_model=dict[str, int])
-def scrape_data(db: Session = Depends(get_db)):
+def scrape_data(
+    source: str = Query("legacy", description="Scrape source: 'legacy' or 'powertochoose'"),
+    db: Session = Depends(get_db)
+):
     """
-    Trigger a scrape of all providers and update the database.  This endpoint
-    returns the number of plans processed.  It should be protected in
-    production (e.g., via API key or internal access only).
+    Trigger a scrape of electricity plans and update the database.
+
+    Sources:
+    - legacy: Original scrapers (comparison sites)
+    - powertochoose: Live PowerToChoose.org data (recommended)
+
+    Returns the number of plans processed. Rate limited to prevent abuse.
     """
-    plans = scraper.scrape_all()
+    from ..scraping import powertochoose_scraper
+
+    if source == "powertochoose":
+        print("[API] Using live PowerToChoose scraper...")
+        plans = powertochoose_scraper.scrape_powertochoose_all_texas()
+    else:
+        print("[API] Using legacy scrapers...")
+        plans = scraper.scrape_all()
+
     created_or_updated = 0
     # Insert provider and plan entries
     for plan in plans:
@@ -59,4 +74,9 @@ def scrape_data(db: Session = Depends(get_db)):
         plan_create = schemas.PlanCreate(provider_id=provider.id, **plan)
         crud.create_or_update_plan(db, provider.id, plan_create)
         created_or_updated += 1
-    return {"plans_processed": created_or_updated}
+
+    return {
+        "plans_processed": created_or_updated,
+        "source": source,
+        "timestamp": plan["last_updated"].isoformat() if plans else None
+    }
