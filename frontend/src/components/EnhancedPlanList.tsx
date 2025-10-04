@@ -23,11 +23,20 @@ interface Provider {
 }
 
 const EnhancedPlanList: React.FC = () => {
+  // Filter state (temporary, not applied until search)
+  const [tempProviderFilter, setTempProviderFilter] = useState<string>('');
+  const [tempPlanTypeFilter, setTempPlanTypeFilter] = useState<string>('');
+  const [tempContractFilter, setTempContractFilter] = useState<string>('');
+
+  // Applied filters (used for API query)
   const [providerFilter, setProviderFilter] = useState<string | undefined>(undefined);
   const [planTypeFilter, setPlanTypeFilter] = useState<string | undefined>(undefined);
   const [contractFilter, setContractFilter] = useState<number | undefined>(undefined);
+
   const [selectedPlans, setSelectedPlans] = useState<Plan[]>([]);
   const [usage, setUsage] = useState<number>(1146); // Texas average
+  const [baseFee, setBaseFee] = useState<number>(9.95); // Default base fee
+  const [useCustomBaseFee, setUseCustomBaseFee] = useState<boolean>(false);
 
   const { data: providers } = useQuery({
     queryKey: ['providers'],
@@ -48,7 +57,22 @@ const EnhancedPlanList: React.FC = () => {
 
   const calculateMonthlyCost = (rate: number | null | undefined): number => {
     if (!rate) return 0;
-    return (usage * rate / 100) + 9.95; // Base charge estimate
+    return (usage * rate / 100) + (useCustomBaseFee ? baseFee : 9.95);
+  };
+
+  const handleSearch = () => {
+    setProviderFilter(tempProviderFilter || undefined);
+    setPlanTypeFilter(tempPlanTypeFilter || undefined);
+    setContractFilter(tempContractFilter ? Number(tempContractFilter) : undefined);
+  };
+
+  const handleReset = () => {
+    setTempProviderFilter('');
+    setTempPlanTypeFilter('');
+    setTempContractFilter('');
+    setProviderFilter(undefined);
+    setPlanTypeFilter(undefined);
+    setContractFilter(undefined);
   };
 
   const handleSelect = (plan: Plan) => {
@@ -185,8 +209,8 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
           <div className="filter-group">
             <label>Provider:</label>
             <select
-              value={providerFilter ?? ''}
-              onChange={(e) => setProviderFilter(e.target.value || undefined)}
+              value={tempProviderFilter}
+              onChange={(e) => setTempProviderFilter(e.target.value)}
             >
               <option value="">All Providers</option>
               {providers?.map((provider) => (
@@ -197,8 +221,8 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
           <div className="filter-group">
             <label>Plan Type:</label>
             <select
-              value={planTypeFilter ?? ''}
-              onChange={(e) => setPlanTypeFilter(e.target.value || undefined)}
+              value={tempPlanTypeFilter}
+              onChange={(e) => setTempPlanTypeFilter(e.target.value)}
             >
               <option value="">All Types</option>
               <option value="Fixed">Fixed</option>
@@ -211,11 +235,45 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
             <label>Contract Term (months):</label>
             <input
               type="number"
-              value={contractFilter ?? ''}
-              onChange={(e) => setContractFilter(e.target.value ? Number(e.target.value) : undefined)}
+              value={tempContractFilter}
+              onChange={(e) => setTempContractFilter(e.target.value)}
               placeholder="e.g. 12"
             />
           </div>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+          <button
+            onClick={handleSearch}
+            style={{
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              flex: 1
+            }}
+          >
+            🔍 Search Plans
+          </button>
+          <button
+            onClick={handleReset}
+            style={{
+              backgroundColor: '#f44336',
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              flex: 1
+            }}
+          >
+            🔄 Reset Filters
+          </button>
         </div>
       </div>
 
@@ -287,7 +345,7 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
           </table>
         </div>
         <p style={{ marginTop: '10px', fontSize: '0.85em', color: '#666' }}>
-          *Based on usage of {usage} kWh/month. Includes estimated $9.95 base charge.
+          *Based on usage of {usage} kWh/month. Includes {useCustomBaseFee ? `$${baseFee.toFixed(2)}` : '$9.95 (estimated)'} base charge.
         </p>
       </div>
 
@@ -307,8 +365,31 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
             max="5000"
           />
         </div>
+        <div className="input-group" style={{ marginTop: '15px' }}>
+          <label>Base Fee Calculation</label>
+          <select
+            value={useCustomBaseFee ? 'custom' : 'estimated'}
+            onChange={(e) => setUseCustomBaseFee(e.target.value === 'custom')}
+          >
+            <option value="estimated">Estimated ($9.95/month)</option>
+            <option value="custom">Custom Base Fee</option>
+          </select>
+        </div>
+        {useCustomBaseFee && (
+          <div className="input-group" style={{ marginTop: '15px' }}>
+            <label>Custom Base Fee ($/month)</label>
+            <input
+              type="number"
+              value={baseFee}
+              onChange={(e) => setBaseFee(Number(e.target.value))}
+              min="0"
+              max="50"
+              step="0.01"
+            />
+          </div>
+        )}
         <p style={{ fontSize: '0.85em', color: '#666', marginTop: '10px' }}>
-          Texas residential average: 1,146 kWh/month. Adjust to see personalized estimates.
+          Texas residential average: 1,146 kWh/month. Base fee: Most plans charge $5-$15/month in fixed charges.
         </p>
       </div>
 
