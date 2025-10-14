@@ -1,0 +1,9 @@
+2025-10-10 19:46:40 | INFO     | root | Logging system initialized
+2025-10-10 19:46:40 | INFO     | root | Log files location: C:\Users\marce\texas-energy-analyzer\backend\logs
+2025-10-10 19:46:40 | INFO     | app.main | Application starting up...
+2025-10-10 19:46:40 | INFO     | app.main | Starting background scheduler...
+2025-10-10 19:46:40 | INFO     | apscheduler.scheduler | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-10 19:46:40 | INFO     | apscheduler.scheduler | Added job "PowerToChoose Daily Scrape" to job store "default"
+2025-10-10 19:46:40 | INFO     | apscheduler.scheduler | Scheduler started
+2025-10-10 19:46:40 | INFO     | app.scheduler | [Scheduler] Background scheduler started. Next run: 2:00 AM
+2025-10-11 13:09:50 | WARNING  | apscheduler.executors.default | Run time of job "PowerToChoose Daily Scrape (trigger: cron[hour='2', minute='0'], next run at: 2025-10-11 02:00:00 CDT)" was missed by 11:09:50.287318

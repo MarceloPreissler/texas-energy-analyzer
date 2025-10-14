@@ -63,13 +63,10 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# CORS - restrict in production
-allowed_origins = [
-    "http://localhost:5173",  # Vite dev server
-    "http://localhost:3000",  # Alternative
-    "http://127.0.0.1:5173",
-    # Add your production domain here
-]
+# CORS - read from environment variable or use defaults
+import os
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000")
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
 
 app.add_middleware(
     CORSMiddleware,
@@ -79,10 +76,10 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization"],
 )
 
-# Prevent host header attacks
+# Prevent host header attacks - allow Railway domains
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["localhost", "127.0.0.1", "*.local"]
+    allowed_hosts=["localhost", "127.0.0.1", "*.local", "*.up.railway.app", "*.vercel.app"]
 )
 
 # Include routers
