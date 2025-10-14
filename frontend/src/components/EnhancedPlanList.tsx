@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { fetchPlans, fetchProviders } from '../services/api';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetchPlans, fetchProviders, triggerScrape } from '../services/api';
 import PlanComparison from './PlanComparison';
+import PriceAnalytics from './PriceAnalytics';
 
 interface Plan {
   id: number;
@@ -23,20 +24,27 @@ interface Provider {
 }
 
 const EnhancedPlanList: React.FC = () => {
+  const queryClient = useQueryClient();
+
   // Filter state (temporary, not applied until search)
   const [tempProviderFilter, setTempProviderFilter] = useState<string>('');
   const [tempPlanTypeFilter, setTempPlanTypeFilter] = useState<string>('');
+  const [tempServiceTypeFilter, setTempServiceTypeFilter] = useState<string>('Residential');
+  const [tempZipCodeFilter, setTempZipCodeFilter] = useState<string>('');
   const [tempContractFilter, setTempContractFilter] = useState<string>('');
 
   // Applied filters (used for API query)
   const [providerFilter, setProviderFilter] = useState<string | undefined>(undefined);
   const [planTypeFilter, setPlanTypeFilter] = useState<string | undefined>(undefined);
+  const [serviceTypeFilter, setServiceTypeFilter] = useState<string | undefined>('Residential');
+  const [zipCodeFilter, setZipCodeFilter] = useState<string | undefined>(undefined);
   const [contractFilter, setContractFilter] = useState<number | undefined>(undefined);
 
   const [selectedPlans, setSelectedPlans] = useState<Plan[]>([]);
-  const [usage, setUsage] = useState<number>(1146); // Texas average
+  const [usage, setUsage] = useState<number>(1000); // Common usage tier for rate comparison
   const [baseFee, setBaseFee] = useState<number>(9.95); // Default base fee
   const [useCustomBaseFee, setUseCustomBaseFee] = useState<boolean>(false);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
   const { data: providers } = useQuery({
     queryKey: ['providers'],
@@ -44,9 +52,26 @@ const EnhancedPlanList: React.FC = () => {
   });
 
   const { data: plans, isLoading } = useQuery({
-    queryKey: ['plans', providerFilter, planTypeFilter, contractFilter],
-    queryFn: () => fetchPlans(providerFilter, planTypeFilter, contractFilter),
+    queryKey: ['plans', providerFilter, planTypeFilter, serviceTypeFilter, zipCodeFilter, contractFilter],
+    queryFn: () => fetchPlans(providerFilter, planTypeFilter, serviceTypeFilter, zipCodeFilter, contractFilter),
+    enabled: true, // Ensure query runs on mount
   });
+
+  const handleRefreshData = async () => {
+    setIsRefreshing(true);
+    try {
+      await triggerScrape(serviceTypeFilter || 'Residential', zipCodeFilter);
+      // Invalidate and refetch all queries
+      queryClient.invalidateQueries({ queryKey: ['plans'] });
+      queryClient.invalidateQueries({ queryKey: ['providers'] });
+      alert('Data refreshed successfully!');
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      alert('Failed to refresh data. Check console for details.');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const getRateClass = (rate: number | null | undefined): string => {
     if (!rate) return '';
@@ -63,15 +88,21 @@ const EnhancedPlanList: React.FC = () => {
   const handleSearch = () => {
     setProviderFilter(tempProviderFilter || undefined);
     setPlanTypeFilter(tempPlanTypeFilter || undefined);
+    setServiceTypeFilter(tempServiceTypeFilter || undefined);
+    setZipCodeFilter(tempZipCodeFilter || undefined);
     setContractFilter(tempContractFilter ? Number(tempContractFilter) : undefined);
   };
 
   const handleReset = () => {
     setTempProviderFilter('');
     setTempPlanTypeFilter('');
+    setTempServiceTypeFilter('Residential');
+    setTempZipCodeFilter('');
     setTempContractFilter('');
     setProviderFilter(undefined);
     setPlanTypeFilter(undefined);
+    setServiceTypeFilter('Residential');
+    setZipCodeFilter(undefined);
     setContractFilter(undefined);
   };
 
@@ -132,8 +163,24 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
     return <div className="card"><div className="loading">Loading plans...</div></div>;
   }
 
+  // Check if no results and suggest alternatives
+  const noResultsMessage = plans && plans.length === 0 && (providerFilter || planTypeFilter || zipCodeFilter || contractFilter) ? (
+    <div className="card" style={{ backgroundColor: '#fff3cd', borderLeft: '4px solid #ffc107' }}>
+      <h3>⚠️ No Plans Found</h3>
+      <p>No plans match your current filters. Try these options:</p>
+      <ul style={{ marginTop: '10px', marginLeft: '20px' }}>
+        {zipCodeFilter && <li><strong>Remove zip code filter</strong> - Most plans in the database don't have zip codes assigned yet</li>}
+        {serviceTypeFilter === 'Commercial' && <li><strong>Check filters</strong> - Commercial plans available. Try adjusting contract term or plan type filters.</li>}
+        {(providerFilter || planTypeFilter || contractFilter) && <li><strong>Click "🔄 Reset Filters"</strong> to see all available plans</li>}
+        <li><strong>Click "🔄 Refresh Data"</strong> to scrape fresh plans from multiple sources</li>
+      </ul>
+    </div>
+  ) : null;
+
   return (
     <>
+      {noResultsMessage}
+
       <div className="dashboard">
         {summaryStats && (
           <>
@@ -207,6 +254,26 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
         <h2 className="card-title">🔍 Filter Plans</h2>
         <div className="filter-controls">
           <div className="filter-group">
+            <label>Service Type:</label>
+            <select
+              value={tempServiceTypeFilter}
+              onChange={(e) => setTempServiceTypeFilter(e.target.value)}
+            >
+              <option value="Residential">🏠 Residential</option>
+              <option value="Commercial">🏢 Commercial</option>
+            </select>
+          </div>
+          <div className="filter-group">
+            <label>Zip Code (optional):</label>
+            <input
+              type="text"
+              value={tempZipCodeFilter}
+              onChange={(e) => setTempZipCodeFilter(e.target.value)}
+              placeholder="e.g. 75001"
+              maxLength={5}
+            />
+          </div>
+          <div className="filter-group">
             <label>Provider:</label>
             <select
               value={tempProviderFilter}
@@ -274,7 +341,28 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
           >
             🔄 Reset Filters
           </button>
+          <button
+            onClick={handleRefreshData}
+            disabled={isRefreshing}
+            style={{
+              backgroundColor: isRefreshing ? '#999' : '#2196F3',
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              cursor: isRefreshing ? 'not-allowed' : 'pointer',
+              flex: 1
+            }}
+          >
+            {isRefreshing ? '⏳ Refreshing...' : '🔄 Refresh Data'}
+          </button>
         </div>
+        <p style={{ marginTop: '10px', fontSize: '0.85em', color: '#666' }}>
+          Tip: Use "Refresh Data" to scrape live {serviceTypeFilter || 'Residential'} plans from multiple sources
+          {zipCodeFilter && ` for zip code ${zipCodeFilter}`}
+        </p>
       </div>
 
       <div className="card">
@@ -426,6 +514,10 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
             </p>
           </div>
         </div>
+      )}
+
+      {plans && plans.length > 0 && providers && (
+        <PriceAnalytics plans={plans} providers={providers} />
       )}
     </>
   );

@@ -1,0 +1,590 @@
+<!DOCTYPE html><html data-wf-page="652d6cc20811d0c298c4c9ba" data-wf-site="5b92c215aeef7719f1cbf7ce" lang="en" class=" w-mod-js w-mod-ix"><head><style>.wf-force-outline-none[tabindex="-1"]:focus{outline:none;}</style><link rel="preload" href="/fonts/poppins_normal.woff2" as="font" crossorigin=""> <link rel="preload" href="/fonts/poppins_600.woff2" as="font" crossorigin=""> <link rel="preload" href="/fonts/poppins_500.woff2" as="font" crossorigin=""> <link rel="preload" href="/fonts/poppins_700.woff2" as="font" crossorigin=""><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><link href="/css/normalize.95ec3c3e4d1a4cccab1d3e80c590e994.css" rel="stylesheet" type="text/css"><link href="/css/components.95ec3c3e4d1a4cccab1d3e80c590e994.css" rel="stylesheet" type="text/css"><link href="/css/energybot.95ec3c3e4d1a4cccab1d3e80c590e994.css" rel="stylesheet" type="text/css"><script async="" src="https://scripts.clarity.ms/0.8.33/clarity.js"></script><script async="" src="https://www.clarity.ms/tag/uet/26336489?insights=1"></script><script src="//bat.bing.com/bat.js" async=""></script><script src="https://connect.facebook.net/signals/config/157865895065747?v=2.9.235&amp;r=stable&amp;domain=www.energybot.com&amp;hme=17acfb61045d3371dfae695fa3b5ad6946c5e7b0f340bb5dc12b59e9cfc87854&amp;ex_m=88%2C149%2C129%2C19%2C123%2C62%2C42%2C124%2C69%2C61%2C136%2C77%2C13%2C87%2C27%2C118%2C109%2C67%2C70%2C117%2C133%2C96%2C138%2C7%2C3%2C4%2C6%2C5%2C2%2C78%2C86%2C139%2C215%2C161%2C56%2C220%2C217%2C218%2C49%2C176%2C26%2C66%2C224%2C223%2C164%2C29%2C55%2C8%2C58%2C82%2C83%2C84%2C89%2C113%2C28%2C25%2C116%2C112%2C111%2C130%2C68%2C132%2C131%2C44%2C114%2C54%2C106%2C12%2C135%2C39%2C205%2C207%2C171%2C22%2C23%2C24%2C16%2C17%2C38%2C34%2C36%2C35%2C73%2C79%2C81%2C94%2C122%2C125%2C40%2C95%2C20%2C18%2C100%2C63%2C32%2C127%2C126%2C128%2C119%2C21%2C31%2C53%2C93%2C134%2C64%2C15%2C30%2C186%2C157%2C266%2C203%2C147%2C189%2C182%2C91%2C115%2C72%2C104%2C48%2C41%2C102%2C103%2C108%2C52%2C14%2C110%2C101%2C59%2C43%2C97%2C47%2C50%2C46%2C85%2C137%2C0%2C107%2C11%2C105%2C9%2C1%2C51%2C80%2C57%2C60%2C99%2C76%2C75%2C45%2C120%2C74%2C71%2C65%2C98%2C90%2C37%2C121%2C33%2C92%2C10%2C140" async=""></script><script async="" src="https://connect.facebook.net/en_US/fbevents.js"></script><script type="text/javascript" async="" src="https://app.posthog.com/static/array.js"></script><script type="text/javascript">!function(o,c){var n=c.documentElement,t=" w-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}(window,document);</script><link href="/images/favicon.png" rel="shortcut icon" type="image/x-icon"><link href="/images/webclip.png" rel="apple-touch-icon"><style> 
+select{
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  }
+  .button-with-icon{
+  pointer-events: none;
+  }
+  input[type="number"]::-webkit-outer-spin-button, 
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+</style>
+<link href="/css/ebot-ext.css" rel="stylesheet">
+<script defer="">
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js";                                                                                     
+(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('phc_4zwrWWaQxgDE8uvpMXqT5dw9OG254aQCtB9sxLD5Q0q',{api_host:'https://app.posthog.com', session_recording: { maskAllInputs: false }})
+</script>
+<script defer="">
+  document.addEventListener('eb.ui.event', function(e) {
+    if (window.posthog) {
+      try {
+        if (e.detail.action && e.detail.action === 'AssignedId') {
+          window.posthog.identify(e.detail.data.id);
+          if (e.detail.data.created_now === true) {
+            window.posthog.capture('Assigned ID');
+          }
+        } else if (e.detail) {
+           window.posthog.capture(e.detail.action, e.detail.data);
+        }
+      } catch (e) {
+        console.log(e);
+      }      
+    }
+  });
+</script>
+<script defer="" src="/eb-webcomponents/v1/eb-webcomponents.bundle.95ec3c3e4d1a4cccab1d3e80c590e994.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Corporation",
+  "name": "EnergyBot",
+  "url": "https://www.energybot.com",
+  "logo": "https://www.energybot.com/images/EB-Logo-Black_1.svg",
+  "sameAs": [
+    "https://www.facebook.com/teamenergybot",
+    "https://twitter.com/teamenergybot",
+    "https://www.instagram.com/energybot.team/",
+    "https://www.linkedin.com/company/energybot/"
+  ]
+}
+</script>
+<!--  Google tag (gtag.js)  -->
+<script defer="" src="https://www.googletagmanager.com/gtag/js?id=G-BF2217XHH6"></script>
+<script defer="">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-BF2217XHH6');
+</script>
+<!--  Meta Pixel Code  -->
+<script defer="">
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '157865895065747');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=157865895065747&ev=PageView&noscript=1"></noscript>
+<!--  End Meta Pixel Code  -->
+<script defer="">(function(w,d,t,r,u){var f,n,i;w[u]=w[u]||[],f=function(){var o={ti:"26336489", enableAutoSpaTracking: true};o.q=w[u],w[u]=new UET(o),w[u].push("pageLoad")},n=d.createElement(t),n.src=r,n.async=1,n.onload=n.onreadystatechange=function(){var s=this.readyState;s&&s!=="loaded"&&s!=="complete"||(f(),n.onload=n.onreadystatechange=null)},i=d.getElementsByTagName(t)[0],i.parentNode.insertBefore(n,i)})(window,document,"script","//bat.bing.com/bat.js","uetq");</script>
+
+<style>
+.button-div { -webkit-mask-image: -webkit-radial-gradient(white, black); }
+</style> 
+<title>Business &amp; Commerial Electric Rates - EnergyBot</title>
+<meta content="See today's Texas business electricity rates and plans. Compare electricity providers and find the best commercial electricity plan for your business in minutes." name="description">
+<meta content="Business &amp; Commerial Electric Rates - EnergyBot" property="og:title">
+<meta content="Get the best commercial electricity rate for your Texas business. Get personalized plans online or chat with an energy advisor. " property="og:description">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="EnergyBot">
+<meta content="https://uploads-ssl.webflow.com/5b92c215aeef7719f1cbf7ce/6182d4d33bde6305300e2d5b_eb-og-thumbnail.png" property="og:image">
+<meta property="og:updated_time" content="2025-10-10T15:05:36+00:00">
+<meta content="Business &amp; Commerial Electric Rates - EnergyBot" property="twitter:title">
+<meta content="Get the best commercial electricity rate for your Texas business. Get personalized plans online or chat with an energy advisor. " property="twitter:description">
+<meta content="https://uploads-ssl.webflow.com/5b92c215aeef7719f1cbf7ce/6182d4d33bde6305300e2d5b_eb-og-thumbnail.png" property="twitter:image">
+<link rel="canonical" href="https://www.energybot.com/electricity-rates/texas/business-commercial-electricity.html">
+<link rel="preconnect" href="https://www.googletagmanager.com">
+<link rel="preconnect" href="https://www.google-analytics.com">
+<link rel="preconnect" href="https://connect.facebook.net">
+
+<script type="application/ld+json"> { "@context": "https://schema.org/", "@type": "BreadcrumbList", "itemListElement": [ { "@type": "ListItem", "position": 1, "name": "EnergyBot", "item": "https://www.energybot.com" }, { "@type": "ListItem", "position": 2, "name": "Electricity Rates", "item": "https://www.energybot.com/electricity-rates/" }, { "@type": "ListItem", "position": 3, "name": "Texas Electricity Rates", "item": "https://www.energybot.com/electricity-rates/texas/" }, { "@type": "ListItem", "position": 4, "name": "Business Electricity Rates", "item": "https://www.energybot.com/electricity-rates/texas/business-commercial-electricity/" } ] }
+</script> <script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{ "@type": "Question", "name": "Who is the cheapest business electricity supplier in Texas?", "acceptedAnswer": { "@type": "Answer", "text": "It depends on your location and usage, but Constellation Energy, Direct Energy, and Gexa Energy often have some of the lowest rates in Texas." } },{ "@type": "Question", "name": "What are the average commercial electric rates in Texas?", "acceptedAnswer": { "@type": "Answer", "text": "As of May 2025, the average commercial rate in Texas is 8.78 ¢/kWh, but rates can vary depending on your business’s specific needs and usage." } },{ "@type": "Question", "name": "Who has the cheapest commercial electricity rates in Texas?", "acceptedAnswer": { "@type": "Answer", "text": "Rates fluctuate often, but currently, you can find deals as low as 8.23 ¢/kWh for a 6-month term from various providers." } },{ "@type": "Question", "name": "What is a retail electric provider?", "acceptedAnswer": { "@type": "Answer", "text": "A retail electric provider (REP) is a company that supplies electricity to consumers in Texas. They purchase electricity from generators and resell it to customers, offering various plans and rates." } }]
+}
+</script>
+<script src="/js/lazysizes.min.js" async=""></script>
+
+<script charset="utf-8" src="/eb-webcomponents/v1/vendors~eb-apply-referral-eb-apply-referral~eb-historical-trend-chart-v2-eb-historical-trend-chart-v~a847fc89-chunk.js?t=1759771116281"></script><script charset="utf-8" src="/eb-webcomponents/v1/vendors~utm-tracking-component-utm-tracking-component-chunk.js?t=1759771116281"></script><script charset="utf-8" src="/eb-webcomponents/v1/utm-tracking-component-utm-tracking-component-chunk.js?t=1759771116281"></script><script charset="utf-8" src="/eb-webcomponents/v1/vendors~bill-calculator-bill-calculator~eb-apply-referral-eb-apply-referral~eb-average-rate-by-metro~fd80a9b5-chunk.js?t=1759771116281"></script><script charset="utf-8" src="/eb-webcomponents/v1/vendors~eb-apply-referral-eb-apply-referral~eb-contact-us-form-eb-contact-us-form~eb-esid-search-eb-~8e173627-chunk.js?t=1759771116281"></script><script charset="utf-8" src="/eb-webcomponents/v1/eb-zip-code-input-eb-zip-code-input-chunk.js?t=1759771116281"></script><script src="https://bat.bing.com/p/action/26336489.js" type="text/javascript" async="" data-ueto="ueto_a9f86a4506"></script><script type="text/javascript" async="" src="https://googleads.g.doubleclick.net/pagead/viewthroughconversion/818683116/?random=1760183603767&amp;cv=11&amp;fst=1760183603767&amp;bg=ffffff&amp;guid=ON&amp;async=1&amp;en=gtag.config&amp;gtm=45je5a80v886871815za200zd886871815xec&amp;gcd=13l3l3l3l1l1&amp;dma=0&amp;tag_exp=101509157~103116026~103200004~103233427~104527907~104528501~104684208~104684211~104948813~105322302~105391253~115480710~115616985~115834636~115834638~115868792~115868794&amp;u_w=1920&amp;u_h=1080&amp;url=https%3A%2F%2Fwww.energybot.com%2Felectricity-rates%2Ftexas%2Fbusiness-commercial-electricity.html&amp;frm=0&amp;tiba=Business%20%26%20Commerial%20Electric%20Rates%20-%20EnergyBot&amp;hn=www.googleadservices.com&amp;npa=0&amp;pscdl=noapi&amp;auid=1431349216.1760183604&amp;uaa=x86&amp;uab=64&amp;uafvl=Not%253DA%253FBrand%3B24.0.0.0%7CChromium%3B140.0.7339.16&amp;uamb=0&amp;uam=&amp;uap=Windows&amp;uapv=10.0&amp;uaw=0&amp;data=event%3Dgtag.config&amp;rfmt=3&amp;fmt=4"></script><link rel="stylesheet" type="text/css" href="https://seal-blue.bbb.org/legacy.min.css"></head><body><div><style>
+  .ebw-top-banner {
+    color: white;
+    background-color: var(--primary);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    display: flex;
+    min-height: 48px;
+    padding: 10px;
+    overflow-wrap: break-word;
+  }
+
+  .ebw-top-banner p {
+    margin-bottom: 0px;
+  }
+
+</style>
+</div><div id="main-nav" data-animation="default" data-collapse="medium" data-duration="400" data-easing="ease" data-easing2="ease" role="banner" class="main-mega-menu w-nav"><section class="mega-menu-container"><a href="https://www.energybot.com" class="eb-brand w-nav-brand"><img src="/images/logo-new-1.svg" alt="EnergyBot logo" class="eb-logo"></a><nav role="navigation" class="nav-menu-container w-nav-menu"><div class="nav-menu-container-wrapper"><div class="mega-menu-list-button-wrapper"><ul role="list" class="mega-menu-link-list w-list-unstyled"><li class="eb-mega-menu-list-item"><div data-hover="false" data-delay="0" data-w-id="28904c33-8178-3a20-f9d2-bd08d46de153" class="mega-menu-link-list-wrapper w-dropdown"><div class="mega-menu-link-list-toggle w-dropdown-toggle" id="w-dropdown-toggle-0" aria-controls="w-dropdown-list-0" aria-haspopup="menu" aria-expanded="false" role="button" tabindex="0"><div>Electricity Rates</div><div class="link-list__dropdown-icon w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12">
+                          <g class="nc-icon-wrapper" fill="currentColor">
+                            <path d="M10.293,3.293,6,7.586,1.707,3.293A1,1,0,0,0,.293,4.707l5,5a1,1,0,0,0,1.414,0l5-5a1,1,0,1,0-1.414-1.414Z" fill="currentColor"></path>
+                          </g>
+                        </svg></div></div><nav class="mega-menu-dropdown w-dropdown-list" id="w-dropdown-list-0" aria-labelledby="w-dropdown-toggle-0"><div class="mega-menu-dropdown-grid"><div id="w-node-_28904c33-8178-3a20-f9d2-bd08d46de15a-d46de14a" class="mega-menu-dropdown-container"><div class="mega-menu-dropdown-left"><div id="w-node-_28904c33-8178-3a20-f9d2-bd08d46de15c-d46de14a" class="eb-mega-menu-dropdown-column"><div class="eb-mega-meny-dropdown-header"><img src="/images/location-icon-outline_1.svg" loading="lazy" alt="" class="eb-icon-24"><div class="eb-mega-menu-header">States</div></div><div class="eb-mega-menu-dropdown-item"><a href="/electricity-rates/texas/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Texas</a><a href="/electricity-rates/pennsylvania/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Pennsylvania</a><a href="/electricity-rates/ohio/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Ohio</a><a href="/electricity-rates/illinois/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Illinois</a><a href="/electricity-rates/new-york/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">New York</a><a href="/electricity-rates/new-jersey/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">New Jersey</a><a href="/electricity-rates/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">See All &gt;</a></div></div><div id="w-node-_28904c33-8178-3a20-f9d2-bd08d46de170-d46de14a" class="eb-mega-menu-dropdown-column"><div class="eb-mega-meny-dropdown-header"><img src="/images/baseline-location_on-24px.svg" loading="lazy" alt="" class="eb-icon-24"><div class="eb-mega-menu-header">Cities</div></div><div class="eb-mega-menu-dropdown-item"><a href="/electricity-rates/texas/houston/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Houston</a><a href="/electricity-rates/texas/dallas/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Dallas</a><a href="/electricity-rates/texas/fort-worth/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Fort Worth</a><a href="/electricity-rates/texas/arlington/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Arlington</a><a href="/electricity-rates/texas/frisco/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Frisco</a><a href="/electricity-rates/texas/plano/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Plano</a><a href="/electricity-rates/texas/corpus-christi/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Corpus Christi</a><a href="/electricity-rates/texas/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">See All &gt;</a></div></div><div id="w-node-_28904c33-8178-3a20-f9d2-bd08d46de186-d46de14a" class="eb-mega-menu-dropdown-column"><div class="eb-mega-meny-dropdown-header"><img src="/images/New-Lightning-Bolt-Black.svg" loading="lazy" alt="" class="eb-icon-24"><div class="eb-mega-menu-header">Providers</div></div><div class="eb-mega-menu-dropdown-item"><a href="/providers/constellation-energy/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Constellation Energy</a><a href="/providers/gexa-energy/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Gexa Energy</a><a href="/providers/just-energy/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Just Energy</a><a href="/providers/pulse-power/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Pulse Power</a><a href="/providers/reliant-energy/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Reliant Energy</a><a href="/providers/rhythm-energy/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Rhythm Energy</a><a href="/providers" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">See All &gt;</a></div></div></div><div class="mega-menu-dropdown-right"><div class="mega-menu-zip-code-container display-none"><div class="eb-mega-menu-header">How it works</div><div class="text-block-15">Enter your zip code to compare &nbsp;electricity rates and electric companies in your city.</div><div class="eb-html-zip-code w-embed"><eb-zip-code-input><style>#eb-zip-code-input-container{height:100%;width:100%;display:flex;align-items:center;justify-content:space-between}#eb-zip-code-input-field{width:100%;max-width:unset}#eb-zip-code-submit-button{white-space:nowrap}@media (max-width:767px){#eb-zip-code-submit-button{padding:14px 20px}}@media (min-width:768px){#eb-zip-code-submit-button{padding:18px 32px}}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}input[type=number]{-moz-appearance:textfield}</style><div id="eb-zip-code-input-container"><input type="tel" class="eb-text-field cta-field w-input" placeholder="Zip Code" id="eb-zip-code-input-field" maxlength="10" required=""> <a href="#" class="eb-button hero-button w-button" id="eb-zip-code-submit-button">Get Started</a></div></eb-zip-code-input></div></div><div class="eb-mega-menu-dropdown-column"><div class="eb-mega-meny-dropdown-header"><img src="/images/location-icon-outline_1.svg" loading="lazy" alt="" class="eb-icon-24"><div class="eb-mega-menu-header">Resources</div></div><div class="eb-mega-menu-dropdown-item direction-horizontal"><div><a href="/blog/energy-efficiency-blog.html" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Efficiency</a><a href="/blog/solar-blog.html" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Solar</a></div><div><a href="/blog/electricity-shopping-blog.html" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Electricity Shopping</a><a href="/blog/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">See All &gt;</a></div></div></div><div class="eb-mega-menu-bottom-links display-none"><a href="/about/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">About Us</a></div></div></div><div id="w-node-_28904c33-8178-3a20-f9d2-bd08d46de1a4-d46de14a" class="mega-menu-content-block-overlay"></div></div></nav></div></li><li class="eb-mega-menu-list-item"><a href="/electricity-rates/texas/business-commercial-electricity/" class="mega-menu-link">Business</a></li><li class="eb-mega-menu-list-item solar-hide"><div data-hover="false" data-delay="0" data-w-id="28904c33-8178-3a20-f9d2-bd08d46de1a9" class="mega-menu-link-list-wrapper w-dropdown"><div class="mega-menu-link-list-toggle w-dropdown-toggle" id="w-dropdown-toggle-1" aria-controls="w-dropdown-list-1" aria-haspopup="menu" aria-expanded="false" role="button" tabindex="0"><div>Solar</div><div class="link-list__dropdown-icon w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12">
+                          <g class="nc-icon-wrapper" fill="currentColor">
+                            <path d="M10.293,3.293,6,7.586,1.707,3.293A1,1,0,0,0,.293,4.707l5,5a1,1,0,0,0,1.414,0l5-5a1,1,0,1,0-1.414-1.414Z" fill="currentColor"></path>
+                          </g>
+                        </svg></div></div><nav class="mega-menu-dropdown w-dropdown-list" id="w-dropdown-list-1" aria-labelledby="w-dropdown-toggle-1"><div class="mega-menu-dropdown-grid"><div id="w-node-_28904c33-8178-3a20-f9d2-bd08d46de1b0-d46de14a" class="mega-menu-dropdown-container cc-mobile"><div class="mega-menu-dropdown-left"><div id="w-node-_28904c33-8178-3a20-f9d2-bd08d46de1b2-d46de14a" class="eb-mega-menu-dropdown-column"><div class="eb-mega-meny-dropdown-header"><img src="/images/sun_icon_outlined.svg" loading="lazy" alt="" class="eb-icon-24"><div class="eb-mega-menu-header">Solar Resources</div></div><div class="eb-mega-menu-dropdown-item"><a href="/solar-calculator.html" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Solar Calculator</a><a href="/incentives.html" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Solar Incentives</a><a href="/blog/solar-panel-cost.html" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Solar Panel Cost </a><a href="/blog/solar-panels-for-your-home.html" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Is Solar Right For You?</a></div><a href="/solar-panels/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">See all &gt;</a></div><div class="eb-mega-menu-dropdown-column"><div class="eb-mega-meny-dropdown-header"><img src="/images/location-icon-outline_1.svg" loading="lazy" alt="" class="eb-icon-24"><div class="eb-mega-menu-header">Shop by Location</div></div><div class="eb-mega-menu-dropdown-item"><a href="/solar-panels/arizona/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Arizona</a><a href="/solar-panels/california/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">California</a><a href="/solar-panels/florida/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Florida</a><a href="/solar-panels/texas/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Texas</a><a href="/solar-panels/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">See all &gt;</a></div></div></div><div class="mega-menu-dropdown-right"><div class="mega-menu-zip-code-container"><div class="eb-mega-menu-header">How it works</div><div class="text-block-15">Enter your zip code to compare &nbsp;electricity rates and electric companies in your city.</div><a href="/app.html#/zip-search?ftype=SOLAR_INTRO" class="eb-button hero-button mega-menu-solar-button w-button" tabindex="0">Shop Solar</a></div><div class="eb-mega-menu-bottom-links display-none"><a href="/about/" class="eb-text-link eb-mega-menu-dropdown-item no-padding" tabindex="0">About Us</a></div></div></div><div id="w-node-_28904c33-8178-3a20-f9d2-bd08d46de1cb-d46de14a" class="mega-menu-content-block-overlay"></div></div></nav></div></li><li class="eb-mega-menu-list-item mobile-only"><div data-hover="false" data-delay="0" data-w-id="af7f8249-56fc-9e36-cbd4-ef7b0abe55c5" class="mega-menu-link-list-wrapper w-dropdown"><div class="mega-menu-link-list-toggle w-dropdown-toggle" id="w-dropdown-toggle-2" aria-controls="w-dropdown-list-2" aria-haspopup="menu" aria-expanded="false" role="button" tabindex="0"><div>Resources</div><div class="link-list__dropdown-icon w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12">
+                          <g class="nc-icon-wrapper" fill="currentColor">
+                            <path d="M10.293,3.293,6,7.586,1.707,3.293A1,1,0,0,0,.293,4.707l5,5a1,1,0,0,0,1.414,0l5-5a1,1,0,1,0-1.414-1.414Z" fill="currentColor"></path>
+                          </g>
+                        </svg></div></div><nav class="mega-menu-dropdown w-dropdown-list" id="w-dropdown-list-2" aria-labelledby="w-dropdown-toggle-2"><div class="mega-menu-dropdown-grid"><div id="w-node-af7f8249-56fc-9e36-cbd4-ef7b0abe55cc-d46de14a" class="mega-menu-dropdown-container cc-mobile"><div class="mega-menu-dropdown-left"><div class="eb-mega-menu-dropdown-column"><div class="eb-mega-meny-dropdown-header"><img src="/images/location-icon-outline_1.svg" loading="lazy" alt="" class="eb-icon-24"><div class="eb-mega-menu-header">Resources</div></div><div class="eb-mega-menu-dropdown-item"><div><a href="/blog/energy-efficiency-blog.html" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Efficiency</a><a href="/blog/solar-blog.html" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Solar</a></div><div><a href="/blog/electricity-shopping-blog.html" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Electricity Shopping</a><a href="/blog/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">See All &gt;</a></div></div></div></div><div class="mega-menu-dropdown-right"><div class="mega-menu-zip-code-container"><div class="eb-h5-text">How it works</div><div class="text-block-15">Enter your zip code to compare &nbsp;electricity rates and electric companies in your city.</div><a href="/app.html#/zip-search?ftype=SOLAR_INTRO" class="eb-button hero-button mega-menu-solar-button w-button" tabindex="0">Shop Solar</a></div><div class="eb-mega-menu-dropdown-column"><div class="eb-mega-meny-dropdown-header"><img src="/images/location-icon-outline_1.svg" loading="lazy" alt="" class="eb-icon-24"><div class="eb-h5-text">Resources<br></div></div><div class="eb-mega-menu-dropdown-item direction-horizontal"><div><a href="/electricity-rates/texas/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Energy Efficiency</a><a href="/electricity-rates/pennsylvania/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Solar</a></div><div><a href="/electricity-rates/ohio/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">Electricity Shopping</a><a href="/electricity-rates-by-state.html" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">See All &gt;</a></div></div></div><div class="eb-mega-menu-bottom-links display-none"><a href="/blog/" class="eb-text-link eb-mega-menu-dropdown-item" tabindex="0">About Us</a><a href="/blog/" class="eb-text-link eb-mega-menu-dropdown-item no-padding" tabindex="0">Learn &gt;</a></div></div></div><div id="w-node-af7f8249-56fc-9e36-cbd4-ef7b0abe560b-d46de14a" class="mega-menu-content-block-overlay"></div></div></nav></div></li><li class="eb-mega-menu-list-item mobile-only"><a href="/about/" class="mega-menu-link">About Us</a></li><li class="eb-mega-menu-list-item mobile-only"><a href="/blog/" class="mega-menu-link">Learn</a></li><li class="eb-mega-menu-list-item mobile-only"><a href="/contact-us.html" class="mega-menu-link">Contact Us</a></li><li class="eb-mega-menu-list-item mobile-only"><a href="/app.html#/v2/auth/user-login?ftype=AUTH2" class="mega-menu-link">Log In</a></li></ul><div class="mega-menu-cta-wrapper"><div class="eb-mega-menu-bottom-links-container display-none"></div><div class="button-container"><a id="contact-us-button" href="/contact-us.html" class="eb-new-link-block icon-only-after-desktop mr-3 w-inline-block"><img src="/images/eb-phone_1.svg" alt="" class="eb-icon-24"><div class="eb-hide-text-landscape display-none">Contact </div></a><a id="log-in-button" href="/app.html#/v2/auth/user-login?ftype=AUTH2" class="eb-new-link-block icon-only-after-desktop mr-3 w-inline-block"><img src="/images/icon-login-outlined-black.svg" alt="" class="eb-icon-24"><div class="eb-hide-text-landscape">Log In</div></a><a id="top-nav-get-started-button" href="/app.html#/zip-search?ftype=DEFAULT" class="eb-button mega-menu-button w-button">Get Started</a></div></div></div></div></nav><div class="eb-menu-button w-nav-button" style="-webkit-user-select: text;" aria-label="menu" role="button" tabindex="0" aria-controls="w-nav-overlay-0" aria-haspopup="menu" aria-expanded="false"><div class="hamburger-div"><div class="eb-icon-line black-icon-line" data-ix="navbar-menu-icon-move" style="transition: all;"></div><div class="eb-icon-line black-icon-line" data-ix="hide-when-nav-opens" style="transition: all;"></div><div class="eb-icon-line black-icon-line" data-ix="nav-menu-line-move-2" style="transition: all;"></div></div></div></section><div class="w-nav-overlay" data-wf-ignore="" id="w-nav-overlay-0"></div></div><div><style>
+  .confine-to-parent {
+    max-width: 100%;
+  }
+
+  #zip-code-show-more span {
+    margin-right: 16px;
+  }
+
+  @media (max-width: 991px) {
+    :target {
+      top: -81px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .sm-flex-column {
+      flex-direction: column;
+    }
+
+    .zip-code-reviews-container {
+      min-width: unset !important;
+      width: 300px;
+      margin-top: 8px;
+      align-items: start;
+      justify-content: start;
+    }
+
+    .eb-interstitial-card-content {
+      align-items: flex-start !important;
+    }
+  }
+
+  .introduction-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    row-gap: 20px;
+  }
+
+  @media (min-width: 1440px) {
+    .introduction-container {
+      max-width: 1000px;
+    }
+  }
+
+  .eb-interstitial-card-content {
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .periwinkle {
+    background-color: rgba(67, 83, 255, 0.05);
+    border: 2px solid rgba(227, 228, 246, 1);
+  }
+
+  .flex-column {
+    flex-direction: column;
+  }
+
+  .disclaimer-text {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--blackish-50);
+  }
+
+  .eb-link-14px {
+    font-size: 14px;
+    line-height: 20px;
+    text-decoration: none;
+    transition: 0.2s;
+  }
+
+  .eb-link-14px:hover {
+    text-decoration: none;
+  }
+
+  .underline:hover {
+    text-decoration: underline;
+  }
+
+  .zip-code-reviews-container {
+    min-width: 348px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+</style>
+<div class="eb-hero-section" style="border-bottom: none">
+  <div class="eb-section-container">
+    <div class="eb-nav-guide">
+      <a href="/" class="eb-link-14px color-grey">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M8.33335 17.0827V12.0827H11.6667V17.0827H15.8334V10.416H18.3334L10 2.91602L1.66669 10.416H4.16669V17.0827H8.33335Z" fill="#909090"></path>
+        </svg>
+      </a>
+      <div class="eb-link-14px color-grey">&gt;</div>
+      <a href="/electricity-rates" class="eb-link-14px color-grey underline">Electricity Rates</a>
+      <div class="eb-link-14px color-grey">&gt;</div>
+      <a href="/electricity-rates/texas" class="eb-link-14px color-grey underline">Texas</a>
+      <div class="eb-link-14px color-grey">&gt;</div>
+      <div class="eb-link-14px color-grey" style="font-weight: 600">Business Commercial Electricity </div>
+    </div>
+  </div>
+  <div class="eb-section-container flex-column">
+    <div class="introduction-container">
+      <h1 id="eb-city-main-header" class="h1-no-margin">Compare Business Electricity Rates in Texas</h1>
+      <div class="eb-interstitial-card periwinkle">
+        <div class="eb-div-flex-h-ab-jl sm-flex-column eb-interstitial-card-content">
+          <div class="eb-subhead" style="flex-grow: 1; color: rgba(34, 34, 34, 0.8)">
+            Get the best commercial electricity rate for your Texas business. Get personalized plans online or chat with an energy advisor. 
+          </div>
+          <div class="zip-code-reviews-container">
+            <style>
+  #eb-zip-code-input-container-handlebars {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+
+  #eb-zip-code-input-field-handlebars {
+    width: 100%;
+    max-width: unset;
+  }
+
+
+  #eb-zip-code-submit-button-handlebars {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 767px) {
+    #eb-zip-code-submit-button-handlebars {
+      padding: 14px 20px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    #eb-zip-code-submit-button-handlebars {
+      padding: 18px 32px;
+    }
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+</style>
+
+<div id="eb-zip-code-input-container-handlebars">
+  <input type="tel" class="eb-text-field cta-field w-input" placeholder="Zip Code" id="eb-zip-code-input-field-handlebars" maxlength="10" required="">
+  <a href="#" class="eb-button hero-button w-button" id="eb-zip-code-submit-button-handlebars">
+    Get Started
+  </a>
+</div>
+
+<script>
+  const inputField = document.querySelector('#eb-zip-code-input-field-handlebars');
+  const submitButton = document.getElementById('eb-zip-code-submit-button-handlebars');
+  const zipParam = new URLSearchParams(window.location.search).get("zip_code");
+
+  const submitZip = async () => {
+    const zipInputElement = document.querySelector('#eb-zip-code-input-field-handlebars');
+    zipInputElement.setCustomValidity('');
+    const zipCode = cleanInput(zipInputElement.value);
+    if (isValidZipCode(zipCode) && zipInputElement.checkValidity()) {
+      const contractType = '' || null
+      let contractParam = ''
+      if (contractType === 'RESIDENTIAL' || contractType === 'BUSINESS') {
+        contractParam = `&contract_type=${contractType}`
+      }
+      window.location.href = `/app.html#/redirect?ftype=ZIP_CODE&zip_code=${zipCode}${contractParam}`;
+    } else {
+      zipInputElement.setCustomValidity('Please enter a valid 5-digit zip code.');
+      zipInputElement.reportValidity();
+    }
+  }
+
+  const cleanInput = (input) => {
+    let cleanedInput = input;
+    if (input && input.length > 5) {
+      cleanedInput = input.substr(0, 5);
+    }
+    return cleanedInput;
+  }
+
+  const isValidZipCode = (zip) => {
+    return /^[0-9]{5}?$/.test(zip);
+  }
+
+  if (zipParam) {
+    inputField.value = zipParam
+  }
+
+  inputField.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      submitZip()
+    }
+  })
+
+  submitButton.addEventListener('click', submitZip)
+</script>
+
+            <style>
+  .stars-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .stars-bg {
+    color: #F5A623;
+    opacity: 0.3;
+  }
+
+  .stars-fg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .stars {
+    color: #F5A623;
+    font-size: 20px;
+    position: relative;
+    display: inline-block;
+    gap: 8px;
+  }
+
+  .review-count {
+    color: #4353FF;
+    font-size: 16px;
+    text-decoration: underline;
+  }
+
+  .review-count .bold {
+    font-weight: bold;
+  }
+
+  .avatar-group {
+    display: flex;
+    margin-left: 10px;
+  }
+
+  .avatar {
+    border-radius: 50%;
+    border: 1px solid white;
+    margin-left: -8px;
+    object-fit: cover;
+    width: 24px;
+    height: 24px;
+  }
+
+  .mobile-star {
+    display: none;
+  }
+
+  @media screen and (max-width: 600px) {
+    .stars-container {
+      gap: 2px;
+    }
+
+    .mobile-star {
+      display: block;
+    }
+
+    .stars-bg {
+      display: none;
+    }
+
+    .stars-fg {
+      display: none;
+    }
+  }
+</style>
+<div class="stars-container">
+  <div class="avatar-group">
+    <img src="/reviews/person-1.webp" loading="lazy" alt="Customer 1" class="avatar">
+    <img src="/reviews/person-2.webp" loading="lazy" alt="Customer 2" class="avatar">
+    <img src="/reviews/person-3.webp" loading="lazy" alt="Customer 3" class="avatar">
+  </div>
+  <div class="stars">
+    <div class="mobile-star">★</div>
+    <div class="stars-bg">★</div>
+    <div class="stars-fg" style="width:480%">★</div>
+  </div>
+  <a href="https://www.energybot.com/reviews/" class="review-count">
+    <span class="bold">(4.8)</span> 2k+ reviews
+  </a>
+</div>
+
+          </div>
+        </div>
+      </div>
+      <style>
+  .flex-items-center {
+    display: flex;
+    align-items: center;
+  }
+
+  .byline {
+    display: flex;
+    gap: 4px;
+    font-size: 14px;
+    line-height: 20px;
+    color: rgba(34, 34, 34, 0.8);
+  }
+
+  @media (max-width: 600px) {
+    .blog-info-div {
+      flex-wrap: wrap;
+    }
+
+    .byline:last-child {
+      width: 100%;
+    }
+  }
+</style>
+<div>
+  <div class="blog-info-div eb-small-copy no-margin flex-items-center" style="margin: 12px 0 12px 0; gap: 32px">
+    <div class="byline">
+      <img src="https://cdn.prod.website-files.com/5bb65b667e3c601d409d2000/67d0a0f26900dc236f95740c_thad-warren-headshot-minified.jpg" class="eb-author-picture size-20" alt="Thad Warren" loading="lazy">
+      <span style="font-weight: 600">Author: </span>
+      <a href="/authors/thad-warren.html" style="color: var(--blackish-50)">Thad Warren</a>
+    </div>
+    <div class="byline">
+      <img src="https://cdn.prod.website-files.com/5bb65b667e3c601d409d2000/67b3e41143a1325294996815_Headshot.jpg" class="eb-author-picture size-20" alt="Tommy Richardson">
+      <span style="font-weight: 600">Editor: </span>
+      <a href="/authors/tommy-richardson.html" style="color: var(--blackish-50)">Tommy Richardson</a>
+    </div>
+    <div class="byline">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15.8333 3.33268H15V1.66602H13.3333V3.33268H6.66667V1.66602H5V3.33268H4.16667C3.24167 3.33268 2.5 4.08268 2.5 4.99935V16.666C2.5 17.5827 3.24167 18.3327 4.16667 18.3327H15.8333C16.75 18.3327 17.5 17.5827 17.5 16.666V4.99935C17.5 4.08268 16.75 3.33268 15.8333 3.33268ZM15.8333 16.666H4.16667V8.33268H15.8333V16.666ZM15.8333 6.66602H4.16667V4.99935H15.8333V6.66602ZM5.83333 9.99935H10V14.166H5.83333V9.99935Z" fill="#4E4E4E"></path>
+      </svg>
+      <span style="font-weight: 600">Updated: </span>
+      <time datetime="2025-10-10T15:05:36+00:00">October 10, 2025</time>
+    </div>
+  </div>
+</div>
+
+      <p class="disclaimer-text">EnergyBot rates are updated in real time. Partners don’t influence our content, but we
+        may mention their plans.
+        <a href="/about/how-energybot-makes-money.html" class="disclaimer-text">How we make money.</a>
+      </p>
+    </div>
+  </div>
+</div>
+<div id="main-content" class="eb-lp-section wf-section confine-to-parent" style="padding-bottom: 80px">
+  <div class="eb-section-container w-layout-vflex flex-column" style="grid-row-gap: 0;">
+    <div class="eb-lp-content-container no-max-width">
+      <h2 id=""><strong id="">Business Electricity Rates in Texas</strong></h2><p id="">Currently the average commercial electricity rate in Texas is ¢ /kWh. This rate does not include transmission and delivery fees and is sometimes called the "energy charge". </p><p id="">Below are the lowest available business electricity rates in Texas. *Note: Your business may qualify for lower rates depending on it's usage and other factors. We recommend using our link your data tool so that you can find the best rate for your business and see future bills accurately. </p><p id=""></p><div>
+  <a href="/app.html#/?ftype=DEFAULT" style="text-decoration: none;">
+    <div id="eb-daily-rates-schema">
+      <script type="application/ld+json">{"@context":"https://schema.org/","@type":"Product","name":"EnergyBot","image":"https://cdn.prod.website-files.com/5b92c215aeef7719f1cbf7ce/6838824c0707644ccb7d76d8_eb-illustration.png","description":"Residential Electricity Rates","brand":{"@type":"Brand","name":"Multiple Brands"},"offers":{"@type":"AggregateOffer","highPrice":0.07307,"lowPrice":0.05642,"offerCount":5,"priceCurrency":"USD","offers":[{"@type":"Offer","url":"","priceCurrency":"USD","offeredBy":{"@type":"Corporation","name":"NRG Energy, Inc."},"priceSpecification":{"@type":"UnitPriceSpecification","name":"NRG Energy, Inc. - 3 month","price":0.05642,"priceCurrency":"USD","unitText":"kWh","validFrom":"2025-10-10T15:05:36.927Z","validThrough":"2025-10-11T15:05:36.927Z"}},{"@type":"Offer","url":"","priceCurrency":"USD","offeredBy":{"@type":"Corporation","name":"AP Gas & Electric"},"priceSpecification":{"@type":"UnitPriceSpecification","name":"AP Gas & Electric - 1 month","price":0.0588209714641571,"priceCurrency":"USD","unitText":"kWh","validFrom":"2025-10-10T15:05:36.927Z","validThrough":"2025-10-11T15:05:36.927Z"}},{"@type":"Offer","url":"","priceCurrency":"USD","offeredBy":{"@type":"Corporation","name":"Engie Energy"},"priceSpecification":{"@type":"UnitPriceSpecification","name":"Engie Energy - 6 month","price":0.0625346149602373,"priceCurrency":"USD","unitText":"kWh","validFrom":"2025-10-10T15:05:36.927Z","validThrough":"2025-10-11T15:05:36.927Z"}},{"@type":"Offer","url":"","priceCurrency":"USD","offeredBy":{"@type":"Corporation","name":"NRG Energy, Inc."},"priceSpecification":{"@type":"UnitPriceSpecification","name":"NRG Energy, Inc. - 9 month","price":0.06469,"priceCurrency":"USD","unitText":"kWh","validFrom":"2025-10-10T15:05:36.927Z","validThrough":"2025-10-11T15:05:36.927Z"}},{"@type":"Offer","url":"","priceCurrency":"USD","offeredBy":{"@type":"Corporation","name":"Chariot Energy"},"priceSpecification":{"@type":"UnitPriceSpecification","name":"Chariot Energy - 18 month","price":0.07307,"priceCurrency":"USD","unitText":"kWh","validFrom":"2025-10-10T15:05:36.927Z","validThrough":"2025-10-11T15:05:36.927Z"}}]},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.80","bestRating":"5","worstRating":"0","ratingCount":2417}}</script>
+    </div>
+    <style>
+      .eb-widget-table-row{width:100%}
+      .plan-name-cell>*{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .rates-table{width: 100%; table-layout: fixed;}
+    </style>
+    <table id="idba1a95cb-e3c8-4530-934b-7f2b529e3a32" class="rates-table">
+      <tbody><tr class="eb-widget-table-row w-inline-block">
+        <th class="eb-widget-header-link"><div>Provider</div></th>
+        <th class="eb-widget-header-link"><div>Term</div></th>
+        <th class="eb-widget-header-link"><div>Rate</div></th>
+      </tr>
+
+      <tr class="eb-widget-table-row w-inline-block">
+        <td class="eb-widget-table-cell plan-name-cell"><div>NRG Energy, Inc.</div></td>
+        <td class="eb-widget-table-cell term-cell"><div>3 months</div></td>
+        <td class="eb-widget-table-cell rate-cell"><div>5.64¢</div></td>
+      </tr>
+      <tr class="eb-widget-table-row w-inline-block">
+        <td class="eb-widget-table-cell plan-name-cell"><div>AP Gas &amp; Electric</div></td>
+        <td class="eb-widget-table-cell term-cell"><div>1 month</div></td>
+        <td class="eb-widget-table-cell rate-cell"><div>5.88¢</div></td>
+      </tr>
+      <tr class="eb-widget-table-row w-inline-block">
+        <td class="eb-widget-table-cell plan-name-cell"><div>Engie Energy</div></td>
+        <td class="eb-widget-table-cell term-cell"><div>6 months</div></td>
+        <td class="eb-widget-table-cell rate-cell"><div>6.25¢</div></td>
+      </tr>
+      <tr class="eb-widget-table-row w-inline-block">
+        <td class="eb-widget-table-cell plan-name-cell"><div>NRG Energy, Inc.</div></td>
+        <td class="eb-widget-table-cell term-cell"><div>9 months</div></td>
+        <td class="eb-widget-table-cell rate-cell"><div>6.47¢</div></td>
+      </tr>
+      <tr class="eb-widget-table-row w-inline-block">
+        <td class="eb-widget-table-cell plan-name-cell"><div>Chariot Energy</div></td>
+        <td class="eb-widget-table-cell term-cell"><div>18 months</div></td>
+        <td class="eb-widget-table-cell rate-cell"><div>7.31¢</div></td>
+      </tr>
+    </tbody></table>
+  </a>
+  <div>
+    <div class="eb-small-label"><time datetime="2025-10-10T15:05:36+00:00">Last Updated at: October 10, 2025</time></div>
+  </div>
+</div>
+<p></p><h2 id=""><strong id="">How Commercial Electricity Rates in Texas Work</strong></h2><p id="">In Texas, businesses have the unique advantage of choosing their electricity provider, allowing them to select the best option tailored to their specific needs. Different energy companies offer a variety of electricity plans and competitive rates, with custom options based on business size and usage requirements.</p><p id="">The deregulated energy market in Texas empowers businesses to compare electricity rates and plans from multiple providers, ensuring they find the most suitable and cost-effective option. By leveraging this competitive landscape, Texas businesses can optimize their energy usage and achieve significant cost savings. Working with an energy broker can further help businesses compare, negotiate, and customize energy plans for optimal savings and hassle-free management.</p><ul id=""><li id="">Business electricity rates vary based on several factors, including usage, load factor, location, and more.</li><li id="">EnergyBot allows you to link your business electricity usage history to view the best real-time pricing and gather quotes from dozens of providers.</li><li id="">If you need help, our Texas-based support team is here to help.</li></ul><h2 id=""><strong id="">Business Electricity Providers</strong></h2><p id="">In Texas, you get to choose your electricity provider. These providers, called Retail Electric Providers (REPs) are licensed and <a href="https://www.puc.texas.gov/industry/electric/directories/rep/alpha_rep/" target="_blank" id="">regulated by the PUC of Texas</a>. Providers buy power from generation companies and sell it to customers like your business. They are seperate from your utility like Oncor, CenterPoint, Texas New Mexico Power, or AEP. There are dozens of <a href="/electricity-rates/texas/texas-electric-companies.html" id="">licensed electricity providers in Texas</a>. </p><p id="">Each provider offers different rates, support, and contract terms. Some focus on low-cost plans. Others lean into renewable energy or flexible billing. What matters most is what works best for your business.</p><p id="">EnergyBot helps you compare business energy providers by giving you transparent pricing, reliable customer service, and options that support your energy goals. </p><h2 id=""><strong id="">Switch Business Electricity Suppliers</strong></h2><p id="">Switching your electricity provider doesn’t have to be a headache. We make comparing plans for your small business easy. In Texas, the deregulated market allows you to switch electricity providers effortlessly, ensuring you find a more cost-effective option without any service interruptions.</p><p id="">Our system will pull your historical energy usage and match you with electricity providers that offer the best plans for you. You can switch 100% online or if you prefer our energy procurement team can help guide you along the way.</p><p id="">You can get started shopping here or contact us over the phone at &nbsp;(888) 743-1870.</p><h2 id=""><strong id="">How to Get the Best Business Electricity Rates in TX</strong></h2><p id="">Most small businesses can find the best rates online using EnergyBot to pull their historical usage data to pair them with the best electricity plans. Comparing energy prices from various providers is crucial to secure the most favorable rates, especially considering factors like seasonal demand and market conditions. Monitoring market fluctuations is also essential, as it allows businesses to secure the lowest-priced plans and quickly adapt to changing energy prices.</p><p id="">Since most small business consumers use less energy than larger businesses, let’s say 240,000 kWh or less per year the enrollment process is relatively straightforward.</p><p id="">Larger commercial electric plans can be a bit more complicated.</p><h2 id=""><strong id="">Types of Business Energy Plans</strong></h2><p id="">Businesses in Texas can choose from a range of commercial electricity plans tailored to meet small businesses’ various energy requirements, thereby empowering them to manage their operational costs and sustainability goals. Selecting the right energy plan is crucial, as it can significantly impact both small and large businesses by providing tailored solutions and strategic guidance.</p><p id="">Small business consumers will most likely want the first type of plan, a fixed-rate plan.</p><h3 id=""><strong id="">Fixed-Rate Plans</strong></h3><p id="">These are the most common and offer a locked-in price per kilowatt-hour (kWh) for the entire contract and term length, which usually spans from 6 months to 3 years. Fixed rate energy plans provide stability and predictability in energy costs, protecting businesses from potential price fluctuations in the energy market.</p><p id="">This is usually the best option for most Texas businesses, especially small businesses.</p><h3 id=""><strong id="">Variable-Rate Plans</strong></h3><p id="">In contrast, a variable rate plan’s rates can change monthly, depending on the current electricity market prices. While a variable rate plan can lead to savings during periods of low energy costs, it can also result in higher charges during peak demand times. This electricity plan type suits businesses that can manage potential cost fluctuations.</p><h3 id=""><strong id="">Time-of-Use (TOU) Plans</strong></h3><p id="">These plans vary pricing based on the time of day, with lower rates during off-peak hours and higher rates during peak demand times. They incentivize businesses to shift their energy usage to off-peak periods, promoting energy efficiency and cost savings.</p><h3 id=""><strong id="">Demand Response Programs</strong></h3><p id="">These innovative plans offer businesses financial incentives to reduce their power consumption during times of peak electricity demand, helping to maintain grid reliability. The Electric Reliability Council of Texas (ERCOT) plays a crucial role in managing the electricity grid and ensuring reliable service, especially during extreme weather conditions. Participation can lead to substantial savings and a more sustainable energy footprint.</p><h3 id=""><strong id="">Green Energy Plans</strong></h3><p id="">These are an excellent choice for environmentally conscious businesses. They supply power generated from renewable sources, like wind or solar. Depending on the specific plan, a portion or all of the energy may be sourced from renewables.</p><p id="">Solar and wind energy are especially important in supporting a reliable, resilient, and environmentally friendly energy system in Texas. Wind energy, in particular, is a vital component of Texas's diverse renewable energy portfolio and helps stabilize the energy grid. </p><p id="">While transitioning towards renewable alternatives, it is important to note that fossil fuels still play a significant role in the current energy landscape.</p><h3 id=""><strong id="">Indexed Rate Plans:</strong></h3><p id="">These plans tie the per kWh rate to a specific market index, such as the price of natural gas or the Public Utility Commission of Texas's (PUCT) electricity price index. This plan is best suited for businesses willing to take a risk in exchange for potentially lower costs.</p><h2 id=""><strong id="">Choosing the Right Plan</strong></h2><p id="">Selecting the right electricity plan is crucial for businesses to manage their energy costs effectively. Commercial electricity rates in Texas vary depending on factors such as usage, location, and market conditions. Businesses should consider their energy consumption patterns, peak demand times, and budget when choosing a plan. Fixed rate plans, variable rate plans, and renewable energy plans are among the options available. It is essential to carefully review the Electricity Facts Label (EFL) and understand the terms and conditions of each plan before making a decision. By choosing the right plan, businesses can optimize their energy usage, reduce costs, and minimize their carbon footprint. This strategic approach to energy management can lead to significant cost savings and enhanced operational efficiency.</p><h3 id=""><strong id="">Factors Impacting Your Bill</strong></h3><p id="">Your <a target="_blank" href="https://www.energybot.com/blog/average-business-electric-bill.html" id="">business energy bill</a> can be a big blow to your bottom line. While you can try to reduce your usage and become more energy efficient, sometimes your electric rate per kWh is out of your hands.</p><p id="">For businesses, you have additional factors that may affect your energy rates, including:</p><h3 id=""><strong id="">Type of Business</strong></h3><p id="">Business energy plans and rates may vary by the type of business or industry. Energy supplies rely on complex models to mitigate their overall risk (by customer) and will want to know what type of business you operate.</p><p id="">Residential customers face different contract terms and legal requirements compared to businesses, including the potential for longer-term contracts and the necessity for compliance with specific energy regulations.</p><h3 id=""><strong id="">Business Size</strong></h3><p id="">Generally speaking, larger corporations have more buying power than the average small business since they use much more energy. Here are some examples of different size business electricity usages categories:</p><ul id=""><li id="">Small business (Coffee shop, Retail, Professional office) - 2,500 kWh/month</li><li id="">Medium Business (Restaurant, Gas Station, Small Manufacturing) - 20,000 kWh/month</li></ul><p id="">This makes it even more important for small businesses to research small business electricity rates and find the best electricity provider for their usage. We make it easy for your small business to pull its electricity usage history online.</p><p id="">Via our one-of-a-kind technology and partnerships, you can use your energy habits to find the best electricity rate in about 5 minutes.</p><h3 id=""><strong id="">Usage</strong></h3><p id="">Business rates for energy usage vary by the type of business and the time of day that the energy is consumed. &nbsp;To determine your rate, suppliers rely on a demand curve. If you use a lot of energy at odd times it can cause you to have a higher rate. For example, churches and religious organizations that are generally using a lot more energy on a weekend often pay for more energy than other similar businesses with similar usage amounts.</p><h3 id=""><strong id="">Contract Length</strong></h3><p id="">By signing up for a longer contract with a supplier (2-3 years), you should be able to secure a lower energy rate. With longer terms, suppliers are able to forecast usage better. This allows them to purchase energy futures to balance supply and demand. Providers will often pass those savings on to you.</p><h3 id=""><strong id="">Market Factors on Your Business Electricity Rate</strong></h3><p id="">There are many variables that affect rates. In most cases, you have no control over these. The most common are:</p><ul id=""><li id="">Weather</li><li id="">Market Conditions</li><li id="">Generation efficiency</li><li id="">Peak and off-peak load</li><li id="">Utility charges and tariffs</li><li id="">Regulations</li></ul><p id="">Power plants play a crucial role in maintaining capacity during peak demand periods, which is essential for managing electricity rates, especially with the rising energy consumption in Texas.</p><h2 id=""><strong id="">Energy Deregulation in Texas</strong></h2><p id="">A majority of Texas business consumers are in deregulated energy markets. This means they have the ability to shop for business electricity providers and compare rates. Many entities call this “electric choice.”</p><p id="">In a deregulated market, it is important to understand the distinction between an energy provider and a utility company. While energy providers are responsible for selling and managing energy plans, utility companies are tasked with delivering energy, maintaining infrastructure, and managing outages.</p><p id="">Electricity providers in Texas compete against each other to offer the best service and lowest electricity pricing.</p><h3 id=""><strong id="">Major Texas Cities with Energy Deregulation</strong></h3><p id="">In most cases, if your business is in one of these cities, you have the ability to shop for the best Texas electricity plans for your business.</p><ul id=""><li id=""><a href="https://www.energybot.com/electricity-rates/texas/houston/" target="_blank" id="">Houston (and surrounding areas)</a></li><li id=""><a target="_blank" href="https://www.energybot.com/electricity-rates/texas/dallas/" id="">Dallas (and surrounding areas)</a></li><li id=""><a target="_blank" href="https://www.energybot.com/electricity-rates/texas/fort-worth/" id="">Fort Worth (and surrounding areas)</a></li><li id=""><a target="_blank" href="https://www.energybot.com/electricity-rates/texas/corpus-christi/" id="">Corpus Christi (and surrounding areas)</a></li><li id=""><a target="_blank" href="https://www.energybot.com/electricity-rates/texas/arlington/" id="">Arlington</a></li><li id=""><a target="_blank" href="https://www.energybot.com/electricity-rates/texas/plano/" id="">Plano</a></li><li id=""><a target="_blank" href="https://www.energybot.com/electricity-rates/texas/frisco/" id="">Frisco</a></li><li id=""><a target="_blank" href="https://www.energybot.com/electricity-rates/texas/waco/" id="">Waco</a></li><li id=""><a target="_blank" href="https://www.energybot.com/electricity-rates/texas/san-angelo/" id="">San Angelo</a></li></ul><p id="">You can learn more about switching electricity plans and <a target="_blank" href="https://www.energybot.com/electricity-rates/texas/" id="">comparing rates in Texas here</a>.</p><h2 id=""><strong id="">Electricity Provider Reputation</strong></h2><p id="">The reputation of an electricity provider is a critical factor to consider when selecting a business electricity plan. A reputable provider will have a proven track record of delivering reliable service, competitive rates, and excellent customer support. Businesses should research the provider’s history, read reviews, and check their ratings with the Public Utility Commission of Texas (PUCT). A reputable provider will be transparent about their pricing, plans, and services, ensuring that businesses can make informed decisions. By choosing a reputable electricity provider, businesses can ensure a smooth and hassle-free experience, avoiding potential issues and ensuring consistent energy supply.</p><h2 id=""><strong id="">FAQs About Commercial Electric Plans</strong></h2><h3 id=""><strong id="">Who is the cheapest business electricity supplier?</strong></h3><p id="">It depends on your location and usage, but <a target="_blank" href="https://www.energybot.com/providers/constellation-energy" id="">Constellation Energy</a>, <a target="_blank" href="https://www.energybot.com/providers/direct-energy" id="">Direct Energy</a>, and <a target="_blank" href="https://www.energybot.com/providers/gexa-energy" id="">Gexa Energy</a> often have some of the lowest rates in Texas.</p><h3 id=""><strong id="">What are the average commercial electric rates in Texas?</strong></h3><p id="">As of today, the average commercial rate in Texas is 0.0818¢ /kWh, but rates can vary depending on your business’s specific needs and usage.</p><h3 id=""><strong id="">What is a retail electric provider?</strong></h3><p id="">A retail electric provider (REP) is a company that supplies electricity to consumers in Texas. They purchase electricity from generators and resell it to customers, offering various plans and rates.</p><p>‍</p><p id="">0.163 - averageResDisplayPrice<br> - averageResDisplayPriceCents<br> - cheapestResDisplayPrice<br> - cheapestResDisplayPriceCents<br> - averageResBill<br> - averageResDisplayPriceState<br> - averageResDisplayPriceStateCents<br>0.0818 - averageBusDisplayPrice<br> - averageBusDisplayPriceCents<br> - cheapestBusDisplayPrice<br> - cheapestBusDisplayPriceCents<br> - averageBusBill</p>
+    </div>
+
+    <div id="rate-section" class="eb-lp-content-div">
+      <h2>See today’s electricity rates for cities in Texas</h2><ul style="list-style-type: none;" class="eb-collection">
+          <li class="eb-tl-style-2">
+            <a href="/electricity-rates/texas/houston/" style="text-decoration: none;">Houston</a>
+          </li>
+          <li class="eb-tl-style-2">
+            <a href="/electricity-rates/texas/dallas/" style="text-decoration: none;">Dallas</a>
+          </li>
+          <li class="eb-tl-style-2">
+            <a href="/electricity-rates/texas/fort-worth/" style="text-decoration: none;">Fort Worth</a>
+          </li>
+          <li class="eb-tl-style-2">
+            <a href="/electricity-rates/texas/arlington/" style="text-decoration: none;">Arlington</a>
+          </li>
+          <li class="eb-tl-style-2">
+            <a href="/electricity-rates/texas/corpus-christi/" style="text-decoration: none;">Corpus Christi</a>
+          </li>
+          <li class="eb-tl-style-2">
+            <a href="/electricity-rates/texas/frisco/" style="text-decoration: none;">Frisco</a>
+          </li>
+          <li class="eb-tl-style-2">
+            <a href="/electricity-rates/texas/waco/" style="text-decoration: none;">Waco</a>
+          </li>
+          <li class="eb-tl-style-2">
+            <a href="/electricity-rates/texas/plano/" style="text-decoration: none;">Plano</a>
+          </li>
+          <li class="eb-tl-style-2">
+            <a href="/electricity-rates/texas/katy/" style="text-decoration: none;">Katy</a>
+          </li>
+          <li class="eb-tl-style-2">
+            <a href="/electricity-rates/texas/midland/" style="text-decoration: none;">Midland</a>
+          </li>
+          <li class="eb-tl-style-2">
+            <a href="/electricity-rates/texas/odessa/" style="text-decoration: none;">Odessa</a>
+          </li></ul>
+    </div>
+
+  </div>
+</div>
+</div><div class="eb-2021-footer"><div class="eb-footer-container"><div class="eb-div-flex-ac-jsb v-mobile"><a href="https://www.energybot.com" aria-label="EnergyBot" class="eb-brand w-nav-brand"><img src="/images/logo-new-1.svg" hre="" alt="EnergyBot logo" loading="lazy" class="eb-logo"></a><div class="eb-div-flex-ac-jl mt-3-mobile"><a href="tel:(888)743-1870" class="eb-link-block mr-10 w-inline-block"><img src="/images/call-blue-24px.svg" alt="up icon" class="eb-icon-24"><div class="eb-small-text-link">(888) 741-0277</div></a><a href="mailto:operations@energybot.com" class="eb-link-block w-inline-block"><img src="/images/email-icon-blue.svg" alt="up icon" class="eb-icon-24"><div class="eb-small-text-link">operations@energybot.com</div></a></div></div><div class="eb-main-footer-div"><div class="eb-footer-div"><div class="eb-footer-header">Company</div><a href="/about.html" class="eb-small-text-link">About</a><a href="/careers.html" class="eb-small-text-link">Careers</a><a href="/developer-portal.html" class="eb-small-text-link">Developer Portal</a><a href="/faqs.html" class="eb-small-text-link">FAQ</a><a href="/lowest-rate-guaranteed.html" class="eb-small-text-link">Lowest Rate Guarantee</a><a href="/partner-with-us.html" class="eb-small-text-link">Partner With Us</a><a href="/about/press.html" class="eb-small-text-link">Press</a><a href="/reviews.html" class="eb-small-text-link">Reviews</a><div class="eb-footer-header margin-top-32px">Business Electricity</div><a href="/electricity-rates/texas/business-commercial-electricity/" class="eb-small-text-link">Texas</a><a href="/electricity-rates/pennsylvania/business-commercial-electricity/" class="eb-small-text-link">Pennsylvania</a><a href="/electricity-rates/ohio/business-commercial-electricity/" class="eb-small-text-link">Ohio</a></div><div class="eb-footer-div"><div class="eb-footer-header">States</div><a href="/electricity-rates/connecticut/" class="eb-small-text-link">Connecticut</a><a href="/electricity-rates/illinois/" class="eb-small-text-link">Illinois</a><a href="/electricity-rates/maine/" class="eb-small-text-link">Maine</a><a href="/electricity-rates/maryland/" class="eb-small-text-link">Maryland</a><a href="/electricity-rates/massachusetts/" class="eb-small-text-link">Massachusetts</a><a href="/electricity-rates/new-hampshire/" class="eb-small-text-link">New Hampshire</a><a href="/electricity-rates/new-jersey/" class="eb-small-text-link">New Jersey</a><a href="/electricity-rates/new-york/" class="eb-small-text-link">New York</a><a href="/electricity-rates/ohio/" class="eb-small-text-link">Ohio</a><a href="/electricity-rates/pennsylvania/" class="eb-small-text-link">Pennsylvania</a><a href="/electricity-rates/texas/" class="eb-small-text-link">Texas</a><a href="/electricity-rates-by-state.html" class="eb-small-text-link">See All &gt;</a></div><div class="eb-footer-div"><div class="eb-footer-header">Cities</div><a href="/electricity-rates/texas/houston/" class="eb-small-text-link">Houston</a><a href="/electricity-rates/texas/dallas/" class="eb-small-text-link">Dallas</a><a href="/electricity-rates/texas/fort-worth/" class="eb-small-text-link">Fort Worth</a><a href="/electricity-rates/texas/arlington/" class="eb-small-text-link">Arlington</a><a href="/electricity-rates/texas/lubbock/" class="eb-small-text-link">Lubbock</a><a href="/electricity-rates/texas/corpus-christi/" class="eb-small-text-link">Corpus Christi<br></a><a href="/electricity-rates/texas/frisco/" class="eb-small-text-link">Frisco</a><a href="/electricity-rates/texas/waco/" class="eb-small-text-link">Waco</a><a href="/electricity-rates/texas/plano/" class="eb-small-text-link">Plano</a><a href="/texas-energy.html" class="eb-small-text-link">See All &gt;</a></div><div class="eb-footer-div"><div class="eb-footer-header">Solar Energy</div><a href="/solar-panels/arizona/" class="eb-small-text-link">Arizona</a><a href="/solar-panels/california/" class="eb-small-text-link">California</a><a href="/solar-panels/connecticut/" class="eb-small-text-link">Connecticut</a><a href="/solar-panels/florida/" class="eb-small-text-link">Florida</a><a href="/solar-panels/hawaii/" class="eb-small-text-link">Hawaii</a><a href="/solar-panels/illinois/" class="eb-small-text-link">Illinois</a><a href="/solar-panels/maine/" class="eb-small-text-link">Maine</a><a href="/solar-panels/massachusetts/" class="eb-small-text-link">Massachusetts</a><a href="/solar-panels/new-jersey/" class="eb-small-text-link">New Jersey</a><a href="/solar-panels/pennsylvania/" class="eb-small-text-link">Pennsylvania</a><a href="/solar-panels/texas/" class="eb-small-text-link">Texas</a><a href="/solar-panels/virginia/" class="eb-small-text-link">Virginia</a></div><div class="eb-footer-div"><div class="eb-footer-header">Resources</div><a href="/blog/" class="eb-small-text-link">Blog</a><a href="/electricity-rates/texas/texas-electric-companies.html" class="eb-small-text-link">Best Texas Electric Companies</a><a href="/electricity-rates/texas/business-commercial-electricity/" class="eb-small-text-link">Business Electricity Rates</a><a href="https://www.energybot.com/electricity-rates/" class="eb-small-text-link">Electricity Rates By State</a><a href="/energy-faq/" class="eb-small-text-link">Energy FAQ</a><a href="/energy-usage-calculator.html" class="eb-small-text-link">Energy Usage Calculator</a><a href="/blog/average-electricity-bills-in-every-state.html" class="eb-small-text-link">Average Electricity Bills</a><a href="/providers/" class="eb-small-text-link">Energy Providers</a><a href="/esid-lookup.html" class="eb-small-text-link">ESID&nbsp;Lookup</a><a href="/natural-gas.html" class="eb-small-text-link">Natural Gas</a></div></div><div class="eb-div-flex-at-jsb wrap"><p class="eb-small-copy _2021-footer">Copyright © 2025 EnergyBot • All rights reserved.</p><div class="eb-div-flex-at-jl wrap"><a href="/terms-of-service.html" class="eb-small-text-link">Terms of Service</a><p class="eb-fine-print footer-2021">•</p><a href="/privacy-policy.html" class="eb-small-text-link">Privacy Policy</a><p class="eb-fine-print footer-2021">•</p><a href="/license-information.html" class="eb-small-text-link">License Information</a></div></div><div class="eb-div-flex-at-jl"><p class="eb-small-copy _2021-footer opacity-75">1601 Bryan St Suite 900, Dallas, TX&nbsp;75201<span class="text-opacity-50"></span><span class="text-opacity-50"></span></p></div><div class="div-block-136"><div class="eb-div-flex-ac-jsb wrap"><div class="html-embed-6 bbb mr-5 w-embed w-script"><a id="bbblink" class="rbhzbam" href="https://www.bbb.org/us/tx/dallas/profile/energy/energybot-0875-90920434#bbbseal" title="EnergyBot, Energy, Dallas, TX" style="padding: 0px; margin: 0px;"><img style="padding: 0px; border: none;" id="bbblinkimg" loading="lazy" src="https://seal-dallas.bbb.org/logo/rbhzbam/energybot-90920434.png" width="300" height="57" alt="EnergyBot, Energy, Dallas, TX"></a><script type="text/javascript">var bbbprotocol = ( ("https:" == document.location.protocol) ? "https://" : "http://" ); (function(){var s=document.createElement('script');s.src=bbbprotocol + 'seal-dallas.bbb.org' + unescape('%2Flogo%2Fenergybot-90920434.js');s.type='text/javascript';s.async=true;var st=document.getElementsByTagName('script');st=st[st.length-1];var pt=st.parentNode;pt.insertBefore(s,pt.nextSibling);})();</script><script src="https://seal-dallas.bbb.org/logo/energybot-90920434.js" type="text/javascript" async=""></script></div><div class="eb-div-flex-ac mt-5-mobile"><a href="https://www.facebook.com/teamenergybot" target="_blank" class="eb-social-link w-inline-block"><img src="/images/Instagram-icon.svg" alt="Instagram Icon" loading="lazy" class="eb-icon-24"></a><a href="https://www.linkedin.com/company/energybot/" target="_blank" class="eb-social-link w-inline-block"><img src="/images/LinkedIn-icon.svg" alt="LinkedIn Icon" loading="lazy" class="eb-icon-24"></a><a href="https://www.facebook.com/teamenergybot" target="_blank" class="eb-social-link w-inline-block"><img src="/images/Facebook-icon.svg" alt="Facebook Icon" loading="lazy" class="eb-icon-24"></a><a href="https://www.youtube.com/@teamenergybot" target="_blank" class="eb-social-link w-inline-block"><img src="/images/YouTube---Original.svg" alt="Facebook Icon" loading="lazy" class="eb-icon-24"></a></div></div></div></div></div><script type="text/javascript" crossorigin="anonymous" src="https://us-assets.i.posthog.com/static/web-vitals.js?v=1.275.1"></script><script type="text/javascript" crossorigin="anonymous" src="https://us-assets.i.posthog.com/static/surveys.js?v=1.275.1"></script><script type="text/javascript" crossorigin="anonymous" src="https://us-assets.i.posthog.com/static/dead-clicks-autocapture.js?v=1.275.1"></script><script type="text/javascript" crossorigin="anonymous" src="https://us-assets.i.posthog.com/static/lazy-recorder.js?v=1.275.1"></script><script type="text/javascript" crossorigin="anonymous" src="https://us-assets.i.posthog.com/array/phc_4zwrWWaQxgDE8uvpMXqT5dw9OG254aQCtB9sxLD5Q0q/config.js"></script><script src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=5b92c215aeef7719f1cbf7ce" type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script><script defer="" src="/js/energybot.95ec3c3e4d1a4cccab1d3e80c590e994.js" type="text/javascript"></script><iframe height="0" width="0" style="display: none; visibility: hidden;"></iframe><utm-tracking-component></utm-tracking-component><div id="batBeacon15078561064" style="width: 0px; height: 0px; display: none; visibility: hidden;"><img id="batBeacon941675123239" width="0" height="0" alt="" src="https://bat.bing.com/action/0?ti=26336489&amp;Ver=2&amp;mid=a8c307b5-6ac3-48b9-844b-88164560c5c6&amp;bo=1&amp;sid=e3f8fd50a69811f0bdb5fb6a7600800e&amp;vid=e3f91ed0a69811f091284fc55ed46401&amp;vids=1&amp;msclkid=N&amp;uach=pv%3D10.0&amp;pi=918639831&amp;lg=en-US&amp;sw=1920&amp;sh=1080&amp;sc=24&amp;nwd=1&amp;tl=Business%20%26%20Commerial%20Electric%20Rates%20-%20EnergyBot&amp;p=https%3A%2F%2Fwww.energybot.com%2Felectricity-rates%2Ftexas%2Fbusiness-commercial-electricity.html&amp;r=&amp;lt=674&amp;evt=pageLoad&amp;sv=2&amp;cdb=AQAQ&amp;rn=517610" style="width: 0px; height: 0px; display: none; visibility: hidden;"></div></body></html>

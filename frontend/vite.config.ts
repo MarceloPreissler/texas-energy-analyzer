@@ -9,6 +9,7 @@ export default defineConfig({
     port: 5173,
     allowedHosts: [
       'localhost',
+      'joann-granulocytic-decanically.ngrok-free.dev',  // Your specific ngrok URL
       '.ngrok-free.dev',  // Allow all ngrok URLs
       '.ngrok.io',
       '.ngrok.app',

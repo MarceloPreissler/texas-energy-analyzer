@@ -10,6 +10,7 @@ Features:
 """
 from __future__ import annotations
 
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -23,6 +24,11 @@ from .database import engine
 from . import models
 from .api import plans as plans_router
 from .scheduler import start_scheduler, stop_scheduler
+from .logging_config import setup_logging
+
+# Initialize logging
+setup_logging(log_level="INFO")
+logger = logging.getLogger(__name__)
 
 # Create database tables on startup
 models.Base.metadata.create_all(bind=engine)
@@ -35,11 +41,13 @@ limiter = Limiter(key_func=get_remote_address, default_limits=["100/hour"])
 async def lifespan(app: FastAPI):
     """Application lifespan events."""
     # Startup
-    print("[App] Starting background scheduler...")
+    logger.info("Application starting up...")
+    logger.info("Starting background scheduler...")
     start_scheduler()
     yield
     # Shutdown
-    print("[App] Stopping background scheduler...")
+    logger.info("Application shutting down...")
+    logger.info("Stopping background scheduler...")
     stop_scheduler()
 
 app = FastAPI(

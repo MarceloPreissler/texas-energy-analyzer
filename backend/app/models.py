@@ -35,6 +35,8 @@ class Plan(Base):
     provider_id: int = Column(Integer, ForeignKey("providers.id"), nullable=False)
     plan_name: str = Column(String, nullable=False)
     plan_type: str = Column(String, nullable=True)
+    service_type: str = Column(String, nullable=True, default="Residential")  # Residential or Commercial
+    zip_code: str = Column(String, nullable=True)  # Zip code where plan is available
     contract_months: int = Column(Integer, nullable=True)
     rate_500_cents: float = Column(Float, nullable=True)
     rate_1000_cents: float = Column(Float, nullable=True)

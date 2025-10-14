@@ -38,6 +38,8 @@ def get_plans(
     db: Session,
     provider: Optional[str] = None,
     plan_type: Optional[str] = None,
+    service_type: Optional[str] = None,
+    zip_code: Optional[str] = None,
     contract_months: Optional[int] = None,
     skip: int = 0,
     limit: int = 100,
@@ -47,6 +49,10 @@ def get_plans(
         query = query.join(models.Provider).where(models.Provider.name == provider)
     if plan_type:
         query = query.where(models.Plan.plan_type == plan_type)
+    if service_type:
+        query = query.where(models.Plan.service_type == service_type)
+    if zip_code:
+        query = query.where(models.Plan.zip_code == zip_code)
     if contract_months:
         query = query.where(models.Plan.contract_months == contract_months)
     query = query.order_by(models.Plan.rate_1000_cents.asc().nulls_last()).offset(skip).limit(limit)
@@ -81,6 +87,8 @@ def create_or_update_plan(db: Session, provider_id: int, plan_data: schemas.Plan
             provider_id=provider_id,
             plan_name=plan_data.plan_name,
             plan_type=plan_data.plan_type,
+            service_type=plan_data.service_type,
+            zip_code=plan_data.zip_code,
             contract_months=plan_data.contract_months,
             rate_500_cents=plan_data.rate_500_cents,
             rate_1000_cents=plan_data.rate_1000_cents,
