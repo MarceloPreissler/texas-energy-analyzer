@@ -1,0 +1,9 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "installCommand": "npm install",
+  "env": {
+    "VITE_API_URL": "https://web-production-665ac.up.railway.app"
+  }
+}
