@@ -1,14 +1,19 @@
 import axios from 'axios';
 
-// Detect if accessing via ngrok and use direct backend connection
+// Detect environment and set appropriate API base URL
 const isNgrok = window.location.hostname.includes('ngrok');
-const isLocalhost = window.location.hostname === 'localhost';
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '10.0.0.16';
+const isProduction = !isLocalhost && !isNgrok;
 
 // API base URL logic:
+// - Production (Railway/Vercel): use environment variable or fallback to your Railway backend
 // - localhost: use Vite proxy (empty string)
 // - ngrok: use local network IP for backend
-// - local network IP: use Vite proxy
-const API_BASE_URL = isNgrok ? 'http://10.0.0.16:8000' : '';
+const API_BASE_URL = isProduction
+  ? (import.meta.env.VITE_API_URL || 'https://web-production-665ac.up.railway.app')
+  : isNgrok
+    ? 'http://10.0.0.16:8000'
+    : '';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
