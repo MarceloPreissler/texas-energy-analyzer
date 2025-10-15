@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 import re
 from typing import List, Dict
-from datetime import datetime
+from datetime import datetime, timezone
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
 
@@ -41,6 +41,31 @@ def scrape_energybot_commercial_v2(zip_code: str = "75001", max_plans: int = 100
             page.goto(url, wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(3000)  # Wait for dynamic content
 
+            # Try to load more plans by scrolling
+            print("[EnergyBot v2] Scrolling to load more plans...")
+            for _ in range(3):
+                page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                page.wait_for_timeout(1500)
+
+            # Try clicking "Show More" or "Load More" button if it exists
+            try:
+                show_more_selectors = [
+                    'button:has-text("Show More")',
+                    'button:has-text("Load More")',
+                    'a:has-text("Show More")',
+                    '.show-more',
+                    '.load-more'
+                ]
+                for selector in show_more_selectors:
+                    button = page.query_selector(selector)
+                    if button and button.is_visible():
+                        print(f"[EnergyBot v2] Clicking: {selector}")
+                        button.click()
+                        page.wait_for_timeout(2000)
+                        break
+            except Exception as e:
+                print(f"[EnergyBot v2] No load more button found: {e}")
+
             print("[EnergyBot v2] Page loaded, extracting JSON-LD data...")
 
             # Get all JSON-LD scripts
@@ -67,7 +92,25 @@ def scrape_energybot_commercial_v2(zip_code: str = "75001", max_plans: int = 100
 
                                     # Extract plan details from priceSpecification
                                     price_spec = offer.get('priceSpecification', {})
-                                    plan_name = price_spec.get('name', 'Unknown Plan')
+                                    raw_plan_name = price_spec.get('name', 'Unknown Plan')
+
+                                    # Clean up plan name - format is often "Provider - Provider - Term"
+                                    # Remove all occurrences of provider name
+                                    plan_name = raw_plan_name
+                                    if provider_name:
+                                        # Replace all occurrences of provider name with empty string
+                                        plan_name = plan_name.replace(provider_name, '')
+                                        # Clean up multiple dashes/spaces
+                                        plan_name = re.sub(r'\s*-\s*-\s*', ' - ', plan_name)
+                                        plan_name = plan_name.strip(' -')
+
+                                    # If we removed too much, create a descriptive name
+                                    if not plan_name or len(plan_name) < 3:
+                                        term_match = re.search(r'(\d+)\s*month', raw_plan_name, re.IGNORECASE)
+                                        if term_match:
+                                            plan_name = f"Commercial {term_match.group(0).title()}"
+                                        else:
+                                            plan_name = "Commercial Plan"
 
                                     # Price is in dollars per kWh, convert to cents
                                     price_dollars = price_spec.get('price', 0)
@@ -86,6 +129,11 @@ def scrape_energybot_commercial_v2(zip_code: str = "75001", max_plans: int = 100
                                     elif "solar" in plan_name.lower() or "green" in plan_name.lower():
                                         plan_type = "Solar"
 
+                                    # Extract special features from description if available
+                                    special_features = offer.get('description', None)
+                                    if special_features and len(special_features) > 200:
+                                        special_features = special_features[:200] + '...'
+
                                     plans.append({
                                         "provider_name": provider_name,
                                         "plan_name": plan_name,
@@ -94,8 +142,8 @@ def scrape_energybot_commercial_v2(zip_code: str = "75001", max_plans: int = 100
                                         "zip_code": zip_code,
                                         "contract_months": contract_months,
                                         "rate_1000_cents": round(rate_cents, 3),
-                                        "special_features": None,
-                                        "last_updated": datetime.utcnow(),
+                                        "special_features": special_features,
+                                        "last_updated": datetime.now(timezone.utc),
                                     })
 
                                 except Exception as e:

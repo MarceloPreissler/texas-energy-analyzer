@@ -49,7 +49,7 @@ def read_plan(plan_id: int, db: Session = Depends(get_db)):
 
 @router.post("/scrape", response_model=dict[str, int])
 def scrape_data(
-    source: str = Query("legacy", description="Scrape source: 'legacy' or 'powertochoose'"),
+    source: str = Query("legacy", description="Scrape source: 'legacy', 'powertochoose', 'energybot', or 'commercial'"),
     service_type: str = Query("Residential", description="Service type: 'Residential' or 'Commercial'"),
     zip_code: str | None = Query(None, description="Specific zip code (powertochoose only)"),
     db: Session = Depends(get_db),
@@ -59,8 +59,10 @@ def scrape_data(
     Trigger a scrape of electricity plans and update the database.
 
     Sources:
-    - legacy: Original scrapers (comparison sites)
-    - powertochoose: Live PowerToChoose.org data (recommended)
+    - legacy: Original scrapers (comparison sites) - Residential plans
+    - powertochoose: Live PowerToChoose.org data - Residential plans (recommended)
+    - energybot: EnergyBot.com only - Commercial plans (5 plans)
+    - commercial: All commercial sources - 20+ commercial plans (recommended for commercial)
 
     Service Types:
     - Residential: Residential electricity plans (default)
@@ -68,7 +70,7 @@ def scrape_data(
 
     Returns the number of plans processed. Rate limited to prevent abuse.
     """
-    from ..scraping import powertochoose_scraper
+    from ..scraping import powertochoose_scraper, energybot_scraper_v2, commercial_aggregator
 
     logger.info(f"Scrape request received - source: {source}, service_type: {service_type}, zip_code: {zip_code}")
 
@@ -78,6 +80,12 @@ def scrape_data(
             plans = powertochoose_scraper.scrape_powertochoose(zip_code, service_type=service_type)
         else:
             plans = powertochoose_scraper.scrape_powertochoose_all_texas(service_type=service_type)
+    elif source == "energybot":
+        logger.info("Using EnergyBot scraper for commercial plans")
+        plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
+    elif source == "commercial":
+        logger.info("Using commercial aggregator for all commercial plans")
+        plans = commercial_aggregator.scrape_all_commercial_plans()
     else:
         logger.info("Using legacy scrapers")
         plans = scraper.scrape_all()
