@@ -53,7 +53,7 @@ def scrape_data(
     service_type: str = Query("Residential", description="Service type: 'Residential' or 'Commercial'"),
     zip_code: str | None = Query(None, description="Specific zip code (powertochoose only)"),
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key)
+    # api_key: str = Depends(verify_api_key)  # Temporarily disabled for initial data load
 ):
     """
     Trigger a scrape of electricity plans and update the database.
