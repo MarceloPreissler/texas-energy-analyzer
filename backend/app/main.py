@@ -22,7 +22,7 @@ from slowapi.errors import RateLimitExceeded
 
 from .database import engine
 from . import models
-from .api import plans as plans_router
+from .api import plans as plans_router, admin as admin_router
 from .scheduler import start_scheduler, stop_scheduler
 from .logging_config import setup_logging
 
@@ -84,6 +84,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(plans_router.router)
+app.include_router(admin_router.router)
 
 
 @app.get("/")
