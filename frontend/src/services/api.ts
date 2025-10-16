@@ -15,6 +15,15 @@ const API_BASE_URL = isProduction
     ? 'http://10.0.0.16:8000'
     : '';
 
+// Debug logging to help identify environment detection issues
+console.log('API Configuration Debug:', {
+  hostname: window.location.hostname,
+  isNgrok,
+  isLocalhost,
+  isProduction,
+  API_BASE_URL
+});
+
 const api = axios.create({
   baseURL: API_BASE_URL,
 });
