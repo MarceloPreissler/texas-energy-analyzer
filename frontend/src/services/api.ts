@@ -44,6 +44,23 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
+// CRITICAL: Force all URLs to use HTTPS in production
+// This interceptor ensures no HTTP requests slip through
+api.interceptors.request.use((config) => {
+  if (config.baseURL && config.baseURL.startsWith('http://')) {
+    console.error('BLOCKING HTTP REQUEST - converting to HTTPS:', config.baseURL);
+    config.baseURL = config.baseURL.replace('http://', 'https://');
+  }
+  if (config.url && config.url.startsWith('http://')) {
+    console.error('BLOCKING HTTP URL - converting to HTTPS:', config.url);
+    config.url = config.url.replace('http://', 'https://');
+  }
+  console.log('Request config:', { baseURL: config.baseURL, url: config.url, fullURL: config.baseURL + config.url });
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
+
 interface Provider {
   id: number;
   name: string;
