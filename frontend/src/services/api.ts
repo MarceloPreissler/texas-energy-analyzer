@@ -1,25 +1,41 @@
 import axios from 'axios';
 
 // Detect environment and set appropriate API base URL
-const isNgrok = window.location.hostname.includes('ngrok');
-const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '10.0.0.16';
-const isProduction = !isLocalhost && !isNgrok;
+const hostname = window.location.hostname;
+const protocol = window.location.protocol;
 
-// API base URL logic:
-// - Production (Railway/Vercel): ALWAYS use HTTPS Railway backend
-// - localhost: use Vite proxy (empty string)
-// - ngrok: use local network IP for backend
-const API_BASE_URL = isProduction
-  ? 'https://web-production-665ac.up.railway.app'  // Hardcoded HTTPS - no env var needed
-  : isNgrok
-    ? 'http://10.0.0.16:8000'
-    : '';
+// More robust environment detection
+const isNgrok = hostname.includes('ngrok');
+const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '10.0.0.16';
+const isVercelPreview = hostname.includes('vercel.app');
+const isCustomDomain = hostname === 'texasenergyanalyzer.com' || hostname === 'www.texasenergyanalyzer.com';
+const isProduction = isCustomDomain || isVercelPreview || (!isLocalhost && !isNgrok && protocol === 'https:');
+
+// API base URL logic - explicit and clear
+let API_BASE_URL: string;
+if (isProduction || isVercelPreview || isCustomDomain) {
+  // Production: ALWAYS use HTTPS Railway backend
+  API_BASE_URL = 'https://web-production-665ac.up.railway.app';
+} else if (isNgrok) {
+  // Ngrok tunnel: use local backend
+  API_BASE_URL = 'http://10.0.0.16:8000';
+} else if (isLocalhost) {
+  // Localhost: use Vite proxy (empty string for relative URLs)
+  API_BASE_URL = '';
+} else {
+  // Fallback: if we can't detect, assume production and use HTTPS
+  console.warn('Unable to detect environment, defaulting to production HTTPS');
+  API_BASE_URL = 'https://web-production-665ac.up.railway.app';
+}
 
 // Debug logging to help identify environment detection issues
 console.log('API Configuration Debug:', {
-  hostname: window.location.hostname,
+  hostname,
+  protocol,
   isNgrok,
   isLocalhost,
+  isVercelPreview,
+  isCustomDomain,
   isProduction,
   API_BASE_URL
 });
