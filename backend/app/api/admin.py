@@ -15,6 +15,27 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 SAMPLE_PLANS = COMPREHENSIVE_PLANS
 
 
+@router.delete("/delete-all-plans")
+def delete_all_plans(db: Session = Depends(get_db)):
+    """
+    Delete ALL plans from database.
+    Use with caution - this will wipe all plan data!
+    """
+    try:
+        from ..models import Plan
+        deleted_count = db.query(Plan).delete()
+        db.commit()
+
+        return {
+            "status": "success",
+            "message": "All plans deleted",
+            "deleted_count": deleted_count
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/load-real-data")
 def load_real_data(plans_data: List[Dict[str, Any]] = Body(...), db: Session = Depends(get_db)):
     """
