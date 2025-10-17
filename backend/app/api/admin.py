@@ -40,7 +40,7 @@ def load_real_data(plans_data: List[Dict[str, Any]] = Body(...), db: Session = D
                 provider_id=provider.id,
                 plan_name=plan_data["plan_name"],
                 plan_type=plan_data.get("plan_type", "Fixed"),
-                service_type=plan_data["service_type"],
+                service_type=plan_data.get("service_type", "Residential"),  # Default to Residential if missing
                 zip_code=plan_data.get("zip_code", "75001"),
                 contract_months=plan_data.get("contract_months", 12),
                 rate_500_cents=plan_data.get("rate_500_cents"),
@@ -105,7 +105,7 @@ def load_initial_data(db: Session = Depends(get_db)):
                 provider_id=provider.id,
                 plan_name=plan_data["plan_name"],
                 plan_type=plan_data.get("plan_type", "Fixed"),
-                service_type=plan_data["service_type"],
+                service_type=plan_data.get("service_type", "Residential"),  # Default to Residential if missing
                 zip_code=plan_data.get("zip_code", "75001"),
                 contract_months=plan_data.get("contract_months", 12),
                 rate_500_cents=plan_data.get("rate_500_cents"),
