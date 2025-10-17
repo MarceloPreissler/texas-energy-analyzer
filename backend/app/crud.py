@@ -104,3 +104,46 @@ def create_or_update_plan(db: Session, provider_id: int, plan_data: schemas.Plan
         db.commit()
         db.refresh(new_plan)
         return new_plan
+
+
+# TDU CRUD Operations
+@cache_result(ttl=86400, key_prefix="tdus")  # Cache for 24 hours
+def get_tdus(db: Session, skip: int = 0, limit: int = 100) -> List[models.TDU]:
+    """Get all TDUs from the database."""
+    return db.execute(select(models.TDU).offset(skip).limit(limit)).scalars().all()
+
+
+def get_tdu(db: Session, tdu_id: int) -> Optional[models.TDU]:
+    """Get a specific TDU by ID."""
+    return db.execute(select(models.TDU).where(models.TDU.id == tdu_id)).scalar_one_or_none()
+
+
+def get_tdu_by_name(db: Session, name: str) -> Optional[models.TDU]:
+    """Get a TDU by name."""
+    return db.execute(select(models.TDU).where(models.TDU.name == name)).scalar_one_or_none()
+
+
+def create_or_update_tdu(db: Session, tdu_data: schemas.TDUCreate) -> models.TDU:
+    """
+    Create a new TDU or update an existing one if the name matches.
+    This function helps keep the TDU database up to date.
+    """
+    existing = db.execute(
+        select(models.TDU).where(models.TDU.name == tdu_data.name)
+    ).scalar_one_or_none()
+
+    if existing:
+        # Update fields on existing TDU
+        for field, value in tdu_data.model_dump().items():
+            setattr(existing, field, value)
+        db.add(existing)
+        db.commit()
+        db.refresh(existing)
+        return existing
+    else:
+        # Create new TDU
+        new_tdu = models.TDU(**tdu_data.model_dump())
+        db.add(new_tdu)
+        db.commit()
+        db.refresh(new_tdu)
+        return new_tdu

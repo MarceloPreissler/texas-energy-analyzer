@@ -22,7 +22,7 @@ from slowapi.errors import RateLimitExceeded
 
 from .database import engine
 from . import models
-from .api import plans as plans_router, admin as admin_router
+from .api import plans as plans_router, admin as admin_router, tdus as tdus_router
 from .scheduler import start_scheduler, stop_scheduler
 from .logging_config import setup_logging
 
@@ -85,6 +85,7 @@ app.add_middleware(
 # Include routers
 app.include_router(plans_router.router)
 app.include_router(admin_router.router)
+app.include_router(tdus_router.router)
 
 
 @app.get("/")
@@ -92,11 +93,14 @@ app.include_router(admin_router.router)
 async def read_root(request: Request):
     """API root endpoint with rate limiting."""
     return {
-        "message": "Welcome to the Texas Commercial Energy Market Analyzer API",
-        "version": "1.0.0",
+        "message": "Welcome to the Texas Energy Market Analyzer API",
+        "version": "2.0.0",
         "endpoints": {
             "plans": "/plans",
             "providers": "/plans/providers",
+            "tdus": "/tdus",
+            "tdu_summary": "/tdus/summary",
+            "tdu_cost_calculator": "/tdus/calculate-cost/{tdu_name}?kwh=1000",
             "scrape": "/plans/scrape (POST)",
             "docs": "/docs"
         }

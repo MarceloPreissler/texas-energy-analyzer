@@ -59,3 +59,28 @@ class Provider(ProviderBase):
 
     class Config:
         from_attributes = True
+
+
+# TDU Schemas
+class TDUBase(BaseModel):
+    name: str
+    full_name: Optional[str] = None
+    website: Optional[str] = None
+    service_area: Optional[str] = None
+    major_cities: Optional[str] = None
+    customers: Optional[int] = None
+    monthly_charge: Optional[float] = None
+    delivery_charge_per_kwh: Optional[float] = None
+    rate_effective_date: Optional[str] = None
+
+
+class TDUCreate(TDUBase):
+    pass
+
+
+class TDU(TDUBase):
+    id: int
+    last_updated: datetime
+
+    class Config:
+        from_attributes = True

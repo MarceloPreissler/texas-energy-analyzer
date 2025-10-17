@@ -1,14 +1,15 @@
 """
 SQLAlchemy ORM models.
 
-This module defines the database schema for providers and plans.  Providers
-represent retail electric providers (REPs) such as Reliant, Gexa, TXU and
-Direct Energy.  Plans represent individual electricity plans offered by
-providers, including pricing tiers and additional features.
+This module defines the database schema for providers, plans, and TDUs.
+
+- Providers: Retail electric providers (REPs) such as Reliant, Gexa, TXU and Direct Energy
+- Plans: Individual electricity plans offered by providers, including pricing tiers
+- TDUs: Transmission and Distribution Utilities that deliver electricity to customers
 """
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Text
 from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime
 
@@ -54,3 +55,36 @@ class Plan(Base):
 
     def __repr__(self) -> str:
         return f"Plan(id={self.id}, provider_id={self.provider_id}, plan_name={self.plan_name})"
+
+
+class TDU(Base):
+    """
+    Transmission and Distribution Utility (TDU) model.
+
+    TDUs are regulated utilities that own and maintain the power lines,
+    poles, and infrastructure that deliver electricity to homes and businesses.
+    In Texas, customers can choose their retail electric provider (REP), but
+    the TDU is determined by location and handles delivery charges.
+    """
+    __tablename__ = "tdus"
+
+    id: int = Column(Integer, primary_key=True, index=True)
+    name: str = Column(String, unique=True, nullable=False)
+    full_name: str = Column(String, nullable=True)
+    website: str = Column(String, nullable=True)
+
+    # Service area information
+    service_area: str = Column(Text, nullable=True)  # Description of cities/regions served
+    major_cities: str = Column(Text, nullable=True)  # Comma-separated list of major cities
+    customers: int = Column(Integer, nullable=True)  # Number of customers served
+
+    # Delivery charges (rates change twice a year: March 1 and September 1)
+    monthly_charge: float = Column(Float, nullable=True)  # Fixed monthly charge in dollars
+    delivery_charge_per_kwh: float = Column(Float, nullable=True)  # Cents per kWh
+
+    # Metadata
+    last_updated: datetime = Column(DateTime, nullable=False, default=datetime.utcnow)
+    rate_effective_date: str = Column(String, nullable=True)  # e.g., "2025-03-01"
+
+    def __repr__(self) -> str:
+        return f"TDU(id={self.id}, name={self.name}, monthly_charge=${self.monthly_charge}, delivery={self.delivery_charge_per_kwh}¢/kWh)"
