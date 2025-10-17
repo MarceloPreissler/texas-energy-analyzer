@@ -42,6 +42,17 @@ async def lifespan(app: FastAPI):
     """Application lifespan events."""
     # Startup
     logger.info("Application starting up...")
+
+    # Run database migrations BEFORE starting scheduler
+    logger.info("Running database migrations...")
+    from .database import SessionLocal
+    from .migrations import ensure_migrations
+    db = SessionLocal()
+    try:
+        ensure_migrations(db)
+    finally:
+        db.close()
+
     logger.info("Starting background scheduler...")
     start_scheduler()
     yield
