@@ -435,13 +435,26 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
                   <td>{plan.plan_type ?? '-'}</td>
                   <td>{plan.contract_months ?? '-'}</td>
                   <td className={getRateClass(plan.rate_1000_cents)}>
-                    {plan.rate_1000_cents ? `${plan.rate_1000_cents}¢` : '-'}
+                    {plan.rate_1000_cents ? (
+                      `${plan.rate_1000_cents}¢`
+                    ) : plan.plan_type === 'Free Nights/Weekends' ? (
+                      <span style={{ fontSize: '0.85em', color: '#666', fontStyle: 'italic' }}>
+                        Time-of-Use*
+                      </span>
+                    ) : (
+                      '-'
+                    )}
                   </td>
                   <td>
-                    {plan.rate_1000_cents
-                      ? `$${calculateMonthlyCost(plan.rate_1000_cents).toFixed(2)}`
-                      : '-'
-                    }
+                    {plan.rate_1000_cents ? (
+                      `$${calculateMonthlyCost(plan.rate_1000_cents).toFixed(2)}`
+                    ) : plan.plan_type === 'Free Nights/Weekends' ? (
+                      <span style={{ fontSize: '0.85em', color: '#666', fontStyle: 'italic' }}>
+                        Varies**
+                      </span>
+                    ) : (
+                      '-'
+                    )}
                   </td>
                   <td style={{ fontSize: '0.85em', maxWidth: '300px' }}>
                     {plan.special_features ?? '-'}
