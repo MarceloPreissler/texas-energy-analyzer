@@ -8,6 +8,7 @@ interface Plan {
   id: number;
   provider_id: number;
   plan_name: string;
+  plan_url?: string | null;
   plan_type?: string | null;
   contract_months?: number | null;
   rate_500_cents?: number | null;
@@ -412,7 +413,25 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
                       );
                     })()}
                   </td>
-                  <td>{plan.plan_name}</td>
+                  <td>
+                    {plan.plan_url ? (
+                      <a
+                        href={plan.plan_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          color: '#2196F3',
+                          textDecoration: 'none',
+                          fontWeight: '500'
+                        }}
+                        title="View plan details on provider website"
+                      >
+                        {plan.plan_name} 🔗
+                      </a>
+                    ) : (
+                      <span>{plan.plan_name}</span>
+                    )}
+                  </td>
                   <td>{plan.plan_type ?? '-'}</td>
                   <td>{plan.contract_months ?? '-'}</td>
                   <td className={getRateClass(plan.rate_1000_cents)}>

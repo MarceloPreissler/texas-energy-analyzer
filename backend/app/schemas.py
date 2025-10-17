@@ -15,6 +15,7 @@ from pydantic import BaseModel
 
 class PlanBase(BaseModel):
     plan_name: str
+    plan_url: Optional[str] = None
     plan_type: Optional[str] = None
     service_type: Optional[str] = "Residential"
     zip_code: Optional[str] = None

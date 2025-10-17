@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 
 from .database import SessionLocal
 from .scraping import scraper, energybot_scraper_v2  # REAL data scrapers
+from .scraping.provider_urls import get_plan_url
 from . import crud, schemas
 
 # Configure logging
@@ -64,10 +65,14 @@ def scrape_real_data_job():
                         db, schemas.ProviderCreate(name=provider_name)
                     )
 
+                # Get plan URL
+                plan_url = get_plan_url(provider_name, plan_data.get("plan_name"))
+
                 # Create plan object
                 plan_create = schemas.PlanCreate(
                     provider_id=provider.id,
                     plan_name=plan_data["plan_name"],
+                    plan_url=plan_url,
                     plan_type=plan_data.get("plan_type", "Fixed"),
                     service_type=plan_data.get("service_type", "Residential"),
                     zip_code=plan_data.get("zip_code", "75001"),
@@ -124,10 +129,14 @@ def scrape_real_data_job():
                         db, schemas.ProviderCreate(name=provider_name)
                     )
 
+                # Get plan URL
+                plan_url = get_plan_url(provider_name, plan_data.get("plan_name"))
+
                 # Create plan object
                 plan_create = schemas.PlanCreate(
                     provider_id=provider.id,
                     plan_name=plan_data["plan_name"],
+                    plan_url=plan_url,
                     plan_type=plan_data.get("plan_type", "Fixed"),
                     service_type="Commercial",
                     zip_code=plan_data.get("zip_code", "75001"),
