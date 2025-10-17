@@ -15,7 +15,7 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 SAMPLE_PLANS = COMPREHENSIVE_PLANS
 
 
-@router.delete("/delete-all-plans")
+@router.post("/delete-all-plans")
 def delete_all_plans(db: Session = Depends(get_db)):
     """
     Delete ALL plans from database.

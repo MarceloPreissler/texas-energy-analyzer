@@ -1,0 +1,671 @@
+[
+  {
+    "provider_name": "Gexa",
+    "plan_name": "Gexa Eco Saver Plus 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 8.7,
+    "monthly_bill_1000": 87.0,
+    "special_features": "Gexa Eco Saver Plus 1212 months8.7$87Earn a $125 credit when you use at least 1,000 kWh.",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Gexa",
+    "plan_name": "Gexa Eco Saver Plus 24",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 8.9,
+    "monthly_bill_1000": 89.0,
+    "special_features": "Gexa Eco Saver Plus 2424 months8.9$89Earn a $125 credit when you use at least 1,000 kWh.",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU",
+    "plan_name": "TXU Smart Edge 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 13.5,
+    "monthly_bill_1000": 135.0,
+    "special_features": "TXU Smart Edge 1212 months13.5$135Get a $50 bill credit when you use at least 800 kWh.",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU",
+    "plan_name": "TXU Smart Edge 24",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 13.9,
+    "monthly_bill_1000": 139.0,
+    "special_features": "TXU Smart Edge 2424 months13.9$139Get a $50 bill credit when you use at least 800 kWh.",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Gexa",
+    "plan_name": "Gexa Eco Saver Lite 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 19.0,
+    "monthly_bill_1000": 190.0,
+    "special_features": "Gexa Eco Saver Lite 1212 months19$190100% renewable. Earn $50 credit at 500 kWh.",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Gexa",
+    "plan_name": "Gexa Saver Freedom 36",
+    "plan_type": "Fixed",
+    "contract_months": 36,
+    "rate_1000_cents": 18.0,
+    "monthly_bill_1000": 180.0,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Gexa",
+    "plan_name": "Gexa Saver Freedom 24",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 18.2,
+    "monthly_bill_1000": 182.0,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Gexa",
+    "plan_name": "Gexa Straight Saver 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 18.7,
+    "monthly_bill_1000": 187.0,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Gexa",
+    "plan_name": "Gexa Eco Saver Premier 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 19.6,
+    "monthly_bill_1000": 196.0,
+    "special_features": "Gexa Eco Saver Premier 1212 months19.6$196100% renewable. Earn $150 credit at 2,000 kWh.",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU",
+    "plan_name": "Solar Club 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 18.8,
+    "monthly_bill_1000": 188.0,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU",
+    "plan_name": "Texas Choice 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 19.2,
+    "monthly_bill_1000": 192.0,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU",
+    "plan_name": "Solar Saver 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 20.7,
+    "monthly_bill_1000": 207.0,
+    "special_features": "Solar Saver 1212 months20.7$207$30 credit at 1,200 kWh.",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU",
+    "plan_name": "Smart Deal 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 19.4,
+    "monthly_bill_1000": 194.0,
+    "special_features": "Smart Deal 1212 months19.4$194$50 credit at 1,200 kWh.",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU",
+    "plan_name": "Smart Edge 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 13.5,
+    "monthly_bill_1000": 135.0,
+    "special_features": "Smart Edge 1212 months13.5$135$50 credit at 800 kWh.",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Direct Energy",
+    "plan_name": "Live Brighter Lite 24",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 16.9,
+    "special_features": null,
+    "early_termination_fee": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Direct Energy",
+    "plan_name": "Live Brighter Lite 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 16.9,
+    "special_features": null,
+    "early_termination_fee": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Direct Energy",
+    "plan_name": "Apartment Basics 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 16.9,
+    "special_features": null,
+    "early_termination_fee": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Direct Energy",
+    "plan_name": "Bright Secure 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 17.5,
+    "special_features": null,
+    "early_termination_fee": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Direct Energy",
+    "plan_name": "Live Brighter 1K+ 24",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 18.2,
+    "special_features": null,
+    "early_termination_fee": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Direct Energy",
+    "plan_name": "Twelve Hour Power 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 23.6,
+    "special_features": "Free power between 9 p.m. and 9 a.m.",
+    "early_termination_fee": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Direct Energy",
+    "plan_name": "Live Brighter Lite 24",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 16.5,
+    "special_features": null,
+    "early_termination_fee": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Direct Energy",
+    "plan_name": "Live Brighter Lite 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 16.5,
+    "special_features": null,
+    "early_termination_fee": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Direct Energy",
+    "plan_name": "Apartment Basics 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 16.5,
+    "special_features": null,
+    "early_termination_fee": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Direct Energy",
+    "plan_name": "Bright Secure 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 17.5,
+    "special_features": null,
+    "early_termination_fee": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Direct Energy",
+    "plan_name": "Live Brighter 1K+ 24",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 18.2,
+    "special_features": null,
+    "early_termination_fee": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Direct Energy",
+    "plan_name": "Twelve Hour Power 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 23.6,
+    "special_features": "Free power between 9 p.m. and 9 a.m.",
+    "early_termination_fee": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Power Savings 12 plan",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 15.9,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Power Savings 24 plan",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 15.9,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Basic Power 12 plan",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 17.2,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Conservation 12 plan",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 17.5,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Conservation 24 plan",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 17.5,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Basic Power 24 plan",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 17.8,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Pure Power 24 plan",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 18.0,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Pure Power 12 plan",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 18.0,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Power Savings 2,000 kWh 24 plan",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 22.3,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Power Savings 2,000 kWh 12 plan",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 22.7,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Power Savings 12 plan",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 15.9,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Power Savings 24 plan",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 15.9,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Basic Power 12 plan",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 17.2,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Conservation 12 plan",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 17.5,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Conservation 24 plan",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 17.5,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Basic Power 24 plan",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 17.8,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Pure Power 24 plan",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 18.0,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Pure Power 12 plan",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 18.0,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Power Savings 2,000 kWh 24 plan",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 22.3,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Reliant Power Savings 2,000 kWh 12 plan",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 22.7,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Truly Free Weekends",
+    "plan_type": "Free Nights/Weekends",
+    "special_features": "Free electricity on weekends; higher weekday rates",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "Reliant Energy",
+    "plan_name": "Truly Free Nights",
+    "plan_type": "Free Nights/Weekends",
+    "special_features": "Free electricity at night; higher daytime rates",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Clear Deal 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 14.9,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Clear Deal 24",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 15.9,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Solar Value 12",
+    "plan_type": "Solar",
+    "contract_months": 12,
+    "rate_1000_cents": 15.9,
+    "special_features": "Includes bill credit when usage exceeds 800 or 1,200 kWh",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Simple Rate 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 18.3,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Ultimate Season Pass 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 19.6,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Flex Forward",
+    "plan_type": "Variable",
+    "contract_months": 1,
+    "rate_1000_cents": 19.7,
+    "special_features": "3% cash\u2011back loyalty reward",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Free Nights & Solar Days 12 (8 pm)",
+    "plan_type": "Free Nights/Weekends",
+    "contract_months": 12,
+    "rate_1000_cents": 19.9,
+    "special_features": "Free electricity at night between 8 p.m. and 5 a.m.",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Solar Saver 12",
+    "plan_type": "Solar",
+    "contract_months": 12,
+    "rate_1000_cents": 20.8,
+    "special_features": "Includes bill credit when usage exceeds 800 or 1,200 kWh",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Saver's Discount 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 22.1,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Saver's Discount 24",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 23.4,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Clear Deal 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 14.5,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Clear Deal 24",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 15.5,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Solar Value 12",
+    "plan_type": "Solar",
+    "contract_months": 12,
+    "rate_1000_cents": 15.5,
+    "special_features": "Includes bill credit when usage exceeds 800 or 1,200 kWh",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Simple Rate 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 17.6,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Flex Forward",
+    "plan_type": "Variable",
+    "contract_months": 1,
+    "rate_1000_cents": 18.6,
+    "special_features": "3% cash\u2011back loyalty reward",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Ultimate Season Pass 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 19.2,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Free Nights & Solar Days 12 (8 pm)",
+    "plan_type": "Free Nights/Weekends",
+    "contract_months": 12,
+    "rate_1000_cents": 19.5,
+    "special_features": "Free electricity at night between 8 p.m. and 5 a.m.",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Solar Saver 12",
+    "plan_type": "Solar",
+    "contract_months": 12,
+    "rate_1000_cents": 20.4,
+    "special_features": "Includes bill credit when usage exceeds 800 or 1,200 kWh",
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Saver's Discount 12",
+    "plan_type": "Fixed",
+    "contract_months": 12,
+    "rate_1000_cents": 21.6,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "TXU Energy",
+    "plan_name": "Saver's Discount 24",
+    "plan_type": "Fixed",
+    "contract_months": 24,
+    "rate_1000_cents": 22.8,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:10.984235"
+  },
+  {
+    "provider_name": "NRG Energy, Inc.",
+    "plan_name": "3 month",
+    "plan_type": "Fixed",
+    "service_type": "Commercial",
+    "zip_code": "75001",
+    "contract_months": 3,
+    "rate_1000_cents": 5.404,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:20.440931+00:00"
+  },
+  {
+    "provider_name": "AP Gas & Electric",
+    "plan_name": "1 month",
+    "plan_type": "Fixed",
+    "service_type": "Commercial",
+    "zip_code": "75001",
+    "contract_months": 1,
+    "rate_1000_cents": 5.497,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:20.440931+00:00"
+  },
+  {
+    "provider_name": "Chariot Energy",
+    "plan_name": "6 month",
+    "plan_type": "Fixed",
+    "service_type": "Commercial",
+    "zip_code": "75001",
+    "contract_months": 6,
+    "rate_1000_cents": 6.12,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:20.440931+00:00"
+  },
+  {
+    "provider_name": "NRG Energy, Inc.",
+    "plan_name": "9 month",
+    "plan_type": "Fixed",
+    "service_type": "Commercial",
+    "zip_code": "75001",
+    "contract_months": 9,
+    "rate_1000_cents": 6.298,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:20.440931+00:00"
+  },
+  {
+    "provider_name": "Chariot Energy",
+    "plan_name": "18 month",
+    "plan_type": "Fixed",
+    "service_type": "Commercial",
+    "zip_code": "75001",
+    "contract_months": 18,
+    "rate_1000_cents": 7.137,
+    "special_features": null,
+    "last_updated": "2025-10-17T02:28:20.440931+00:00"
+  }
+]
