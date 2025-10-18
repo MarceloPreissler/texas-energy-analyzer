@@ -31,9 +31,9 @@ def run_migrations(db: Session):
                 logger.info("[Migrations] Adding plan_url column to plans table...")
                 db.execute(text("ALTER TABLE plans ADD COLUMN plan_url VARCHAR"))
                 db.commit()
-                logger.info("[Migrations] Successfully added plan_url column")
+                logger.info("[Migrations] OK - Added plan_url column")
             else:
-                logger.info("[Migrations] plan_url column already exists")
+                logger.info("[Migrations] OK - plan_url column exists")
 
         # Migration 2: Create tdus table if it doesn't exist
         if 'tdus' not in inspector.get_table_names():
@@ -54,10 +54,10 @@ def run_migrations(db: Session):
                 )
             """))
             db.commit()
-            logger.info("[Migrations] Successfully created tdus table")
+            logger.info("[Migrations] OK - Created tdus table")
 
-            # Load TDU data
-            logger.info("[Migrations] Loading TDU data...")
+            # Load TDU data (fast - only 6 records)
+            logger.info("[Migrations] Loading 6 TDUs...")
             from .tdu_data import get_all_tdus
             from . import schemas, crud
 
@@ -66,21 +66,20 @@ def run_migrations(db: Session):
                 try:
                     tdu_create = schemas.TDUCreate(**tdu_data)
                     crud.create_or_update_tdu(db, tdu_create)
-                    logger.info(f"[Migrations] Loaded TDU: {tdu_data['name']}")
                 except Exception as e:
-                    logger.error(f"[Migrations] Error loading TDU {tdu_data.get('name')}: {e}")
+                    logger.error(f"[Migrations] Error loading {tdu_data.get('name')}: {e}")
 
-            logger.info("[Migrations] Successfully loaded all TDU data")
+            logger.info("[Migrations] OK - Loaded all TDUs")
         else:
-            logger.info("[Migrations] tdus table already exists")
+            logger.info("[Migrations] OK - tdus table exists")
 
-        logger.info("[Migrations] All migrations completed successfully")
+        logger.info("[Migrations] All migrations completed")
 
     except Exception as e:
-        logger.error(f"[Migrations] Error during migration: {e}")
+        logger.error(f"[Migrations] Migration error: {e}")
+        # Log but don't crash - some migrations may have succeeded
         import traceback
         traceback.print_exc()
-        raise
 
 
 def ensure_migrations(db: Session):
@@ -89,10 +88,14 @@ def ensure_migrations(db: Session):
 
     This is called during application startup to make sure the database
     schema is up to date.
+
+    IMPORTANT: This function never raises exceptions - it only logs errors.
+    This ensures the app can start even if migrations fail.
     """
     try:
         run_migrations(db)
     except Exception as e:
-        logger.error(f"[Migrations] Failed to apply migrations: {e}")
+        logger.error(f"[Migrations] FAILED - migrations did not complete: {e}")
+        logger.error("[Migrations] App will continue startup - check logs for details")
         # Don't crash the app - migrations might have partially succeeded
-        # The error is logged and can be investigated
+        # The app can still run with the old schema

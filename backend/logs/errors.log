@@ -1,0 +1,477 @@
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (1, 'Gexa Eco Saver Plus 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (1, 'Gexa Eco Saver Plus 24', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (2, 'TXU Smart Edge 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (2, 'TXU Smart Edge 24', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (1, 'Gexa Eco Saver Lite 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (1, 'Gexa Saver Freedom 36', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (1, 'Gexa Saver Freedom 24', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (1, 'Gexa Straight Saver 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (1, 'Gexa Eco Saver Premier 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (2, 'Solar Club 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (2, 'Texas Choice 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (2, 'Solar Saver 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (2, 'Smart Deal 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (2, 'Smart Edge 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (3, 'Live Brighter Lite 24', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (3, 'Live Brighter Lite 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (3, 'Apartment Basics 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (3, 'Bright Secure 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (3, 'Live Brighter 1K+ 24', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (3, 'Twelve Hour Power 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (3, 'Live Brighter Lite 24', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (3, 'Live Brighter Lite 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (3, 'Apartment Basics 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (3, 'Bright Secure 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (3, 'Live Brighter 1K+ 24', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (3, 'Twelve Hour Power 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Power Savings 12 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Power Savings 24 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Basic Power 12 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Conservation 12 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Conservation 24 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Basic Power 24 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Pure Power 24 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Pure Power 12 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Power Savings 2,000 kWh 24 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Power Savings 2,000 kWh 12 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Power Savings 12 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Power Savings 24 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Basic Power 12 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Conservation 12 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Conservation 24 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Basic Power 24 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Pure Power 24 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Pure Power 12 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Power Savings 2,000 kWh 24 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Reliant Power Savings 2,000 kWh 12 plan', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Truly Free Weekends', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (4, 'Truly Free Nights', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Clear Deal 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Clear Deal 24', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Solar Value 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Simple Rate 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Ultimate Season Pass 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Flex Forward', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Free Nights & Solar Days 12 (8 pm)', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Solar Saver 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, "Saver's Discount 12", 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, "Saver's Discount 24", 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Clear Deal 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Clear Deal 24', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Solar Value 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Simple Rate 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Flex Forward', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Ultimate Season Pass 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Free Nights & Solar Days 12 (8 pm)', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, 'Solar Saver 12', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, "Saver's Discount 12", 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error processing residential plan: (sqlite3.OperationalError) no such column: plans.plan_url
+[SQL: SELECT plans.id AS plans_id, plans.provider_id AS plans_provider_id, plans.plan_name AS plans_plan_name, plans.plan_url AS plans_plan_url, plans.plan_type AS plans_plan_type, plans.service_type AS plans_service_type, plans.zip_code AS plans_zip_code, plans.contract_months AS plans_contract_months, plans.rate_500_cents AS plans_rate_500_cents, plans.rate_1000_cents AS plans_rate_1000_cents, plans.rate_2000_cents AS plans_rate_2000_cents, plans.monthly_bill_1000 AS plans_monthly_bill_1000, plans.monthly_bill_2000 AS plans_monthly_bill_2000, plans.early_termination_fee AS plans_early_termination_fee, plans.base_monthly_fee AS plans_base_monthly_fee, plans.renewable_percent AS plans_renewable_percent, plans.special_features AS plans_special_features, plans.last_updated AS plans_last_updated 
+FROM plans 
+WHERE plans.provider_id = ? AND plans.plan_name = ?
+ LIMIT ? OFFSET ?]
+[parameters: (5, "Saver's Discount 24", 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error during scrape: 
