@@ -225,8 +225,10 @@ def start_scheduler():
     Start the background scheduler.
 
     Schedule:
-    - STARTUP: Delete sample data, load real data (delayed 30 seconds for Railway healthchecks)
     - DAILY at 3:00 AM: Scrape fresh real data
+
+    NOTE: Startup scraping is DISABLED to prevent Railway healthcheck timeouts.
+    Use the /admin/delete-fake-commercial-plans endpoint or /plans/scrape for manual data loading.
 
     All data is REAL - NO SAMPLES, NO FALLBACKS.
     """
@@ -241,24 +243,11 @@ def start_scheduler():
         replace_existing=True,
     )
 
-    # Start scheduler FIRST so app can finish startup
+    # Start scheduler
     scheduler.start()
-    logger.info("[Scheduler] [OK] Daily job: 3:00 AM scrape REAL data")
+    logger.info("[Scheduler] [OK] Daily job scheduled: 3:00 AM scrape REAL data")
     logger.info("[Scheduler] NO SAMPLE DATA - ONLY LIVE SOURCES")
-
-    # CRITICAL: Delay startup job by 30 seconds to allow Railway healthchecks to pass
-    # This prevents the 5-minute scraping job from blocking app startup
-    import datetime
-    run_time = datetime.datetime.now() + datetime.timedelta(seconds=30)
-    scheduler.add_job(
-        delete_sample_data_and_load_real,
-        trigger='date',
-        run_date=run_time,
-        id='startup_real_data_load',
-        name='Startup: Load REAL Data (delayed 30s)',
-        replace_existing=True
-    )
-    logger.info("[Scheduler] [OK] Startup job scheduled: Load REAL data in 30 seconds (allows healthchecks to pass)")
+    logger.info("[Scheduler] [INFO] Startup scraping DISABLED - use /plans/scrape or /admin endpoints for initial data load")
 
 
 def stop_scheduler():
