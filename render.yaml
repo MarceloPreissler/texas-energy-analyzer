@@ -1,0 +1,32 @@
+# Render.com Blueprint - Automated deployment for Texas Energy Analyzer
+# This file configures both backend and database on Render
+
+services:
+  # Backend API
+  - type: web
+    name: texas-energy-backend
+    env: python
+    region: oregon
+    buildCommand: pip install -r backend/requirements.txt && playwright install chromium && playwright install-deps chromium
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: texas-energy-db
+          property: connectionString
+      - key: RUN_MIGRATIONS
+        value: "true"
+      - key: ALLOWED_ORIGINS
+        value: "*"
+    autoDeploy: true
+
+databases:
+  # PostgreSQL Database
+  - name: texas-energy-db
+    region: oregon
+    plan: free
+    databaseName: texas_energy
+    user: texas_energy_user
