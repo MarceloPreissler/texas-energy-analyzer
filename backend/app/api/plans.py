@@ -58,19 +58,20 @@ def scrape_data(
     """
     Trigger a scrape of electricity plans and update the database.
 
-    Sources:
-    - legacy: Original scrapers (comparison sites) - Residential plans
-    - powertochoose: Live PowerToChoose.org data - Residential plans (recommended)
-    - energybot: EnergyBot.com only - Commercial plans (5 plans)
-    - commercial: All commercial sources - 20+ commercial plans (recommended for commercial)
+    Sources (REAL DATA ONLY):
+    - legacy: Original scrapers (comparison sites) - 68 Residential plans
+    - powertochoose: Live PowerToChoose.org data - Residential plans
+    - energybot: EnergyBot.com JSON-LD data - 5 REAL Commercial plans
+    - commercial: Redirects to energybot (fake aggregator removed)
 
     Service Types:
     - Residential: Residential electricity plans (default)
     - Commercial: Commercial/business electricity plans
 
+    ALL DATA IS REAL - NO SAMPLE DATA, NO FALLBACKS.
     Returns the number of plans processed. Rate limited to prevent abuse.
     """
-    from ..scraping import powertochoose_scraper, energybot_scraper_v2, commercial_aggregator
+    from ..scraping import powertochoose_scraper, energybot_scraper_v2
 
     logger.info(f"Scrape request received - source: {source}, service_type: {service_type}, zip_code: {zip_code}")
 
@@ -81,13 +82,13 @@ def scrape_data(
         else:
             plans = powertochoose_scraper.scrape_powertochoose_all_texas(service_type=service_type)
     elif source == "energybot":
-        logger.info("Using EnergyBot scraper for commercial plans")
+        logger.info("Using EnergyBot scraper for commercial plans (REAL data only)")
         plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
     elif source == "commercial":
-        logger.info("Using commercial aggregator for all commercial plans")
-        plans = commercial_aggregator.scrape_all_commercial_plans()
+        logger.warning("REMOVED: commercial_aggregator had fake sample data - using EnergyBot for REAL data")
+        plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
     else:
-        logger.info("Using legacy scrapers")
+        logger.info("Using legacy scrapers for residential plans")
         plans = scraper.scrape_all()
 
     created_or_updated = 0
