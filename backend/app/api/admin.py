@@ -36,6 +36,37 @@ def delete_all_plans(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/delete-fake-commercial-plans")
+def delete_fake_commercial_plans(db: Session = Depends(get_db)):
+    """
+    Delete FAKE commercial plans from database.
+    Removes plans with "verify" or "Typical" in special_features.
+    """
+    try:
+        from ..models import Plan
+
+        # Delete fake commercial plans (those with "verify" or "Typical" markers)
+        deleted_count = db.query(Plan).filter(
+            Plan.service_type == "Commercial",
+            (Plan.special_features.like("%verify%") | Plan.special_features.like("%Typical%"))
+        ).delete(synchronize_session=False)
+
+        db.commit()
+
+        # Count remaining commercial plans
+        remaining = db.query(Plan).filter(Plan.service_type == "Commercial").count()
+
+        return {
+            "status": "success",
+            "message": "Fake commercial plans deleted",
+            "deleted_count": deleted_count,
+            "remaining_commercial_plans": remaining
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/load-real-data")
 def load_real_data(plans_data: List[Dict[str, Any]] = Body(...), db: Session = Depends(get_db)):
     """
