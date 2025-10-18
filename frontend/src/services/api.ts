@@ -14,8 +14,8 @@ const isProduction = isCustomDomain || isVercelPreview || (!isLocalhost && !isNg
 // API base URL logic - explicit and clear
 let API_BASE_URL: string;
 if (isProduction || isVercelPreview || isCustomDomain) {
-  // Production: ALWAYS use HTTPS Railway backend
-  API_BASE_URL = 'https://web-production-665ac.up.railway.app';
+  // Production: Use ngrok tunnel to local backend with REAL DATA
+  API_BASE_URL = 'https://joann-granulocytic-decanically.ngrok-free.dev';
 } else if (isNgrok) {
   // Ngrok tunnel: use local backend
   API_BASE_URL = 'http://10.0.0.16:8000';
@@ -23,9 +23,9 @@ if (isProduction || isVercelPreview || isCustomDomain) {
   // Localhost: use Vite proxy (empty string for relative URLs)
   API_BASE_URL = '';
 } else {
-  // Fallback: if we can't detect, assume production and use HTTPS
-  console.warn('Unable to detect environment, defaulting to production HTTPS');
-  API_BASE_URL = 'https://web-production-665ac.up.railway.app';
+  // Fallback: if we can't detect, assume production and use ngrok
+  console.warn('Unable to detect environment, defaulting to production ngrok');
+  API_BASE_URL = 'https://joann-granulocytic-decanically.ngrok-free.dev';
 }
 
 // Environment detection verified - uncomment for debugging if needed
