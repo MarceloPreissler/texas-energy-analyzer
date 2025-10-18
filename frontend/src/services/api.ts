@@ -95,7 +95,7 @@ export async function fetchPlans(
   if (serviceType) params.service_type = serviceType;
   if (zipCode) params.zip_code = zipCode;
   if (contractMonths) params.contract_months = contractMonths;
-  const res = await api.get<Plan[]>('/plans', { params });
+  const res = await api.get<Plan[]>('/plans/', { params });
   return res.data;
 }
 

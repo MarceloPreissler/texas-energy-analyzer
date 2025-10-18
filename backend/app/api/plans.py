@@ -47,7 +47,7 @@ def read_plan(plan_id: int, db: Session = Depends(get_db)):
     return db_plan
 
 
-@router.post("/scrape", response_model=dict[str, int])
+@router.post("/scrape")
 def scrape_data(
     source: str = Query("legacy", description="Scrape source: 'legacy', 'powertochoose', 'energybot', or 'commercial'"),
     service_type: str = Query("Residential", description="Service type: 'Residential' or 'Commercial'"),
@@ -107,6 +107,5 @@ def scrape_data(
 
     return {
         "plans_processed": created_or_updated,
-        "source": source,
-        "timestamp": plan["last_updated"].isoformat() if plans else None
+        "source": source
     }
