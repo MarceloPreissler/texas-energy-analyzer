@@ -225,21 +225,12 @@ def start_scheduler():
     Start the background scheduler.
 
     Schedule:
-    - STARTUP: Delete sample data, load real data (runs once)
+    - STARTUP: Delete sample data, load real data (runs in background)
     - DAILY at 3:00 AM: Scrape fresh real data
 
     All data is REAL - NO SAMPLES, NO FALLBACKS.
     """
     logger.info("[Scheduler] Starting automated REAL DATA scheduler...")
-
-    # Run on startup to ensure real data
-    scheduler.add_job(
-        delete_sample_data_and_load_real,
-        trigger='date',
-        id='startup_real_data_load',
-        name='Startup: Load REAL Data',
-        replace_existing=True
-    )
 
     # Daily scrape at 3 AM - REAL DATA ONLY
     scheduler.add_job(
@@ -250,10 +241,22 @@ def start_scheduler():
         replace_existing=True,
     )
 
+    # Start scheduler FIRST so app can finish startup
     scheduler.start()
-    logger.info("[Scheduler] ✓ Startup job: Load REAL data")
-    logger.info("[Scheduler] ✓ Daily job: 3:00 AM scrape REAL data")
+    logger.info("[Scheduler] [OK] Daily job: 3:00 AM scrape REAL data")
     logger.info("[Scheduler] NO SAMPLE DATA - ONLY LIVE SOURCES")
+
+    # Run startup data load in background (non-blocking)
+    # This allows the app to finish startup and pass healthchecks
+    # while data is being loaded in the background
+    scheduler.add_job(
+        delete_sample_data_and_load_real,
+        trigger='date',
+        id='startup_real_data_load',
+        name='Startup: Load REAL Data',
+        replace_existing=True
+    )
+    logger.info("[Scheduler] [OK] Startup job scheduled: Load REAL data in background")
 
 
 def stop_scheduler():
