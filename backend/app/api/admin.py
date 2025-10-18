@@ -132,6 +132,52 @@ def load_real_data(plans_data: List[Dict[str, Any]] = Body(...), db: Session = D
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/run-migrations")
+def run_migrations_manually(db: Session = Depends(get_db)):
+    """
+    Manually run database migrations.
+    Safe to call multiple times - only applies missing changes.
+    """
+    try:
+        from ..migrations import run_migrations
+
+        run_migrations(db)
+
+        return {
+            "status": "success",
+            "message": "Database migrations completed successfully"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Migration failed: {str(e)}")
+
+
+@router.post("/load-tdus")
+def load_tdu_data(db: Session = Depends(get_db)):
+    """
+    Load TDU data into the database.
+    Loads all 6 Texas TDUs with delivery charges.
+    """
+    try:
+        from ..tdu_data import get_all_tdus
+        from .. import schemas, crud
+
+        tdus = get_all_tdus()
+        loaded_count = 0
+
+        for tdu_data in tdus:
+            tdu_create = schemas.TDUCreate(**tdu_data)
+            crud.create_or_update_tdu(db, tdu_create)
+            loaded_count += 1
+
+        return {
+            "status": "success",
+            "message": f"Loaded {loaded_count} TDUs",
+            "tdus_loaded": loaded_count
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"TDU loading failed: {str(e)}")
+
+
 @router.post("/load-initial-data")
 def load_initial_data(db: Session = Depends(get_db)):
     """

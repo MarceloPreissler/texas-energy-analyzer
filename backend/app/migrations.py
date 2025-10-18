@@ -55,21 +55,7 @@ def run_migrations(db: Session):
             """))
             db.commit()
             logger.info("[Migrations] OK - Created tdus table")
-
-            # Load TDU data (fast - only 6 records)
-            logger.info("[Migrations] Loading 6 TDUs...")
-            from .tdu_data import get_all_tdus
-            from . import schemas, crud
-
-            tdus = get_all_tdus()
-            for tdu_data in tdus:
-                try:
-                    tdu_create = schemas.TDUCreate(**tdu_data)
-                    crud.create_or_update_tdu(db, tdu_create)
-                except Exception as e:
-                    logger.error(f"[Migrations] Error loading {tdu_data.get('name')}: {e}")
-
-            logger.info("[Migrations] OK - Loaded all TDUs")
+            logger.info("[Migrations] TDU data loading skipped - use /admin/load-tdus endpoint")
         else:
             logger.info("[Migrations] OK - tdus table exists")
 
