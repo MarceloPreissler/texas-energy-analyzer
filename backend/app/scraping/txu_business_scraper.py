@@ -2,6 +2,7 @@
 TXU Energy small business/commercial plan scraper.
 
 Scrapes commercial electricity plans from TXU's business site.
+Uses playwright-stealth to bypass bot detection.
 """
 from __future__ import annotations
 
@@ -9,6 +10,7 @@ import re
 from typing import List, Dict
 from datetime import datetime, timezone
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
+from playwright_stealth import stealth_sync
 
 
 def scrape_txu_commercial(zip_code: str = "75001", max_plans: int = 50) -> List[Dict]:
@@ -25,12 +27,19 @@ def scrape_txu_commercial(zip_code: str = "75001", max_plans: int = 50) -> List[
     plans: List[Dict] = []
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(
+            headless=True,
+            args=['--disable-blink-features=AutomationControlled']  # Additional stealth
+        )
         context = browser.new_context(
             viewport={'width': 1920, 'height': 1080},
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         )
         page = context.new_page()
+
+        # STEALTH MODE: Makes browser undetectable as automation
+        stealth_sync(page)
+        print("[TXU Business] Stealth mode activated - bypassing bot detection")
 
         try:
             # TXU Business page
@@ -162,28 +171,9 @@ def scrape_txu_commercial(zip_code: str = "75001", max_plans: int = 50) -> List[
                                 continue
 
                 if not plans:
-                    print("[TXU Business] Could not extract plans from text, using fallback data")
-
-                    # Fallback: Use typical TXU business rates (these are estimates)
-                    fallback_plans = [
-                        {"name": "Business Advantage 12", "rate": 11.9, "term": 12},
-                        {"name": "Business Advantage 24", "rate": 11.5, "term": 24},
-                        {"name": "Business Value 12", "rate": 12.5, "term": 12},
-                        {"name": "Small Business Fixed 12", "rate": 12.8, "term": 12},
-                    ]
-
-                    for plan_info in fallback_plans:
-                        plans.append({
-                            "provider_name": "TXU Energy",
-                            "plan_name": plan_info["name"],
-                            "plan_type": "Fixed",
-                            "service_type": "Commercial",
-                            "zip_code": zip_code,
-                            "contract_months": plan_info["term"],
-                            "rate_1000_cents": plan_info["rate"],
-                            "special_features": "Estimated rate - verify with TXU",
-                            "last_updated": datetime.now(timezone.utc),
-                        })
+                    print("[TXU Business] Could not extract plans from text")
+                    print("[TXU Business] NO FALLBACK DATA - Returning empty to maintain data integrity")
+                    return []  # Return empty instead of fake data
 
                 return plans
 

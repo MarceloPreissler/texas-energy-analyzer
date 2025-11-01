@@ -2,6 +2,7 @@
 Reliant Energy small business/commercial plan scraper.
 
 Scrapes commercial electricity plans from Reliant's business site.
+Uses playwright-stealth to bypass bot detection.
 """
 from __future__ import annotations
 
@@ -9,6 +10,7 @@ import re
 from typing import List, Dict
 from datetime import datetime
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
+from playwright_stealth import stealth_sync
 
 
 def scrape_reliant_commercial(zip_code: str = "75001", max_plans: int = 50) -> List[Dict]:
@@ -25,12 +27,19 @@ def scrape_reliant_commercial(zip_code: str = "75001", max_plans: int = 50) -> L
     plans: List[Dict] = []
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(
+            headless=True,
+            args=['--disable-blink-features=AutomationControlled']  # Additional stealth
+        )
         context = browser.new_context(
             viewport={'width': 1920, 'height': 1080},
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         )
         page = context.new_page()
+
+        # STEALTH MODE: Makes browser undetectable as automation
+        stealth_sync(page)
+        print("[Reliant Business] Stealth mode activated - bypassing bot detection")
 
         try:
             # Try the shop page for business

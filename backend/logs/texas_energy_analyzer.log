@@ -525,3 +525,89 @@ WHERE plans.provider_id = ? AND plans.plan_name = ?
 2025-10-17 18:08:57 | ERROR    | app.scheduler | [Scheduler] Error during scrape: 
 2025-10-17 18:08:57 | INFO     | app.scheduler | [Startup] REAL data loaded successfully!
 2025-10-17 18:08:57 | INFO     | apscheduler.executors.default | Job "Startup: Load REAL Data (trigger: date[2025-10-17 18:08:49 CDT], next run at: 2025-10-17 18:08:49 CDT)" executed successfully
+2025-10-17 23:03:13 | ERROR    | asyncio | Future exception was never retrieved
+future: <Future finished exception=NotImplementedError()>
+Traceback (most recent call last):
+  File "C:\Users\marce\texas-energy-analyzer\backend\app\scheduler.py", line 116, in scrape_real_data_job
+    commercial_plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\marce\texas-energy-analyzer\backend\app\scraping\energybot_scraper_v2.py", line 178, in scrape_energybot_all_texas_v2
+    plans = scrape_energybot_commercial_v2(zip_code="75001", max_plans=50)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\marce\texas-energy-analyzer\backend\app\scraping\energybot_scraper_v2.py", line 29, in scrape_energybot_commercial_v2
+    with sync_playwright() as p:
+  File "C:\Users\marce\texas-energy-analyzer\backend\.venv\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\marce\texas-energy-analyzer\backend\.venv\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\marce\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\marce\texas-energy-analyzer\backend\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 301, in run_as_sync
+    await self.run()
+  File "C:\Users\marce\texas-energy-analyzer\backend\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 310, in run
+    await self._transport.connect()
+  File "C:\Users\marce\texas-energy-analyzer\backend\.venv\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\marce\texas-energy-analyzer\backend\.venv\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\marce\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\marce\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1744, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\marce\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 524, in _make_subprocess_transport
+    raise NotImplementedError
+NotImplementedError
+2025-10-17 23:05:57 | INFO     | root | Logging system initialized
+2025-10-17 23:05:57 | INFO     | root | Log files location: C:\Users\marce\texas-energy-analyzer\backend\logs
+2025-10-17 23:05:57 | INFO     | app.main | Application starting up...
+2025-10-17 23:05:57 | INFO     | app.main | Migrations skipped (set RUN_MIGRATIONS=true to enable)
+2025-10-17 23:05:57 | INFO     | app.main | Starting background scheduler...
+2025-10-17 23:05:57 | INFO     | app.scheduler | [Scheduler] Starting automated REAL DATA scheduler...
+2025-10-17 23:05:57 | INFO     | apscheduler.scheduler | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-17 23:05:57 | INFO     | apscheduler.scheduler | Added job "Daily REAL Data Scrape (Residential + Commercial)" to job store "default"
+2025-10-17 23:05:57 | INFO     | apscheduler.scheduler | Scheduler started
+2025-10-17 23:05:57 | INFO     | app.scheduler | [Scheduler] [OK] Daily job scheduled: 3:00 AM scrape REAL data
+2025-10-17 23:05:57 | INFO     | app.scheduler | [Scheduler] NO SAMPLE DATA - ONLY LIVE SOURCES
+2025-10-17 23:05:57 | INFO     | app.scheduler | [Scheduler] [INFO] Startup scraping DISABLED - use /plans/scrape or /admin endpoints for initial data load
+2025-10-17 23:06:29 | INFO     | app.migrations | [Migrations] Checking for pending database migrations...
+2025-10-17 23:06:29 | INFO     | app.migrations | [Migrations] OK - plan_url column exists
+2025-10-17 23:06:29 | INFO     | app.migrations | [Migrations] OK - tdus table exists
+2025-10-17 23:06:29 | INFO     | app.migrations | [Migrations] All migrations completed
+2025-10-17 23:06:48 | INFO     | app.api.plans | Scrape request received - source: legacy, service_type: Residential, zip_code: None
+2025-10-17 23:06:48 | INFO     | app.api.plans | Using legacy scrapers for residential plans
+2025-10-17 23:06:55 | INFO     | app.api.plans | Scrape completed - 68 plans processed from legacy
+2025-10-17 23:08:52 | INFO     | app.api.plans | Scrape request received - source: legacy, service_type: Residential, zip_code: None
+2025-10-17 23:08:52 | INFO     | app.api.plans | Using legacy scrapers for residential plans
+2025-10-17 23:08:57 | INFO     | app.api.plans | Scrape completed - 68 plans processed from legacy
+2025-10-17 23:09:51 | INFO     | app.api.plans | Scrape request received - source: legacy, service_type: Residential, zip_code: None
+2025-10-17 23:09:51 | INFO     | app.api.plans | Using legacy scrapers for residential plans
+2025-10-17 23:09:55 | INFO     | app.api.plans | Scrape completed - 68 plans processed from legacy
+2025-10-17 23:11:30 | INFO     | root | Logging system initialized
+2025-10-17 23:11:30 | INFO     | root | Log files location: C:\Users\marce\texas-energy-analyzer\backend\logs
+2025-10-17 23:11:30 | INFO     | app.main | Application starting up...
+2025-10-17 23:11:30 | INFO     | app.main | Migrations skipped (set RUN_MIGRATIONS=true to enable)
+2025-10-17 23:11:30 | INFO     | app.main | Starting background scheduler...
+2025-10-17 23:11:30 | INFO     | app.scheduler | [Scheduler] Starting automated REAL DATA scheduler...
+2025-10-17 23:11:30 | INFO     | apscheduler.scheduler | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-17 23:11:30 | INFO     | apscheduler.scheduler | Added job "Daily REAL Data Scrape (Residential + Commercial)" to job store "default"
+2025-10-17 23:11:30 | INFO     | apscheduler.scheduler | Scheduler started
+2025-10-17 23:11:30 | INFO     | app.scheduler | [Scheduler] [OK] Daily job scheduled: 3:00 AM scrape REAL data
+2025-10-17 23:11:30 | INFO     | app.scheduler | [Scheduler] NO SAMPLE DATA - ONLY LIVE SOURCES
+2025-10-17 23:11:30 | INFO     | app.scheduler | [Scheduler] [INFO] Startup scraping DISABLED - use /plans/scrape or /admin endpoints for initial data load
+2025-10-18 06:35:36 | INFO     | root | Logging system initialized
+2025-10-18 06:35:36 | INFO     | root | Log files location: C:\Users\marce\texas-energy-analyzer\backend\logs
+2025-10-18 06:35:36 | INFO     | app.main | Application starting up...
+2025-10-18 06:35:36 | INFO     | app.main | Migrations skipped (set RUN_MIGRATIONS=true to enable)
+2025-10-18 06:35:36 | INFO     | app.main | Starting background scheduler...
+2025-10-18 06:35:36 | INFO     | app.scheduler | [Scheduler] Starting automated REAL DATA scheduler...
+2025-10-18 06:35:36 | INFO     | apscheduler.scheduler | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-18 06:35:36 | INFO     | apscheduler.scheduler | Added job "Daily REAL Data Scrape (Residential + Commercial)" to job store "default"
+2025-10-18 06:35:36 | INFO     | apscheduler.scheduler | Scheduler started
+2025-10-18 06:35:36 | INFO     | app.scheduler | [Scheduler] [OK] Daily job scheduled: 3:00 AM scrape REAL data
+2025-10-18 06:35:36 | INFO     | app.scheduler | [Scheduler] NO SAMPLE DATA - ONLY LIVE SOURCES
+2025-10-18 06:35:36 | INFO     | app.scheduler | [Scheduler] [INFO] Startup scraping DISABLED - use /plans/scrape or /admin endpoints for initial data load
+2025-10-19 03:00:02 | WARNING  | apscheduler.executors.default | Run time of job "Daily REAL Data Scrape (Residential + Commercial) (trigger: cron[hour='3', minute='0'], next run at: 2025-10-19 03:00:00 CDT)" was missed by 0:00:02.919235

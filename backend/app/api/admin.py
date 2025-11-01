@@ -8,6 +8,7 @@ from typing import List, Dict, Any
 from .. import crud, schemas
 from ..database import get_db
 from .comprehensive_plans import COMPREHENSIVE_PLANS
+from ..data_validation import validate_plan_batch, get_data_quality_score
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -178,11 +179,114 @@ def load_tdu_data(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"TDU loading failed: {str(e)}")
 
 
+@router.get("/audit-data-quality")
+def audit_data_quality(db: Session = Depends(get_db)):
+    """
+    Audit production database for fake or estimated data.
+    Returns suspicious plans that may need to be removed.
+    """
+    try:
+        from ..models import Plan
+
+        # Find plans with fake data markers
+        fake_markers = ['estimate', 'typical', 'verify', 'fallback', 'sample', 'demo', 'call for']
+        suspicious_plans = []
+
+        for marker in fake_markers:
+            plans = db.query(Plan).filter(
+                Plan.special_features.ilike(f'%{marker}%')
+            ).all()
+
+            for plan in plans:
+                suspicious_plans.append({
+                    'id': plan.id,
+                    'provider': plan.provider.name if plan.provider else 'Unknown',
+                    'plan_name': plan.plan_name,
+                    'service_type': plan.service_type,
+                    'rate_1000_cents': plan.rate_1000_cents,
+                    'special_features': plan.special_features,
+                    'marker': marker,
+                    'last_updated': plan.last_updated.isoformat()
+                })
+
+        # Get all plans for quality scoring
+        all_plans = db.query(Plan).all()
+        plans_data = [
+            {
+                'provider_name': p.provider.name if p.provider else 'Unknown',
+                'plan_name': p.plan_name,
+                'service_type': p.service_type,
+                'rate_1000_cents': p.rate_1000_cents,
+                'special_features': p.special_features
+            }
+            for p in all_plans
+        ]
+
+        quality_metrics = get_data_quality_score(plans_data)
+
+        return {
+            'status': 'success',
+            'total_plans': len(all_plans),
+            'suspicious_plans_count': len(suspicious_plans),
+            'suspicious_plans': suspicious_plans,
+            'quality_metrics': quality_metrics,
+            'recommendation': 'DELETE suspicious plans' if suspicious_plans else 'Data quality is good'
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/delete-fake-data-markers")
+def delete_fake_data_markers(db: Session = Depends(get_db)):
+    """
+    Delete ALL plans containing fake data markers.
+    This includes: estimated, verify, typical, fallback, sample, demo.
+    """
+    try:
+        from ..models import Plan
+
+        # Delete plans with fake data markers
+        fake_markers = ['estimate', 'typical', 'verify', 'fallback', 'sample', 'demo', 'call for']
+
+        deleted_ids = []
+        total_deleted = 0
+
+        for marker in fake_markers:
+            plans = db.query(Plan).filter(
+                Plan.special_features.ilike(f'%{marker}%')
+            ).all()
+
+            for plan in plans:
+                deleted_ids.append({
+                    'id': plan.id,
+                    'provider': plan.provider.name if plan.provider else 'Unknown',
+                    'plan_name': plan.plan_name,
+                    'marker': marker
+                })
+                db.delete(plan)
+                total_deleted += 1
+
+        db.commit()
+
+        return {
+            'status': 'success',
+            'deleted_count': total_deleted,
+            'deleted_plans': deleted_ids,
+            'message': f'Deleted {total_deleted} plans with fake data markers'
+        }
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/load-initial-data")
 def load_initial_data(db: Session = Depends(get_db)):
     """
-    Load initial sample data into the database.
-    This endpoint is for initial setup and testing.
+    ⚠️ WARNING: Load initial sample data into the database.
+    This endpoint loads FAKE demonstration data and should ONLY be used for testing.
+    DO NOT USE IN PRODUCTION!
     """
     try:
         added = 0

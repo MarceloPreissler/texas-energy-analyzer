@@ -94,7 +94,7 @@ app.add_middleware(
 # Prevent host header attacks - allow Railway domains
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["localhost", "127.0.0.1", "*.local", "*.up.railway.app", "*.vercel.app"]
+    allowed_hosts=["localhost", "127.0.0.1", "*.local", "*.up.railway.app", "*.vercel.app", "*.ngrok-free.dev"]
 )
 
 # Include routers

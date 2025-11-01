@@ -20,6 +20,7 @@ from .database import SessionLocal
 from .scraping import scraper, energybot_scraper_v2  # REAL data scrapers
 from .scraping.provider_urls import get_plan_url
 from . import crud, schemas
+from .data_validation import validate_plan_batch, log_validation_summary, get_data_quality_score
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -49,8 +50,14 @@ def scrape_real_data_job():
     try:
         # 1. Scrape REAL residential plans
         logger.info("[Scheduler] Scraping REAL residential plans from PowerChoiceTexas...")
-        residential_plans = scraper.scrape_all()
-        logger.info(f"[Scheduler] Retrieved {len(residential_plans)} REAL residential plans")
+        residential_plans_raw = scraper.scrape_all()
+        logger.info(f"[Scheduler] Retrieved {len(residential_plans_raw)} raw residential plans")
+
+        # VALIDATE: Remove any fake/estimated data
+        residential_plans, rejected_residential = validate_plan_batch(residential_plans_raw, strict=True)
+        logger.info(f"[Scheduler] Validated: {len(residential_plans)} REAL residential plans accepted")
+        if rejected_residential:
+            logger.warning(f"[Scheduler] Rejected {len(rejected_residential)} residential plans with fake data markers")
 
         for plan_data in residential_plans:
             try:
@@ -113,8 +120,14 @@ def scrape_real_data_job():
 
         # 2. Scrape REAL commercial plans
         logger.info("[Scheduler] Scraping REAL commercial plans from EnergyBot...")
-        commercial_plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
-        logger.info(f"[Scheduler] Retrieved {len(commercial_plans)} REAL commercial plans")
+        commercial_plans_raw = energybot_scraper_v2.scrape_energybot_all_texas_v2()
+        logger.info(f"[Scheduler] Retrieved {len(commercial_plans_raw)} raw commercial plans")
+
+        # VALIDATE: Remove any fake/estimated data
+        commercial_plans, rejected_commercial = validate_plan_batch(commercial_plans_raw, strict=True)
+        logger.info(f"[Scheduler] Validated: {len(commercial_plans)} REAL commercial plans accepted")
+        if rejected_commercial:
+            logger.warning(f"[Scheduler] Rejected {len(rejected_commercial)} commercial plans with fake data markers")
 
         for plan_data in commercial_plans:
             try:
@@ -178,6 +191,20 @@ def scrape_real_data_job():
         db.commit()
         logger.info(f"[Scheduler] SUCCESS! Total: {total_added} added, {total_updated} updated")
         logger.info(f"[Scheduler] ALL DATA IS REAL - NO SAMPLES")
+
+        # Log validation summary
+        log_validation_summary(
+            plans_before=len(residential_plans_raw) + len(commercial_plans_raw),
+            plans_after=len(residential_plans) + len(commercial_plans),
+            rejected=rejected_residential + rejected_commercial
+        )
+
+        # Calculate and log data quality score
+        all_valid_plans = residential_plans + commercial_plans
+        if all_valid_plans:
+            quality_metrics = get_data_quality_score(all_valid_plans)
+            logger.info(f"[Scheduler] Data Quality Score: {quality_metrics['quality_score']}%")
+            logger.info(f"[Scheduler] Quality Issues: {', '.join(quality_metrics['issues'])}")
 
     except Exception as e:
         db.rollback()
