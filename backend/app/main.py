@@ -57,13 +57,25 @@ async def lifespan(app: FastAPI):
     else:
         logger.info("Migrations skipped (set RUN_MIGRATIONS=true to enable)")
 
+    # Start scheduler with error handling
     logger.info("Starting background scheduler...")
-    start_scheduler()
+    try:
+        start_scheduler()
+        logger.info("✓ Background scheduler started successfully")
+    except Exception as e:
+        logger.error(f"⚠️ Failed to start scheduler: {e}")
+        logger.error("App will continue without scheduler - manual scraping still available")
+        # Don't crash the app if scheduler fails
+
     yield
     # Shutdown
     logger.info("Application shutting down...")
     logger.info("Stopping background scheduler...")
-    stop_scheduler()
+    try:
+        stop_scheduler()
+        logger.info("✓ Background scheduler stopped successfully")
+    except Exception as e:
+        logger.error(f"⚠️ Error stopping scheduler: {e}")
 
 app = FastAPI(
     title="Texas Commercial Energy Market Analyzer",

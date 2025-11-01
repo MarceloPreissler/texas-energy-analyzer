@@ -61,9 +61,9 @@ RUN mkdir -p /app/data
 # Expose port
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000/health')"
+# Health check - give app more time to start (Playwright + scheduler initialization)
+HEALTHCHECK --interval=30s --timeout=15s --start-period=60s --retries=5 \
+    CMD python -c "import requests; requests.get('http://localhost:8000/health', timeout=10)"
 
 # Run the application
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
