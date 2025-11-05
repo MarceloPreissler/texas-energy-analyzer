@@ -206,6 +206,19 @@ def scrape_real_data_job():
             logger.info(f"[Scheduler] Data Quality Score: {quality_metrics['quality_score']}%")
             logger.info(f"[Scheduler] Quality Issues: {', '.join(quality_metrics['issues'])}")
 
+        # Send email notification after successful scrape
+        logger.info("[Scheduler] Sending daily email report...")
+        try:
+            from .email_notifications import send_daily_report
+            email_sent = send_daily_report(db)
+            if email_sent:
+                logger.info("[Scheduler] ✓ Daily email report sent successfully")
+            else:
+                logger.warning("[Scheduler] ⚠ Daily email report not sent (check REPORT_EMAIL config)")
+        except Exception as email_error:
+            logger.error(f"[Scheduler] Failed to send email report: {email_error}")
+            # Don't fail the whole scrape job if email fails
+
     except Exception as e:
         db.rollback()
         logger.error(f"[Scheduler] Error during scrape: {e}")

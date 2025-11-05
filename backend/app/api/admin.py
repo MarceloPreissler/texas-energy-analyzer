@@ -281,6 +281,83 @@ def delete_fake_data_markers(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/send-daily-report")
+def send_daily_email_report(db: Session = Depends(get_db)):
+    """
+    Manually trigger daily email report.
+    Sends comprehensive status report with commercial rate summary to configured email.
+    """
+    try:
+        from ..email_notifications import send_daily_report
+
+        email_sent = send_daily_report(db)
+
+        if email_sent:
+            return {
+                "status": "success",
+                "message": "Daily report email sent successfully"
+            }
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to send email. Check REPORT_EMAIL and SMTP configuration."
+            )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Email error: {str(e)}")
+
+
+@router.post("/send-test-email")
+def send_test_email(email: str, db: Session = Depends(get_db)):
+    """
+    Send a test email to verify SMTP configuration.
+
+    Args:
+        email: Email address to send test to (query parameter)
+    """
+    try:
+        from ..email_notifications import send_email_report
+
+        test_body = """
+        <html>
+        <body style="font-family: Arial, sans-serif;">
+            <h2 style="color: #0066cc;">🔌 Texas Energy Analyzer - Test Email</h2>
+            <p>If you're reading this, your email configuration is working correctly!</p>
+            <p><strong>Next steps:</strong></p>
+            <ol>
+                <li>Set REPORT_EMAIL environment variable in Railway</li>
+                <li>Daily reports will be sent automatically at 3 AM CT</li>
+                <li>Or trigger manually via /admin/send-daily-report</li>
+            </ol>
+            <hr>
+            <p style="color: #666; font-size: 12px;">
+                This is a test email from Texas Energy Analyzer.
+            </p>
+        </body>
+        </html>
+        """
+
+        success = send_email_report(
+            to_email=email,
+            subject="Texas Energy Analyzer - Test Email",
+            html_body=test_body
+        )
+
+        if success:
+            return {
+                "status": "success",
+                "message": f"Test email sent successfully to {email}",
+                "note": "Check your inbox (and spam folder)"
+            }
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to send test email. Check SMTP configuration in environment variables."
+            )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Email error: {str(e)}")
+
+
 @router.post("/load-initial-data")
 def load_initial_data(db: Session = Depends(get_db)):
     """
