@@ -9,6 +9,7 @@ NO SAMPLE DATA. NO FALLBACK DATA.
 """
 from __future__ import annotations
 
+import os
 import logging
 from datetime import datetime
 
@@ -17,7 +18,7 @@ from apscheduler.triggers.cron import CronTrigger
 from sqlalchemy.orm import Session
 
 from .database import SessionLocal
-from .scraping import scraper, energybot_scraper_v2  # REAL data scrapers
+from .scraping import scraper, energybot_scraper_v2, energybot_business_enhanced  # REAL data scrapers
 from .scraping.provider_urls import get_plan_url
 from . import crud, schemas
 
@@ -27,6 +28,9 @@ logger = logging.getLogger(__name__)
 
 # Initialize scheduler
 scheduler = BackgroundScheduler()
+
+# Check which commercial scraper to use
+USE_ENHANCED_ENERGYBOT = os.getenv("USE_ENHANCED_ENERGYBOT", "true").lower() == "true"
 
 
 def scrape_real_data_job():
@@ -114,16 +118,28 @@ def scrape_real_data_job():
         logger.info(f"[Scheduler] Residential: {total_added} added, {total_updated} updated")
 
         # 2. Scrape REAL commercial plans
-        logger.info("[Scheduler] Scraping REAL commercial plans from EnergyBot...")
-        try:
-            commercial_plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
-            logger.info(f"[Scheduler] Retrieved {len(commercial_plans)} REAL commercial plans")
-        except Exception as scraper_error:
-            logger.error(f"[Scheduler] EnergyBot scraper failed: {scraper_error}")
-            import traceback
-            logger.error(f"[Scheduler] EnergyBot traceback: {traceback.format_exc()}")
-            commercial_plans = []  # Continue with empty list
-            logger.warning("[Scheduler] Continuing with 0 commercial plans due to scraper failure")
+        if USE_ENHANCED_ENERGYBOT:
+            logger.info("[Scheduler] Scraping REAL commercial plans from EnergyBot ENHANCED (full navigation)...")
+            try:
+                commercial_plans = energybot_business_enhanced.scrape_energybot_all_texas_enhanced()
+                logger.info(f"[Scheduler] Retrieved {len(commercial_plans)} REAL commercial plans (enhanced)")
+            except Exception as scraper_error:
+                logger.error(f"[Scheduler] EnergyBot Enhanced scraper failed: {scraper_error}")
+                import traceback
+                logger.error(f"[Scheduler] EnergyBot Enhanced traceback: {traceback.format_exc()}")
+                commercial_plans = []  # Continue with empty list
+                logger.warning("[Scheduler] Continuing with 0 commercial plans due to enhanced scraper failure")
+        else:
+            logger.info("[Scheduler] Scraping REAL commercial plans from EnergyBot v2 (JSON-LD only)...")
+            try:
+                commercial_plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
+                logger.info(f"[Scheduler] Retrieved {len(commercial_plans)} REAL commercial plans (v2)")
+            except Exception as scraper_error:
+                logger.error(f"[Scheduler] EnergyBot v2 scraper failed: {scraper_error}")
+                import traceback
+                logger.error(f"[Scheduler] EnergyBot v2 traceback: {traceback.format_exc()}")
+                commercial_plans = []  # Continue with empty list
+                logger.warning("[Scheduler] Continuing with 0 commercial plans due to v2 scraper failure")
 
         for plan_data in commercial_plans:
             try:
