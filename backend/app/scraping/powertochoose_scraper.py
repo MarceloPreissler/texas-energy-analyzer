@@ -37,7 +37,8 @@ def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residenti
 
         try:
             print(f"[PowerToChoose] Navigating to site...")
-            page.goto("https://www.powertochoose.org/", wait_until="networkidle", timeout=30000)
+            # Use 'load' instead of 'networkidle' for faster loading
+            page.goto("https://www.powertochoose.org/", wait_until="load", timeout=45000)
 
             # Accept cookies if present
             try:
@@ -71,19 +72,64 @@ def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residenti
             except Exception as e:
                 print(f"[PowerToChoose] Error selecting Commercial: {e}")
 
-            # Enter zip code
+            # Enter zip code - try multiple selectors
             print(f"[PowerToChoose] Entering zip code: {zip_code}")
-            page.fill('input[name="zip_code"]', zip_code)
+            zip_selectors = [
+                'input[name="zip_code"]',
+                'input[name="zipCode"]',
+                'input[id="zip"]',
+                'input[placeholder*="ZIP"]',
+                'input[placeholder*="zip"]',
+                'input[type="text"]',  # Fallback to first text input
+            ]
+            filled = False
+            for selector in zip_selectors:
+                try:
+                    page.fill(selector, zip_code, timeout=3000)
+                    filled = True
+                    print(f"[PowerToChoose] Zip code entered using: {selector}")
+                    break
+                except:
+                    continue
 
-            # Click search button
-            page.click('button[type="submit"]:has-text("Shop")', timeout=5000)
+            if not filled:
+                print(f"[PowerToChoose] WARNING: Could not find zip code input")
+                return []
 
-            # Wait for results to load
+            # Click search button - try multiple selectors
+            search_selectors = [
+                'button[type="submit"]:has-text("Shop")',
+                'button:has-text("Shop")',
+                'button:has-text("Search")',
+                'button:has-text("Find Plans")',
+                'input[type="submit"]',
+                'button[type="submit"]',
+            ]
+            clicked = False
+            for selector in search_selectors:
+                try:
+                    page.click(selector, timeout=3000)
+                    clicked = True
+                    print(f"[PowerToChoose] Search clicked using: {selector}")
+                    break
+                except:
+                    continue
+
+            if not clicked:
+                print(f"[PowerToChoose] WARNING: Could not find search button")
+                return []
+
+            # Wait for results to load - try multiple strategies
             print(f"[PowerToChoose] Waiting for results...")
-            page.wait_for_selector('.plan-details, .plan-result, table tr', timeout=15000)
+            try:
+                # Try waiting for common result selectors
+                page.wait_for_selector('table.table tbody tr, .plan-result, .plan-card, .plan-details', timeout=20000)
+            except PlaywrightTimeout:
+                print(f"[PowerToChoose] Timeout waiting for results, checking page content...")
+                # Continue anyway - maybe results are already there
 
             # Give extra time for dynamic content
-            page.wait_for_timeout(2000)
+            page.wait_for_timeout(3000)
 
             # Try multiple selector strategies
             plan_rows = page.query_selector_all('table.table tbody tr')

@@ -106,15 +106,24 @@ def scrape_real_data_job():
                     total_added += 1
 
             except Exception as e:
-                logger.error(f"[Scheduler] Error processing residential plan: {e}")
+                logger.error(f"[Scheduler] Error processing residential plan '{plan_data.get('plan_name', 'Unknown')}': {e}")
+                import traceback
+                logger.error(f"[Scheduler] Traceback: {traceback.format_exc()}")
                 continue
 
         logger.info(f"[Scheduler] Residential: {total_added} added, {total_updated} updated")
 
         # 2. Scrape REAL commercial plans
         logger.info("[Scheduler] Scraping REAL commercial plans from EnergyBot...")
-        commercial_plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
-        logger.info(f"[Scheduler] Retrieved {len(commercial_plans)} REAL commercial plans")
+        try:
+            commercial_plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
+            logger.info(f"[Scheduler] Retrieved {len(commercial_plans)} REAL commercial plans")
+        except Exception as scraper_error:
+            logger.error(f"[Scheduler] EnergyBot scraper failed: {scraper_error}")
+            import traceback
+            logger.error(f"[Scheduler] EnergyBot traceback: {traceback.format_exc()}")
+            commercial_plans = []  # Continue with empty list
+            logger.warning("[Scheduler] Continuing with 0 commercial plans due to scraper failure")
 
         for plan_data in commercial_plans:
             try:
@@ -170,7 +179,9 @@ def scrape_real_data_job():
                     total_added += 1
 
             except Exception as e:
-                logger.error(f"[Scheduler] Error processing commercial plan: {e}")
+                logger.error(f"[Scheduler] Error processing commercial plan '{plan_data.get('plan_name', 'Unknown')}': {e}")
+                import traceback
+                logger.error(f"[Scheduler] Traceback: {traceback.format_exc()}")
                 continue
 
         logger.info(f"[Scheduler] Commercial: {total_added} added, {total_updated} updated")
