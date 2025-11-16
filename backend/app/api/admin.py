@@ -15,6 +15,156 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 SAMPLE_PLANS = COMPREHENSIVE_PLANS
 
 
+@router.post("/emergency-fix")
+def emergency_fix(db: Session = Depends(get_db)):
+    """
+    EMERGENCY FIX - Force migrations and load real data immediately.
+
+    This endpoint will:
+    1. Force database migrations
+    2. Scrape real data (residential + commercial)
+    3. Load into database
+    4. Return status
+
+    Use this when nothing is working and you need data NOW.
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    results = {
+        "migrations": "pending",
+        "residential_scrape": "pending",
+        "commercial_scrape": "pending",
+        "data_load": "pending",
+        "final_counts": {}
+    }
+
+    try:
+        # Step 1: Force migrations
+        logger.info("[EMERGENCY] Running migrations...")
+        from ..migrations import run_migrations
+        run_migrations(db)
+        results["migrations"] = "success"
+        logger.info("[EMERGENCY] Migrations completed")
+
+    except Exception as e:
+        results["migrations"] = f"failed: {str(e)}"
+        logger.error(f"[EMERGENCY] Migration failed: {e}")
+
+    try:
+        # Step 2: Scrape residential (quick - 68 plans)
+        logger.info("[EMERGENCY] Scraping residential...")
+        from ..scraping import scraper
+        residential_plans = scraper.scrape_all()
+        results["residential_scrape"] = f"success ({len(residential_plans)} plans)"
+        logger.info(f"[EMERGENCY] Scraped {len(residential_plans)} residential plans")
+
+        # Load residential into DB
+        loaded_res = 0
+        for plan_data in residential_plans:
+            try:
+                provider_name = plan_data.get("provider_name")
+                if not provider_name:
+                    continue
+
+                provider = crud.get_provider_by_name(db, provider_name)
+                if not provider:
+                    provider = crud.create_provider(db, schemas.ProviderCreate(name=provider_name))
+
+                plan_create = schemas.PlanCreate(
+                    provider_id=provider.id,
+                    plan_name=plan_data.get("plan_name", "Unknown"),
+                    plan_url=plan_data.get("plan_url"),
+                    plan_type=plan_data.get("plan_type", "Fixed"),
+                    service_type="Residential",
+                    zip_code=plan_data.get("zip_code", "75001"),
+                    contract_months=plan_data.get("contract_months"),
+                    rate_1000_cents=plan_data.get("rate_1000_cents"),
+                    rate_500_cents=plan_data.get("rate_500_cents"),
+                    rate_2000_cents=plan_data.get("rate_2000_cents"),
+                )
+
+                crud.create_or_update_plan(db, provider.id, plan_create)
+                loaded_res += 1
+            except Exception as e:
+                logger.warning(f"[EMERGENCY] Error loading residential plan: {e}")
+                continue
+
+        db.commit()
+        results["data_load"] = f"residential: {loaded_res} plans loaded"
+        logger.info(f"[EMERGENCY] Loaded {loaded_res} residential plans")
+
+    except Exception as e:
+        results["residential_scrape"] = f"failed: {str(e)}"
+        logger.error(f"[EMERGENCY] Residential scrape failed: {e}")
+
+    try:
+        # Step 3: Scrape commercial (1 ZIP for speed - Dallas)
+        logger.info("[EMERGENCY] Scraping commercial (Dallas only for speed)...")
+        from ..scraping.energybot_business_enhanced import scrape_energybot_business_enhanced
+        commercial_plans = scrape_energybot_business_enhanced("75214", "ONCOR", "Dallas")
+        results["commercial_scrape"] = f"success ({len(commercial_plans)} plans)"
+        logger.info(f"[EMERGENCY] Scraped {len(commercial_plans)} commercial plans")
+
+        # Load commercial into DB
+        loaded_com = 0
+        for plan_data in commercial_plans:
+            try:
+                provider_name = plan_data.get("provider_name")
+                if not provider_name:
+                    continue
+
+                provider = crud.get_provider_by_name(db, provider_name)
+                if not provider:
+                    provider = crud.create_provider(db, schemas.ProviderCreate(name=provider_name))
+
+                plan_create = schemas.PlanCreate(
+                    provider_id=provider.id,
+                    plan_name=plan_data.get("plan_name", "Unknown"),
+                    plan_url=plan_data.get("plan_url"),
+                    plan_type=plan_data.get("plan_type", "Fixed"),
+                    service_type="Commercial",
+                    zip_code=plan_data.get("zip_code", "75001"),
+                    contract_months=plan_data.get("contract_months"),
+                    rate_1000_cents=plan_data.get("rate_1000_cents"),
+                )
+
+                crud.create_or_update_plan(db, provider.id, plan_create)
+                loaded_com += 1
+            except Exception as e:
+                logger.warning(f"[EMERGENCY] Error loading commercial plan: {e}")
+                continue
+
+        db.commit()
+        results["data_load"] = f"residential: {loaded_res}, commercial: {loaded_com}"
+        logger.info(f"[EMERGENCY] Loaded {loaded_com} commercial plans")
+
+    except Exception as e:
+        results["commercial_scrape"] = f"failed: {str(e)}"
+        logger.error(f"[EMERGENCY] Commercial scrape failed: {e}")
+
+    # Final counts
+    try:
+        from ..models import Plan, Provider
+        results["final_counts"] = {
+            "providers": db.query(Provider).count(),
+            "residential_plans": db.query(Plan).filter(Plan.service_type == "Residential").count(),
+            "commercial_plans": db.query(Plan).filter(Plan.service_type == "Commercial").count(),
+        }
+        results["final_counts"]["total_plans"] = (
+            results["final_counts"]["residential_plans"] +
+            results["final_counts"]["commercial_plans"]
+        )
+    except Exception as e:
+        results["final_counts"] = {"error": str(e)}
+
+    return {
+        "status": "completed",
+        "results": results,
+        "message": "Emergency fix completed. Check final_counts to verify data was loaded."
+    }
+
+
 @router.post("/delete-all-plans")
 def delete_all_plans(db: Session = Depends(get_db)):
     """
