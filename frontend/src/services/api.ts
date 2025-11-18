@@ -4,6 +4,12 @@ import axios from 'axios';
 const hostname = window.location.hostname;
 const protocol = window.location.protocol;
 
+// Allow explicit overrides before running environment heuristics.  This makes
+// it trivial to point a preview build at a staging API without editing the
+// source bundle.
+const envApiBaseUrl = (import.meta as any)?.env?.VITE_API_BASE_URL;
+const windowApiOverride = (window as any)?.__API_BASE_URL;
+
 // More robust environment detection
 const isNgrok = hostname.includes('ngrok');
 const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '10.0.0.16';
@@ -13,7 +19,11 @@ const isProduction = isCustomDomain || isVercelPreview || (!isLocalhost && !isNg
 
 // API base URL logic - explicit and clear
 let API_BASE_URL: string;
-if (isProduction || isVercelPreview || isCustomDomain) {
+if (envApiBaseUrl) {
+  API_BASE_URL = envApiBaseUrl;
+} else if (windowApiOverride) {
+  API_BASE_URL = windowApiOverride;
+} else if (isProduction || isVercelPreview || isCustomDomain) {
   // Production: Use Railway backend (works 24/7, no computer needed)
   API_BASE_URL = 'https://web-production-665ac.up.railway.app';
 } else if (isNgrok) {
@@ -72,8 +82,15 @@ interface Plan {
   service_type?: string | null;
   zip_code?: string | null;
   contract_months?: number | null;
+  plan_url?: string | null;
+  rate_500_cents?: number | null;
   rate_1000_cents?: number | null;
+  rate_2000_cents?: number | null;
   monthly_bill_1000?: number | null;
+  monthly_bill_2000?: number | null;
+  early_termination_fee?: number | null;
+  cancellation_fee?: number | null;
+  renewable_percent?: number | null;
   special_features?: string | null;
 }
 
@@ -87,7 +104,8 @@ export async function fetchPlans(
   planType?: string,
   serviceType?: string,
   zipCode?: string,
-  contractMonths?: number
+  contractMonths?: number,
+  limit?: number
 ): Promise<Plan[]> {
   const params: Record<string, string | number> = {};
   if (provider) params.provider = provider;
@@ -95,6 +113,7 @@ export async function fetchPlans(
   if (serviceType) params.service_type = serviceType;
   if (zipCode) params.zip_code = zipCode;
   if (contractMonths) params.contract_months = contractMonths;
+  if (limit) params.limit = limit;
   const res = await api.get<Plan[]>('/plans/', { params });
   return res.data;
 }
@@ -109,5 +128,13 @@ export async function triggerScrape(
   };
   if (zipCode) params.zip_code = zipCode;
   const res = await api.post('/plans/scrape', null, { params });
+  return res.data;
+}
+
+export async function scrapePowerToChoose(zipCode: string) {
+  const res = await api.post<{ plans_processed: number; zip_code: string }>(
+    '/plans/scrape/powertochoose',
+    { zip_code: zipCode }
+  );
   return res.data;
 }

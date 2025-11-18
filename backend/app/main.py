@@ -92,8 +92,16 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS - read from environment variable or use defaults
 import os
-allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000")
-allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
+default_allowed_origins = ",".join(
+    [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://texasenergyanalyzer.com",
+        "https://www.texasenergyanalyzer.com",
+    ]
+)
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", default_allowed_origins)
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
 
 app.add_middleware(
     CORSMiddleware,

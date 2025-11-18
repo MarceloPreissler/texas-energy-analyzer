@@ -42,7 +42,7 @@ def get_plans(
     zip_code: Optional[str] = None,
     contract_months: Optional[int] = None,
     skip: int = 0,
-    limit: int = 100,
+    limit: Optional[int] = 100,
 ) -> List[models.Plan]:
     query = select(models.Plan)
     if provider:
@@ -55,7 +55,11 @@ def get_plans(
         query = query.where(models.Plan.zip_code == zip_code)
     if contract_months:
         query = query.where(models.Plan.contract_months == contract_months)
-    query = query.order_by(models.Plan.rate_1000_cents.asc().nulls_last()).offset(skip).limit(limit)
+    query = query.order_by(models.Plan.rate_1000_cents.asc().nulls_last())
+    if skip:
+        query = query.offset(skip)
+    if limit:
+        query = query.limit(limit)
     return db.execute(query).scalars().all()
 
 
@@ -76,7 +80,7 @@ def create_or_update_plan(db: Session, provider_id: int, plan_data: schemas.Plan
     ).scalar_one_or_none()
     if existing:
         # Update fields on existing plan
-        for field, value in plan_data.model_dump(exclude={"provider_id"}).items():
+        for field, value in plan_data.model_dump(exclude={"provider_id", "provider_name"}).items():
             setattr(existing, field, value)
         db.add(existing)
         db.commit()
@@ -86,6 +90,7 @@ def create_or_update_plan(db: Session, provider_id: int, plan_data: schemas.Plan
         new_plan = models.Plan(
             provider_id=provider_id,
             plan_name=plan_data.plan_name,
+            plan_url=plan_data.plan_url,
             plan_type=plan_data.plan_type,
             service_type=plan_data.service_type,
             zip_code=plan_data.zip_code,
@@ -96,6 +101,7 @@ def create_or_update_plan(db: Session, provider_id: int, plan_data: schemas.Plan
             monthly_bill_1000=plan_data.monthly_bill_1000,
             monthly_bill_2000=plan_data.monthly_bill_2000,
             early_termination_fee=plan_data.early_termination_fee,
+            cancellation_fee=plan_data.cancellation_fee,
             base_monthly_fee=plan_data.base_monthly_fee,
             renewable_percent=plan_data.renewable_percent,
             special_features=plan_data.special_features,

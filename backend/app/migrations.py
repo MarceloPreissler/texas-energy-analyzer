@@ -35,6 +35,31 @@ def run_migrations(db: Session):
             else:
                 logger.info("[Migrations] OK - plan_url column exists")
 
+            if 'renewable_percent' not in columns:
+                logger.info("[Migrations] Adding renewable_percent column to plans table...")
+                db.execute(text("ALTER TABLE plans ADD COLUMN renewable_percent INTEGER"))
+                db.commit()
+                logger.info("[Migrations] OK - Added renewable_percent column")
+            else:
+                logger.info("[Migrations] OK - renewable_percent column exists")
+
+            if 'cancellation_fee' not in columns:
+                logger.info("[Migrations] Adding cancellation_fee column to plans table...")
+                db.execute(text("ALTER TABLE plans ADD COLUMN cancellation_fee FLOAT"))
+                db.commit()
+                logger.info("[Migrations] OK - Added cancellation_fee column")
+            else:
+                logger.info("[Migrations] OK - cancellation_fee column exists")
+
+            indexes = [idx['name'] for idx in inspector.get_indexes('plans')]
+            if 'ix_plans_zip_code' not in indexes:
+                logger.info("[Migrations] Adding ix_plans_zip_code index...")
+                db.execute(text("CREATE INDEX ix_plans_zip_code ON plans (zip_code)"))
+                db.commit()
+                logger.info("[Migrations] OK - Added ix_plans_zip_code index")
+            else:
+                logger.info("[Migrations] OK - ix_plans_zip_code index exists")
+
         # Migration 2: Create tdus table if it doesn't exist
         if 'tdus' not in inspector.get_table_names():
             logger.info("[Migrations] Creating tdus table...")

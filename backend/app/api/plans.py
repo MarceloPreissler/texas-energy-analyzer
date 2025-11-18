@@ -8,11 +8,13 @@ from __future__ import annotations
 
 import logging
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from .. import crud, models, schemas
 from ..database import get_db
 from ..scraping import scraper
+from ..scrapers import scrape_power_to_choose
 from ..auth import verify_api_key
 from ..cache import cache_result
 
@@ -25,6 +27,10 @@ def read_providers(db: Session = Depends(get_db), skip: int = 0, limit: int = 10
     return crud.get_providers(db, skip=skip, limit=limit)
 
 
+class PowerToChooseRequest(BaseModel):
+    zip_code: str = Field(..., pattern=r"^\d{5}$", description="Texas ZIP code")
+
+
 @router.get("/", response_model=list[schemas.Plan])
 def read_plans(
     provider: str | None = Query(None, description="Filter by provider name"),
@@ -33,10 +39,34 @@ def read_plans(
     zip_code: str | None = Query(None, description="Filter by zip code"),
     contract_months: int | None = Query(None, description="Filter by contract term in months"),
     skip: int = 0,
-    limit: int = 100,
+    limit: int | None = Query(None, ge=1, le=10000, description="Maximum number of plans to return"),
     db: Session = Depends(get_db),
 ):
     return crud.get_plans(db, provider=provider, plan_type=plan_type, service_type=service_type, zip_code=zip_code, contract_months=contract_months, skip=skip, limit=limit)
+
+
+@router.post("/scrape/powertochoose")
+def scrape_powertochoose(payload: PowerToChooseRequest, db: Session = Depends(get_db)):
+    """Scrape every PowerToChoose plan for the requested ZIP code and persist it."""
+
+    scraped_plans = scrape_power_to_choose(payload.zip_code)
+    created_or_updated = 0
+
+    for plan in scraped_plans:
+        provider_name = plan.provider_name or "Unknown Provider"
+        provider = crud.get_provider_by_name(db, provider_name)
+        if not provider:
+            provider = crud.create_provider(db, schemas.ProviderCreate(name=provider_name))
+
+        plan.provider_id = provider.id
+        plan.zip_code = payload.zip_code
+        crud.create_or_update_plan(db, provider.id, plan)
+        created_or_updated += 1
+
+    return {
+        "zip_code": payload.zip_code,
+        "plans_processed": created_or_updated,
+    }
 
 
 @router.get("/{plan_id}", response_model=schemas.Plan)

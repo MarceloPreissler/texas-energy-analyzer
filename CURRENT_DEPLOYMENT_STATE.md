@@ -118,7 +118,7 @@ SMTP_FROM_EMAIL - Sender email (optional, defaults to noreply@texasenergyanalyze
 ### **Optional**
 ```
 RUN_MIGRATIONS - Set to "true" to run migrations on startup (currently false)
-ALLOWED_ORIGINS - CORS allowed origins (defaults to localhost)
+ALLOWED_ORIGINS - CORS allowed origins (defaults now include localhost + texasenergyanalyzer.com)
 ```
 
 ---

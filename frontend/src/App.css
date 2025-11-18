@@ -307,6 +307,23 @@ body {
   margin: 20px 0;
 }
 
+.data-source-list {
+  margin: 8px 0 0 1.25rem;
+  color: #203a43;
+  line-height: 1.5;
+}
+
+.data-source-list li {
+  margin-bottom: 4px;
+}
+
+.data-integrity-note {
+  margin-top: 12px;
+  font-size: 0.9em;
+  color: #2c5364;
+  font-weight: 600;
+}
+
 .loading {
   text-align: center;
   padding: 40px;
@@ -333,4 +350,124 @@ body {
   0% { opacity: 1; }
   50% { opacity: 0.5; }
   100% { opacity: 1; }
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.filter-buttons button {
+  flex: 1;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+  background-color: #2c5364;
+}
+
+.filter-buttons button:nth-child(2) {
+  background-color: #f44336;
+}
+
+.filter-buttons button:nth-child(3) {
+  background-color: #2196F3;
+}
+
+.plan-row.time-of-use {
+  background: #fff7ed;
+}
+
+.plan-row.renewable {
+  border-left: 4px solid #4CAF50;
+}
+
+.tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.75em;
+  font-weight: 600;
+}
+
+.tag.time {
+  background: #ffecb3;
+  color: #a15c00;
+}
+
+.tag.renewable {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.zip-card {
+  border: 2px dashed #2c5364;
+}
+
+.zip-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.zip-actions input {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1em;
+}
+
+.zip-actions button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background-color: #4CAF50;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.helper-text {
+  margin-top: 10px;
+  font-size: 0.85em;
+  color: #666;
+}
+
+.error-text {
+  margin-top: 8px;
+  color: #c62828;
+  font-weight: 600;
+}
+
+.warning-card {
+  background: #fff8e1;
+  border-left: 4px solid #ff9800;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pagination-controls button {
+  margin: 0 4px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #2c5364;
+  background: white;
+  cursor: pointer;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px 0;
+  font-weight: bold;
 }
