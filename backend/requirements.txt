@@ -3,7 +3,6 @@ uvicorn
 sqlalchemy
 psycopg2-binary
 alembic
-playwright==1.49.0
 playwright-stealth
 apscheduler
 requests

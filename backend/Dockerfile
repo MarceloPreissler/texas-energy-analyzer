@@ -4,9 +4,16 @@ FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app
 
-# Install system dependencies (if any extra needed, usually none for basic python)
+# Install system dependencies
+# build-essential and python3-dev are REQUIRED for compiling C extensions (psycopg2, cryptography, etc.)
 RUN apt-get update && apt-get install -y \
     postgresql-client \
+    build-essential \
+    python3-dev \
+    libpq-dev \
+    libffi-dev \
+    libssl-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python dependencies
