@@ -31,7 +31,12 @@ setup_logging(log_level="INFO")
 logger = logging.getLogger(__name__)
 
 # Create database tables on startup
-models.Base.metadata.create_all(bind=engine)
+try:
+    models.Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created successfully")
+except Exception as e:
+    logger.error(f"Failed to initialize database: {e}")
+    logger.error("Application starting in degraded mode (Database unavailable)")
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address, default_limits=["100/hour"])
