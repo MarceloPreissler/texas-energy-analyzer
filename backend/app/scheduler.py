@@ -356,8 +356,19 @@ def start_scheduler():
     # Start scheduler
     scheduler.start()
     logger.info("[Scheduler] [OK] Daily job scheduled: 3:00 AM scrape REAL data")
-    logger.info("[Scheduler] NO SAMPLE DATA - ONLY LIVE SOURCES")
-    logger.info("[Scheduler] [INFO] Startup scraping DISABLED - use /plans/scrape or /admin endpoints for initial data load")
+    
+    # Schedule an immediate scrape (2 minutes from now) to ensure fresh data on deployment
+    run_date = datetime.now()
+    from datetime import timedelta
+    run_date += timedelta(minutes=2)
+    scheduler.add_job(
+        scrape_real_data_job,
+        'date',
+        run_date=run_date,
+        id='startup_scrape',
+        name='Startup Data Refresh'
+    )
+    logger.info(f"[Scheduler] [INFO] Scheduled startup data refresh for {run_date}")
 
 
 def stop_scheduler():
