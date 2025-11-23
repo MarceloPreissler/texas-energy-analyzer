@@ -16,10 +16,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from sqlalchemy.orm import Session
 
-from .database import SessionLocal
+from .database import SessionLocal, engine
 from .scraping import scraper, energybot_scraper_v2, powertochoose_scraper  # REAL data scrapers
 from .scraping.provider_urls import get_plan_url
-from . import crud, schemas
+from . import crud, schemas, models
 from .data_validation import validate_plan_batch, log_validation_summary, get_data_quality_score
 
 # Configure logging
@@ -48,6 +48,13 @@ def scrape_real_data_job():
     total_updated = 0
 
     try:
+        # Ensure database tables exist (in case app started while DB was paused)
+        try:
+            models.Base.metadata.create_all(bind=engine)
+            logger.info("[Scheduler] Verified/Created database tables")
+        except Exception as db_err:
+            logger.error(f"[Scheduler] Warning: Failed to verify tables: {db_err}")
+
         # 1. Scrape REAL residential plans
         logger.info("[Scheduler] Scraping REAL residential plans from PowerChoiceTexas...")
         residential_plans_raw = scraper.scrape_all()
