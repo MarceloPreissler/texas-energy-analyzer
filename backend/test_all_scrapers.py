@@ -87,11 +87,11 @@ def test_energybot_scraper():
     print("="*60)
 
     try:
-        from app.scraping.energybot_scraper import scrape_energybot_commercial
+        from app.scraping.energybot_scraper_v2 import scrape_energybot_commercial_v2
 
         print("Starting EnergyBot scrape for Dallas (75001)...")
         start_time = datetime.now()
-        plans = scrape_energybot_commercial(zip_code="75001", max_plans=20)
+        plans = scrape_energybot_commercial_v2(zip_code="75001", max_plans=20)
         elapsed = (datetime.now() - start_time).total_seconds()
 
         print(f"✓ Success! Scraped {len(plans)} plans in {elapsed:.2f} seconds")
