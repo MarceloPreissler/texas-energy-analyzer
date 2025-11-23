@@ -1,24 +1,17 @@
-# Single-stage build for reliability
-FROM python:3.11-slim
+# Use official Playwright image which includes Python and browsers
+# This guarantees compatibility and missing dependencies are not an issue
+FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies (if any extra needed, usually none for basic python)
 RUN apt-get update && apt-get install -y \
-    gcc \
     postgresql-client \
-    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Install Playwright browsers and dependencies
-# We install directly into the system to avoid path issues
-RUN pip install playwright && \
-    playwright install chromium && \
-    playwright install-deps chromium
 
 # Copy application code
 COPY . .
