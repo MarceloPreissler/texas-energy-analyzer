@@ -94,22 +94,6 @@ app = FastAPI(
 # Add rate limiting
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-
-# CORS - read from environment variable or use defaults
-import os
-allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000")
-allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-
-
-@app.get("/")
-@limiter.limit("10/minute")
-async def read_root(request: Request):
-    """API root endpoint with rate limiting."""
     return {
         "message": "Welcome to the Texas Energy Market Analyzer API",
         "version": "2.0.0",
