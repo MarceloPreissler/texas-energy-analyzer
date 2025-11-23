@@ -104,20 +104,6 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST"],  # Only allow needed methods
-    allow_headers=["Content-Type", "Authorization"],
-)
-
-# Prevent host header attacks - allow Railway domains
-app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=["localhost", "127.0.0.1", "*.local", "*.up.railway.app", "*.vercel.app", "*.ngrok-free.dev"]
-)
-
-# Include routers
-app.include_router(plans_router.router)
-app.include_router(admin_router.router)
-app.include_router(tdus_router.router)
 
 
 @app.get("/")
