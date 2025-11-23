@@ -5,10 +5,10 @@ services:
   # Backend API
   - type: web
     name: texas-energy-backend
-    env: python
+    env: docker
     region: oregon
-    buildCommand: pip install -r backend/requirements.txt
-    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    dockerContext: backend
+    dockerfilePath: backend/Dockerfile
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
