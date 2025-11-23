@@ -113,6 +113,7 @@ def scrape_real_data_job():
                     # Update existing plan
                     for key, value in plan_create.dict(exclude={'provider_id'}).items():
                         setattr(existing, key, value)
+                    existing.last_updated = datetime.utcnow()  # Force update timestamp
                     total_updated += 1
                 else:
                     # Create new plan
@@ -183,6 +184,7 @@ def scrape_real_data_job():
                     # Update existing plan
                     for key, value in plan_create.dict(exclude={'provider_id'}).items():
                         setattr(existing, key, value)
+                    existing.last_updated = datetime.utcnow()  # Force update timestamp
                     total_updated += 1
                 else:
                     # Create new plan
@@ -253,6 +255,7 @@ def scrape_real_data_job():
                     # Update existing plan
                     for key, value in plan_create.dict(exclude={'provider_id'}).items():
                         setattr(existing, key, value)
+                    existing.last_updated = datetime.utcnow()  # Force update timestamp
                     total_updated += 1
                 else:
                     # Create new plan
