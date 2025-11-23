@@ -94,6 +94,36 @@ app = FastAPI(
 # Add rate limiting
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# CORS - read from environment variable or use defaults
+import os
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000")
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],  # Only allow needed methods
+    allow_headers=["Content-Type", "Authorization"],
+)
+
+# Prevent host header attacks - allow Railway domains
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=["localhost", "127.0.0.1", "*.local", "*.up.railway.app", "*.vercel.app", "*.ngrok-free.dev", "*.onrender.com"]
+)
+
+# Include routers
+app.include_router(plans_router.router)
+app.include_router(admin_router.router)
+app.include_router(tdus_router.router)
+
+
+@app.get("/")
+@limiter.limit("10/minute")
+async def read_root(request: Request):
+    """API root endpoint with rate limiting."""
     return {
         "message": "Welcome to the Texas Energy Market Analyzer API",
         "version": "2.0.0",
