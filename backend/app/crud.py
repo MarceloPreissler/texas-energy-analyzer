@@ -3,6 +3,22 @@ CRUD helper functions for interacting with the database.
 
 These functions encapsulate common operations such as retrieving providers
 and plans, creating new entries, and updating existing rows.  FastAPI
+endpoints call these helpers to perform database actions.
+"""
+from __future__ import annotations
+
+from typing import List, Optional
+
+from sqlalchemy.orm import Session
+from sqlalchemy import select
+from datetime import datetime
+
+from . import models, schemas
+from .cache import cache_result
+
+
+def get_provider_by_name(db: Session, name: str) -> Optional[models.Provider]:
+    return db.execute(select(models.Provider).where(models.Provider.name == name)).scalar_one_or_none()
 
 
 def create_provider(db: Session, provider: schemas.ProviderCreate) -> models.Provider:
@@ -54,6 +70,22 @@ def create_or_update_plan(db: Session, provider_id: int, plan_data: schemas.Plan
     This function helps keep the database idempotent when scraping.
     """
     existing = db.execute(
+        select(models.Plan).where(
+            models.Plan.provider_id == provider_id,
+            models.Plan.plan_name == plan_data.plan_name,
+        )
+    ).scalar_one_or_none()
+    if existing:
+        # Update fields on existing plan
+        for field, value in plan_data.model_dump(exclude={"provider_id"}).items():
+            setattr(existing, field, value)
+        existing.last_updated = datetime.utcnow()  # Force update timestamp
+        db.add(existing)
+        db.commit()
+        db.refresh(existing)
+        return existing
+    else:
+        new_plan = models.Plan(
             provider_id=provider_id,
             plan_name=plan_data.plan_name,
             plan_type=plan_data.plan_type,
