@@ -19,6 +19,7 @@ services:
       - key: RUN_MIGRATIONS
         value: "false"
       - key: ALLOWED_ORIGINS
+        # Comma-separated list of allowed origins for CORS
         value: "https://www.texasenergyanalyzer.com,https://texasenergyanalyzer.com,https://texas-energy-analyzer.vercel.app,http://localhost:5173"
     autoDeploy: true
 
