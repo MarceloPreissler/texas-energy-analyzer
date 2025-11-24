@@ -6,33 +6,6 @@ const protocol = window.location.protocol;
 
 // More robust environment detection
 const isNgrok = hostname.includes('ngrok');
-const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '10.0.0.16';
-const isVercelPreview = hostname.includes('vercel.app');
-const isCustomDomain = hostname === 'texasenergyanalyzer.com' || hostname === 'www.texasenergyanalyzer.com';
-const isProduction = isCustomDomain || isVercelPreview || (!isLocalhost && !isNgrok && protocol === 'https:');
-
-// API base URL logic - explicit and clear
-let API_BASE_URL: string;
-if (isProduction || isVercelPreview || isCustomDomain) {
-  // Production: Use Railway backend (works 24/7, no computer needed)
-  API_BASE_URL = 'https://web-production-665ac.up.railway.app';
-} else if (isNgrok) {
-  // Ngrok tunnel: use local backend
-  API_BASE_URL = 'http://10.0.0.16:8000';
-} else if (isLocalhost) {
-  // Localhost: use Vite proxy (empty string for relative URLs)
-  API_BASE_URL = '';
-} else {
-  // Fallback: if we can't detect, assume production and use Railway
-  console.warn('Unable to detect environment, defaulting to production Railway');
-  API_BASE_URL = 'https://web-production-665ac.up.railway.app';
-}
-
-// Environment detection verified - uncomment for debugging if needed
-// console.log('API Configuration Debug:', {
-//   hostname,
-//   protocol,
-//   isNgrok,
 //   isLocalhost,
 //   isVercelPreview,
 //   isCustomDomain,
