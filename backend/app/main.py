@@ -91,6 +91,30 @@ app = FastAPI(
     lifespan=lifespan  # Enable background scheduler
 )
 
+# Add rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# CORS - read from environment variable or use defaults
+import os
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "")
+if not allowed_origins_str or allowed_origins_str == "*":
+    # Fallback if not set or if set to wildcard (which fails with allow_credentials=True)
+    allowed_origins = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://www.texasenergyanalyzer.com",
+        "https://texasenergyanalyzer.com",
+        "https://texas-energy-analyzer.vercel.app"
+    ]
+else:
+    allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],  # Only allow needed methods
     allow_headers=["Content-Type", "Authorization"],
 )
 
