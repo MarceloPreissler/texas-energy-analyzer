@@ -31,7 +31,10 @@ def scrape_energybot_commercial_v2(zip_code: str = "75001", max_plans: int = 100
         # Launch browser (headful can be useful for debugging, but headless is faster)
         # Using headless=True for production, but stealth is handled by playwright-stealth if needed.
         # Here we just use standard playwright with a user agent.
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(
+            headless=True,
+            args=['--no-sandbox', '--disable-setuid-sandbox']
+        )
         context = browser.new_context(
             viewport={'width': 1920, 'height': 1080},
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
