@@ -2,16 +2,12 @@ import axios from 'axios';
 
 // Detect environment and set appropriate API base URL
 const hostname = window.location.hostname;
-const protocol = window.location.protocol;
 
-// More robust environment detection
-const isNgrok = hostname.includes('ngrok');
-//   isLocalhost,
-//   isVercelPreview,
-//   isCustomDomain,
-//   isProduction,
-//   API_BASE_URL
-// });
+// Use environment variable if available (Vite replaces this at build time)
+// Fallback to Render backend if not set
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://texas-energy-backend.onrender.com';
+
+console.log('API Base URL:', API_BASE_URL); // Debug log
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -21,10 +17,10 @@ const api = axios.create({
 // CSP upgrade-insecure-requests (in index.html) handles this at browser level
 api.interceptors.request.use((config) => {
   // Force HTTPS for any HTTP URLs (backup to CSP)
-  if (config.baseURL && config.baseURL.startsWith('http://')) {
+  if (config.baseURL && config.baseURL.startsWith('http://') && !config.baseURL.includes('localhost')) {
     config.baseURL = config.baseURL.replace('http://', 'https://');
   }
-  if (config.url && config.url.startsWith('http://')) {
+  if (config.url && config.url.startsWith('http://') && !config.url.includes('localhost')) {
     config.url = config.url.replace('http://', 'https://');
   }
   return config;
@@ -35,12 +31,14 @@ api.interceptors.request.use((config) => {
 interface Provider {
   id: number;
   name: string;
+  website?: string | null;
 }
 
 interface Plan {
   id: number;
   provider_id: number;
   plan_name: string;
+  plan_url?: string | null;
   plan_type?: string | null;
   service_type?: string | null;
   zip_code?: string | null;
