@@ -2,7 +2,6 @@ import axios from 'axios';
 
 // Detect environment and set appropriate API base URL
 const hostname = window.location.hostname;
-const protocol = window.location.protocol;
 
 // Allow explicit overrides before running environment heuristics.  This makes
 // it trivial to point a preview build at a staging API without editing the
@@ -36,19 +35,14 @@ if (envApiBaseUrl) {
   // Fallback: if we can't detect, assume production and use Railway
   console.warn('Unable to detect environment, defaulting to production Railway');
   API_BASE_URL = 'https://web-production-665ac.up.railway.app';
+// Use environment variable if available (Vite replaces this at build time)
+// Fallback to Render backend if not set
+const API_BASE_URL = (import.meta.env.VITE_API_URL || '').trim();
+if (!API_BASE_URL) {
+  console.error("VITE_API_URL is not defined! API calls will fail.");
 }
 
-// Environment detection verified - uncomment for debugging if needed
-// console.log('API Configuration Debug:', {
-//   hostname,
-//   protocol,
-//   isNgrok,
-//   isLocalhost,
-//   isVercelPreview,
-//   isCustomDomain,
-//   isProduction,
-//   API_BASE_URL
-// });
+console.log('API Base URL:', API_BASE_URL); // Debug log
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -58,10 +52,10 @@ const api = axios.create({
 // CSP upgrade-insecure-requests (in index.html) handles this at browser level
 api.interceptors.request.use((config) => {
   // Force HTTPS for any HTTP URLs (backup to CSP)
-  if (config.baseURL && config.baseURL.startsWith('http://')) {
+  if (config.baseURL && config.baseURL.startsWith('http://') && !config.baseURL.includes('localhost')) {
     config.baseURL = config.baseURL.replace('http://', 'https://');
   }
-  if (config.url && config.url.startsWith('http://')) {
+  if (config.url && config.url.startsWith('http://') && !config.url.includes('localhost')) {
     config.url = config.url.replace('http://', 'https://');
   }
   return config;
@@ -72,12 +66,14 @@ api.interceptors.request.use((config) => {
 interface Provider {
   id: number;
   name: string;
+  website?: string | null;
 }
 
 interface Plan {
   id: number;
   provider_id: number;
   plan_name: string;
+  plan_url?: string | null;
   plan_type?: string | null;
   service_type?: string | null;
   zip_code?: string | null;
@@ -127,7 +123,14 @@ export async function triggerScrape(
     service_type: serviceType
   };
   if (zipCode) params.zip_code = zipCode;
-  const res = await api.post('/plans/scrape', null, { params });
+
+  const apiKey = import.meta.env.VITE_API_KEY;
+
+  const headers: Record<string, string> = {
+    'X-API-Key': apiKey,
+  };
+
+  const res = await api.post('/plans/scrape', null, { params, headers });
   return res.data;
 }
 

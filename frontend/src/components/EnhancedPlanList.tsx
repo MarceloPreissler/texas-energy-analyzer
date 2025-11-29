@@ -44,6 +44,11 @@ type SortField = (typeof SORT_FIELDS)[number]['value'];
 type SortDirection = 'asc' | 'desc';
 
 const EnhancedPlanList: React.FC = () => {
+interface Props {
+  onRefresh: (date: Date) => void;
+}
+
+const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
   const queryClient = useQueryClient();
 
   const [tempProviderFilter, setTempProviderFilter] = useState('');
@@ -85,6 +90,35 @@ const EnhancedPlanList: React.FC = () => {
     queryKey: ['plans', providerFilter, planTypeFilter, serviceTypeFilter, zipCodeFilter, contractFilter],
     queryFn: () => fetchPlans(providerFilter, planTypeFilter, serviceTypeFilter, zipCodeFilter, contractFilter),
   });
+
+  const handleRefreshData = async () => {
+    setIsRefreshing(true);
+    try {
+      await triggerScrape(serviceTypeFilter || 'Residential', zipCodeFilter);
+      // Invalidate and refetch all queries
+      queryClient.invalidateQueries({ queryKey: ['plans'] });
+      queryClient.invalidateQueries({ queryKey: ['providers'] });
+      onRefresh(new Date());
+      alert('Data refreshed successfully!');
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      alert('Failed to refresh data. Check console for details.');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const getRateClass = (rate: number | null | undefined): string => {
+    if (!rate) return '';
+    if (rate < 12) return 'rate-good';
+    if (rate < 15) return 'rate-warning';
+    return 'rate-high';
+  };
+
+  const calculateMonthlyCost = (rate: number | null | undefined): number => {
+    if (!rate) return 0;
+    return (usage * rate / 100) + (useCustomBaseFee ? baseFee : 9.95);
+  };
 
   const handleSearch = () => {
     setProviderFilter(tempProviderFilter || undefined);

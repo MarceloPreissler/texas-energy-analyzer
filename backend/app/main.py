@@ -31,7 +31,12 @@ setup_logging(log_level="INFO")
 logger = logging.getLogger(__name__)
 
 # Create database tables on startup
-models.Base.metadata.create_all(bind=engine)
+try:
+    models.Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created successfully")
+except Exception as e:
+    logger.error(f"Failed to initialize database: {e}")
+    logger.error("Application starting in degraded mode (Database unavailable)")
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address, default_limits=["100/hour"])
@@ -102,6 +107,18 @@ default_allowed_origins = ",".join(
 )
 allowed_origins_str = os.getenv("ALLOWED_ORIGINS", default_allowed_origins)
 allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "")
+if not allowed_origins_str or allowed_origins_str == "*":
+    # Fallback if not set or if set to wildcard (which fails with allow_credentials=True)
+    allowed_origins = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://www.texasenergyanalyzer.com",
+        "https://texasenergyanalyzer.com",
+        "https://texas-energy-analyzer.vercel.app"
+    ]
+else:
+    allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
 
 app.add_middleware(
     CORSMiddleware,
@@ -114,7 +131,7 @@ app.add_middleware(
 # Prevent host header attacks - allow Railway domains
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["localhost", "127.0.0.1", "*.local", "*.up.railway.app", "*.vercel.app", "*.ngrok-free.dev"]
+    allowed_hosts=["localhost", "127.0.0.1", "*.local", "*.up.railway.app", "*.vercel.app", "*.ngrok-free.dev", "*.onrender.com"]
 )
 
 # Include routers

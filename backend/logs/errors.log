@@ -511,3 +511,4 @@ Traceback (most recent call last):
   File "C:\Users\marce\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 524, in _make_subprocess_transport
     raise NotImplementedError
 NotImplementedError
+2025-11-28 19:41:15 | ERROR    | app.scheduler | [Scheduler] Error during scrape: 
