@@ -611,3 +611,34 @@ NotImplementedError
 2025-10-18 06:35:36 | INFO     | app.scheduler | [Scheduler] NO SAMPLE DATA - ONLY LIVE SOURCES
 2025-10-18 06:35:36 | INFO     | app.scheduler | [Scheduler] [INFO] Startup scraping DISABLED - use /plans/scrape or /admin endpoints for initial data load
 2025-10-19 03:00:02 | WARNING  | apscheduler.executors.default | Run time of job "Daily REAL Data Scrape (Residential + Commercial) (trigger: cron[hour='3', minute='0'], next run at: 2025-10-19 03:00:00 CDT)" was missed by 0:00:02.919235
+2025-11-28 19:39:09 | INFO     | root | Logging system initialized
+2025-11-28 19:39:09 | INFO     | root | Log files location: C:\Users\marce\OneDrive\Energy-Analyzer\texas-energy-analyzer\backend\logs
+2025-11-28 19:39:09 | INFO     | app.main | Database tables created successfully
+2025-11-28 19:39:09 | INFO     | app.main | Application starting up...
+2025-11-28 19:39:09 | INFO     | app.main | Migrations skipped (set RUN_MIGRATIONS=true to enable)
+2025-11-28 19:39:09 | INFO     | app.main | Starting background scheduler...
+2025-11-28 19:39:09 | INFO     | app.scheduler | [Scheduler] Starting automated REAL DATA scheduler...
+2025-11-28 19:39:09 | INFO     | apscheduler.scheduler | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-11-28 19:39:09 | INFO     | apscheduler.scheduler | Added job "Daily REAL Data Scrape (Residential + Commercial)" to job store "default"
+2025-11-28 19:39:09 | INFO     | apscheduler.scheduler | Scheduler started
+2025-11-28 19:39:09 | INFO     | app.scheduler | [Scheduler] [OK] Daily job scheduled: 3:00 AM scrape REAL data
+2025-11-28 19:39:09 | INFO     | apscheduler.scheduler | Added job "Startup Data Refresh" to job store "default"
+2025-11-28 19:39:09 | INFO     | app.scheduler | [Scheduler] [INFO] Scheduled startup data refresh for 2025-11-28 19:41:09.639842
+2025-11-28 19:39:09 | INFO     | app.main | ✓ Background scheduler started successfully
+2025-11-28 19:41:09 | INFO     | apscheduler.executors.default | Running job "Startup Data Refresh (trigger: date[2025-11-28 19:41:09 CST], next run at: 2025-11-28 19:41:09 CST)" (scheduled at 2025-11-28 19:41:09.639842-06:00)
+2025-11-28 19:41:09 | INFO     | app.scheduler | [Scheduler] Starting REAL DATA scrape at 2025-11-28 19:41:09.651859
+2025-11-28 19:41:09 | INFO     | apscheduler.scheduler | Removed job startup_scrape
+2025-11-28 19:41:09 | INFO     | app.scheduler | [Scheduler] NO SAMPLE DATA - ONLY LIVE SOURCES
+2025-11-28 19:41:09 | INFO     | app.scheduler | [Scheduler] Verified/Created database tables
+2025-11-28 19:41:09 | INFO     | app.scheduler | [Scheduler] Scraping REAL residential plans from PowerChoiceTexas...
+2025-11-28 19:41:14 | INFO     | app.scheduler | [Scheduler] Retrieved 56 raw residential plans
+2025-11-28 19:41:14 | WARNING  | app.data_validation | REJECTED: Reliant Energy - Truly Free Weekends: Missing required field: rate_1000_cents
+2025-11-28 19:41:14 | WARNING  | app.data_validation | REJECTED: Reliant Energy - Truly Free Nights: Missing required field: rate_1000_cents
+2025-11-28 19:41:14 | INFO     | app.data_validation | Validation complete: 54 valid, 2 rejected
+2025-11-28 19:41:14 | INFO     | app.scheduler | [Scheduler] Validated: 54 REAL residential plans accepted
+2025-11-28 19:41:14 | WARNING  | app.scheduler | [Scheduler] Rejected 2 residential plans with fake data markers
+2025-11-28 19:41:15 | INFO     | app.scheduler | [Scheduler] Residential: 34 added, 20 updated
+2025-11-28 19:41:15 | INFO     | app.scheduler | [Scheduler] Scraping REAL commercial plans from EnergyBot...
+2025-11-28 19:41:15 | INFO     | app.scraping.energybot_scraper_v2 | [EnergyBot v2] Scraping Texas commercial plans
+2025-11-28 19:41:15 | ERROR    | app.scheduler | [Scheduler] Error during scrape: 
+2025-11-28 19:41:15 | INFO     | apscheduler.executors.default | Job "Startup Data Refresh (trigger: date[2025-11-28 19:41:09 CST], next run at: 2025-11-28 19:41:09 CST)" executed successfully

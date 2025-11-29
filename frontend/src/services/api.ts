@@ -5,7 +5,10 @@ const hostname = window.location.hostname;
 
 // Use environment variable if available (Vite replaces this at build time)
 // Fallback to Render backend if not set
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'https://texas-energy-backend.onrender.com').trim();
+const API_BASE_URL = (import.meta.env.VITE_API_URL || '').trim();
+if (!API_BASE_URL) {
+  console.error("VITE_API_URL is not defined! API calls will fail.");
+}
 
 console.log('API Base URL:', API_BASE_URL); // Debug log
 
