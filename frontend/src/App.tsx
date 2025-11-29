@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import EnhancedPlanList from './components/EnhancedPlanList';
 import './App.css';
 
 const App: React.FC = () => {
-  const [lastRefresh] = useState(new Date());
+  const [lastRefresh, setLastRefresh] = useState(new Date());
+
+  const handleRefresh = (refreshDate: Date) => {
+    setLastRefresh(refreshDate);
+  };
 
   const formatTime = (date: Date) => {
     return date.toLocaleDateString('en-US', {
@@ -57,7 +61,7 @@ const App: React.FC = () => {
         </p>
       </div>
 
-      <EnhancedPlanList />
+      <EnhancedPlanList onRefresh={handleRefresh} />
     </div>
   );
 };

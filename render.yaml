@@ -5,10 +5,10 @@ services:
   # Backend API
   - type: web
     name: texas-energy-backend
-    env: python
+    env: docker
     region: oregon
-    buildCommand: pip install -r backend/requirements.txt
-    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    dockerContext: backend
+    dockerfilePath: backend/Dockerfile
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
@@ -19,7 +19,8 @@ services:
       - key: RUN_MIGRATIONS
         value: "false"
       - key: ALLOWED_ORIGINS
-        value: "*"
+        # Comma-separated list of allowed origins for CORS
+        value: "https://www.texasenergyanalyzer.com,https://texasenergyanalyzer.com,https://texas-energy-analyzer.vercel.app,http://localhost:5173"
     autoDeploy: true
 
 databases:

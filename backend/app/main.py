@@ -31,7 +31,12 @@ setup_logging(log_level="INFO")
 logger = logging.getLogger(__name__)
 
 # Create database tables on startup
-models.Base.metadata.create_all(bind=engine)
+try:
+    models.Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created successfully")
+except Exception as e:
+    logger.error(f"Failed to initialize database: {e}")
+    logger.error("Application starting in degraded mode (Database unavailable)")
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address, default_limits=["100/hour"])
@@ -58,13 +63,25 @@ async def lifespan(app: FastAPI):
     finally:
         db.close()
 
+    # Start scheduler with error handling
     logger.info("Starting background scheduler...")
-    start_scheduler()
+    try:
+        start_scheduler()
+        logger.info("✓ Background scheduler started successfully")
+    except Exception as e:
+        logger.error(f"⚠️ Failed to start scheduler: {e}")
+        logger.error("App will continue without scheduler - manual scraping still available")
+        # Don't crash the app if scheduler fails
+
     yield
     # Shutdown
     logger.info("Application shutting down...")
     logger.info("Stopping background scheduler...")
-    stop_scheduler()
+    try:
+        stop_scheduler()
+        logger.info("✓ Background scheduler stopped successfully")
+    except Exception as e:
+        logger.error(f"⚠️ Error stopping scheduler: {e}")
 
 app = FastAPI(
     title="Texas Commercial Energy Market Analyzer",
@@ -81,8 +98,18 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS - read from environment variable or use defaults
 import os
-allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000")
-allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "")
+if not allowed_origins_str or allowed_origins_str == "*":
+    # Fallback if not set or if set to wildcard (which fails with allow_credentials=True)
+    allowed_origins = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://www.texasenergyanalyzer.com",
+        "https://texasenergyanalyzer.com",
+        "https://texas-energy-analyzer.vercel.app"
+    ]
+else:
+    allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
 
 app.add_middleware(
     CORSMiddleware,
@@ -95,7 +122,7 @@ app.add_middleware(
 # Prevent host header attacks - allow Railway domains
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["localhost", "127.0.0.1", "*.local", "*.up.railway.app", "*.vercel.app"]
+    allowed_hosts=["localhost", "127.0.0.1", "*.local", "*.up.railway.app", "*.vercel.app", "*.ngrok-free.dev", "*.onrender.com"]
 )
 
 # Include routers

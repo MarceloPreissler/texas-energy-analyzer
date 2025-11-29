@@ -8,6 +8,7 @@ from typing import List, Dict, Any
 from .. import crud, schemas
 from ..database import get_db
 from .comprehensive_plans import COMPREHENSIVE_PLANS
+from ..data_validation import validate_plan_batch, get_data_quality_score
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -328,11 +329,191 @@ def load_tdu_data(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"TDU loading failed: {str(e)}")
 
 
+@router.get("/audit-data-quality")
+def audit_data_quality(db: Session = Depends(get_db)):
+    """
+    Audit production database for fake or estimated data.
+    Returns suspicious plans that may need to be removed.
+    """
+    try:
+        from ..models import Plan
+
+        # Find plans with fake data markers
+        fake_markers = ['estimate', 'typical', 'verify', 'fallback', 'sample', 'demo', 'call for']
+        suspicious_plans = []
+
+        for marker in fake_markers:
+            plans = db.query(Plan).filter(
+                Plan.special_features.ilike(f'%{marker}%')
+            ).all()
+
+            for plan in plans:
+                suspicious_plans.append({
+                    'id': plan.id,
+                    'provider': plan.provider.name if plan.provider else 'Unknown',
+                    'plan_name': plan.plan_name,
+                    'service_type': plan.service_type,
+                    'rate_1000_cents': plan.rate_1000_cents,
+                    'special_features': plan.special_features,
+                    'marker': marker,
+                    'last_updated': plan.last_updated.isoformat()
+                })
+
+        # Get all plans for quality scoring
+        all_plans = db.query(Plan).all()
+        plans_data = [
+            {
+                'provider_name': p.provider.name if p.provider else 'Unknown',
+                'plan_name': p.plan_name,
+                'service_type': p.service_type,
+                'rate_1000_cents': p.rate_1000_cents,
+                'special_features': p.special_features
+            }
+            for p in all_plans
+        ]
+
+        quality_metrics = get_data_quality_score(plans_data)
+
+        return {
+            'status': 'success',
+            'total_plans': len(all_plans),
+            'suspicious_plans_count': len(suspicious_plans),
+            'suspicious_plans': suspicious_plans,
+            'quality_metrics': quality_metrics,
+            'recommendation': 'DELETE suspicious plans' if suspicious_plans else 'Data quality is good'
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/delete-fake-data-markers")
+def delete_fake_data_markers(db: Session = Depends(get_db)):
+    """
+    Delete ALL plans containing fake data markers.
+    This includes: estimated, verify, typical, fallback, sample, demo.
+    """
+    try:
+        from ..models import Plan
+
+        # Delete plans with fake data markers
+        fake_markers = ['estimate', 'typical', 'verify', 'fallback', 'sample', 'demo', 'call for']
+
+        deleted_ids = []
+        total_deleted = 0
+
+        for marker in fake_markers:
+            plans = db.query(Plan).filter(
+                Plan.special_features.ilike(f'%{marker}%')
+            ).all()
+
+            for plan in plans:
+                deleted_ids.append({
+                    'id': plan.id,
+                    'provider': plan.provider.name if plan.provider else 'Unknown',
+                    'plan_name': plan.plan_name,
+                    'marker': marker
+                })
+                db.delete(plan)
+                total_deleted += 1
+
+        db.commit()
+
+        return {
+            'status': 'success',
+            'deleted_count': total_deleted,
+            'deleted_plans': deleted_ids,
+            'message': f'Deleted {total_deleted} plans with fake data markers'
+        }
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/send-daily-report")
+def send_daily_email_report(db: Session = Depends(get_db)):
+    """
+    Manually trigger daily email report.
+    Sends comprehensive status report with commercial rate summary to configured email.
+    """
+    try:
+        from ..email_notifications import send_daily_report
+
+        email_sent = send_daily_report(db)
+
+        if email_sent:
+            return {
+                "status": "success",
+                "message": "Daily report email sent successfully"
+            }
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to send email. Check REPORT_EMAIL and SMTP configuration."
+            )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Email error: {str(e)}")
+
+
+@router.post("/send-test-email")
+def send_test_email(email: str, db: Session = Depends(get_db)):
+    """
+    Send a test email to verify SMTP configuration.
+
+    Args:
+        email: Email address to send test to (query parameter)
+    """
+    try:
+        from ..email_notifications import send_email_report
+
+        test_body = """
+        <html>
+        <body style="font-family: Arial, sans-serif;">
+            <h2 style="color: #0066cc;">🔌 Texas Energy Analyzer - Test Email</h2>
+            <p>If you're reading this, your email configuration is working correctly!</p>
+            <p><strong>Next steps:</strong></p>
+            <ol>
+                <li>Set REPORT_EMAIL environment variable in Railway</li>
+                <li>Daily reports will be sent automatically at 3 AM CT</li>
+                <li>Or trigger manually via /admin/send-daily-report</li>
+            </ol>
+            <hr>
+            <p style="color: #666; font-size: 12px;">
+                This is a test email from Texas Energy Analyzer.
+            </p>
+        </body>
+        </html>
+        """
+
+        success = send_email_report(
+            to_email=email,
+            subject="Texas Energy Analyzer - Test Email",
+            html_body=test_body
+        )
+
+        if success:
+            return {
+                "status": "success",
+                "message": f"Test email sent successfully to {email}",
+                "note": "Check your inbox (and spam folder)"
+            }
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to send test email. Check SMTP configuration in environment variables."
+            )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Email error: {str(e)}")
+
+
 @router.post("/load-initial-data")
 def load_initial_data(db: Session = Depends(get_db)):
     """
-    Load initial sample data into the database.
-    This endpoint is for initial setup and testing.
+    ⚠️ WARNING: Load initial sample data into the database.
+    This endpoint loads FAKE demonstration data and should ONLY be used for testing.
+    DO NOT USE IN PRODUCTION!
     """
     try:
         added = 0
