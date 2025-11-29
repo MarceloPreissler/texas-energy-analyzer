@@ -49,7 +49,7 @@ def read_plan(plan_id: int, db: Session = Depends(get_db)):
 
 @router.post("/scrape")
 def scrape_data(
-    source: str = Query("legacy", description="Scrape source: 'legacy', 'powertochoose', 'energybot', or 'commercial'"),
+    source: str = Query("legacy", description="Scrape source: 'legacy', 'powertochoose', 'energybot', 'energybot_enhanced', or 'commercial'"),
     service_type: str = Query("Residential", description="Service type: 'Residential' or 'Commercial'"),
     zip_code: str | None = Query(None, description="Specific zip code (powertochoose only)"),
     db: Session = Depends(get_db),
@@ -62,7 +62,8 @@ def scrape_data(
     - legacy: Original scrapers (comparison sites) - 68 Residential plans
     - powertochoose: Live PowerToChoose.org data - Residential plans
     - energybot: EnergyBot.com JSON-LD data - 5 REAL Commercial plans
-    - commercial: Redirects to energybot (fake aggregator removed)
+    - energybot_enhanced: Enhanced EnergyBot with full navigation flow - Multi-TDU Commercial plans (RECOMMENDED)
+    - commercial: Redirects to energybot_enhanced (fake aggregator removed)
 
     Service Types:
     - Residential: Residential electricity plans (default)
@@ -71,7 +72,7 @@ def scrape_data(
     ALL DATA IS REAL - NO SAMPLE DATA, NO FALLBACKS.
     Returns the number of plans processed. Rate limited to prevent abuse.
     """
-    from ..scraping import powertochoose_scraper, energybot_scraper_v2
+    from ..scraping import powertochoose_scraper, energybot_scraper_v2, energybot_business_enhanced
 
     logger.info(f"Scrape request received - source: {source}, service_type: {service_type}, zip_code: {zip_code}")
 
@@ -89,6 +90,19 @@ def scrape_data(
             logger.warning("REMOVED: commercial_aggregator had fake sample data - using EnergyBot for REAL data")
             plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
         else:
+            plans = powertochoose_scraper.scrape_powertochoose_all_texas(service_type=service_type)
+    elif source == "energybot_enhanced":
+        logger.info("Using ENHANCED EnergyBot scraper with full navigation flow (RECOMMENDED)")
+        plans = energybot_business_enhanced.scrape_energybot_all_texas_enhanced()
+    elif source == "energybot":
+        logger.info("Using EnergyBot scraper for commercial plans (REAL data only)")
+        plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
+    elif source == "commercial":
+        logger.warning("Redirecting to energybot_enhanced (recommended for commercial plans)")
+        plans = energybot_business_enhanced.scrape_energybot_all_texas_enhanced()
+    else:
+        logger.info("Using legacy scrapers for residential plans")
+        plans = scraper.scrape_all()
             logger.info("Using legacy scrapers for residential plans")
             plans = scraper.scrape_all()
     except Exception as scrape_error:

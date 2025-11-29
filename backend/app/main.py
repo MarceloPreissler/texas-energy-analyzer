@@ -48,19 +48,20 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Application starting up...")
 
-    # Run database migrations only if enabled (disabled by default for fast Railway startup)
-    import os
-    if os.getenv("RUN_MIGRATIONS", "false").lower() == "true":
-        logger.info("Running database migrations...")
-        from .database import SessionLocal
-        from .migrations import ensure_migrations
-        db = SessionLocal()
-        try:
-            ensure_migrations(db)
-        finally:
-            db.close()
-    else:
-        logger.info("Migrations skipped (set RUN_MIGRATIONS=true to enable)")
+    # Run database migrations automatically (safe to run multiple times)
+    # This ensures database schema is always up-to-date
+    logger.info("Running database migrations...")
+    from .database import SessionLocal
+    from .migrations import ensure_migrations
+    db = SessionLocal()
+    try:
+        ensure_migrations(db)
+        logger.info("Database migrations completed successfully")
+    except Exception as e:
+        logger.error(f"Database migration failed (continuing anyway): {e}")
+        # Don't crash app on migration failure
+    finally:
+        db.close()
 
     # Start scheduler with error handling
     logger.info("Starting background scheduler...")

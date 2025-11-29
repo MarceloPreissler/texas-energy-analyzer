@@ -8,7 +8,6 @@ interface Plan {
   id: number;
   provider_id: number;
   plan_name: string;
-  plan_url?: string | null;
   plan_type?: string | null;
   contract_months?: number | null;
   rate_500_cents?: number | null;
@@ -21,7 +20,6 @@ interface Plan {
 interface Provider {
   id: number;
   name: string;
-  website?: string | null;
 }
 
 interface Props {
@@ -400,42 +398,11 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
                   <td>
                     {(() => {
                       const provider = providers?.find((p) => p.id === plan.provider_id);
-                      return provider?.website ? (
-                        <a
-                          href={provider.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            color: '#2196F3',
-                            textDecoration: 'none',
-                            fontWeight: 'bold'
-                          }}
-                        >
-                          {provider.name} 🔗
-                        </a>
-                      ) : (
-                        <strong>{provider?.name}</strong>
-                      );
+                      return <strong>{provider?.name}</strong>;
                     })()}
                   </td>
                   <td>
-                    {plan.plan_url ? (
-                      <a
-                        href={plan.plan_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          color: '#2196F3',
-                          textDecoration: 'none',
-                          fontWeight: '500'
-                        }}
-                        title="View plan details on provider website"
-                      >
-                        {plan.plan_name} 🔗
-                      </a>
-                    ) : (
-                      <span>{plan.plan_name}</span>
-                    )}
+                    <span>{plan.plan_name}</span>
                   </td>
                   <td>{plan.plan_type ?? '-'}</td>
                   <td>{plan.contract_months ?? '-'}</td>
@@ -561,3 +528,5 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
 };
 
 export default EnhancedPlanList;
+
+// Force rebuild

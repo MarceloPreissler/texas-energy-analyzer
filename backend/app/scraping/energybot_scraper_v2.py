@@ -8,12 +8,17 @@ from __future__ import annotations
 
 import json
 import re
+import os
 import time
 import logging
 from typing import List, Dict
 from datetime import datetime, timezone
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
+# Force Playwright to look in the correct location on Render
+# This is a fallback in case the Docker ENV var is stripped
+if os.path.exists("/ms-playwright"):
+    os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "/ms-playwright"
 # Configure logging
 logger = logging.getLogger(__name__)
 
