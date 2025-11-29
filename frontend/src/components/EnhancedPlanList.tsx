@@ -556,3 +556,5 @@ With your usage of ${usage} kWh/month, your estimated bill with the best plan wo
 };
 
 export default EnhancedPlanList;
+
+// Force rebuild
