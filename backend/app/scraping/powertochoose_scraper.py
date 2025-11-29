@@ -7,9 +7,14 @@ directly from the official PUCT website, ensuring data is always up-to-date.
 from __future__ import annotations
 
 import re
+import os
 from typing import List, Dict
 from datetime import datetime
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
+
+# Force Playwright to look in the correct location on Render
+if os.path.exists("/ms-playwright"):
+    os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "/ms-playwright"
 
 
 def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residential", max_plans: int = 100) -> List[Dict]:
