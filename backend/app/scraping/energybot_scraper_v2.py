@@ -9,10 +9,13 @@ from __future__ import annotations
 import json
 import re
 import time
+import logging
 from typing import List, Dict
 from datetime import datetime, timezone
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
+# Configure logging
+logger = logging.getLogger(__name__)
 
 def scrape_energybot_commercial_v2(zip_code: str = "75001", max_plans: int = 100) -> List[Dict]:
     """
@@ -45,67 +48,67 @@ def scrape_energybot_commercial_v2(zip_code: str = "75001", max_plans: int = 100
             # Navigate to the SPA URL directly
             # This URL initiates the wizard for business contract type
             url = f"https://www.energybot.com/app.html#/redirect?ftype=ZIP_CODE&zip_code={zip_code}&contract_type=BUSINESS"
-            print(f"[EnergyBot v2] Navigating to {url}...")
+            logger.info(f"[EnergyBot v2] Navigating to {url}...")
             page.goto(url, timeout=60000)
 
             # SPA Navigation Steps
             
             # Step 1: Current Electric Status -> Yes
-            print("[EnergyBot v2] Step 1: Waiting for 'Yes' button...")
+            logger.info("[EnergyBot v2] Step 1: Waiting for 'Yes' button...")
             try:
                 page.wait_for_selector("text=Yes", timeout=20000)
                 page.click("text=Yes")
             except:
-                print("[EnergyBot v2] 'Yes' button not found, checking if already on next step...")
+                logger.warning("[EnergyBot v2] 'Yes' button not found, checking if already on next step...")
 
             # Step 2: Business Name -> Same business name
-            print("[EnergyBot v2] Step 2: Waiting for 'Same business name' button...")
+            logger.info("[EnergyBot v2] Step 2: Waiting for 'Same business name' button...")
             try:
                 page.wait_for_selector("text=Same business name", timeout=20000)
                 page.click("text=Same business name")
             except:
-                print("[EnergyBot v2] 'Same business name' button not found...")
+                logger.warning("[EnergyBot v2] 'Same business name' button not found...")
 
             # Step 3: Bill Amount -> Select 250 and Continue
-            print("[EnergyBot v2] Step 3: Waiting for bill select field...")
+            logger.info("[EnergyBot v2] Step 3: Waiting for bill select field...")
             try:
                 page.wait_for_selector("#bill-select-field", timeout=20000)
                 page.select_option("#bill-select-field", "250")
                 page.click("#eb-nav-button-next")
             except:
-                print("[EnergyBot v2] Bill select field not found...")
+                logger.warning("[EnergyBot v2] Bill select field not found...")
 
             # Step 4: View Preference -> Standard View
-            print("[EnergyBot v2] Step 4: Waiting for 'Standard View' button...")
+            logger.info("[EnergyBot v2] Step 4: Waiting for 'Standard View' button...")
             try:
                 page.wait_for_selector("text=Standard View", timeout=20000)
                 page.click("text=Standard View")
             except:
-                print("[EnergyBot v2] 'Standard View' button not found...")
+                logger.warning("[EnergyBot v2] 'Standard View' button not found...")
 
             # Step 5: Start Date -> As Soon As Possible and Continue
-            print("[EnergyBot v2] Step 5: Waiting for 'As Soon As Possible' radio...")
+            logger.info("[EnergyBot v2] Step 5: Waiting for 'As Soon As Possible' radio...")
             try:
                 page.wait_for_selector("label[for='select-asap-date-radio']", timeout=20000)
                 page.click("label[for='select-asap-date-radio']")
                 page.click("#eb-nav-button-next")
             except:
-                print("[EnergyBot v2] 'As Soon As Possible' radio not found...")
+                logger.warning("[EnergyBot v2] 'As Soon As Possible' radio not found...")
 
             # Wait for results
-            print("[EnergyBot v2] Waiting for results to load...")
+            logger.info("[EnergyBot v2] Waiting for results to load...")
             page.wait_for_selector(".eb-plan-card", timeout=30000)
             
             # Scroll to load more plans
-            print("[EnergyBot v2] Scrolling to load all plans...")
+            logger.info("[EnergyBot v2] Scrolling to load all plans...")
             for _ in range(5):
                 page.mouse.wheel(0, 2000)
                 page.wait_for_timeout(1000)
                 
             # Extract Plans
-            print("[EnergyBot v2] Extracting plan data...")
+            logger.info("[EnergyBot v2] Extracting plan data...")
             plan_cards = page.query_selector_all(".eb-plan-card")
-            print(f"[EnergyBot v2] Found {len(plan_cards)} plan cards.")
+            logger.info(f"[EnergyBot v2] Found {len(plan_cards)} plan cards.")
             
             for card in plan_cards:
                 try:
@@ -147,14 +150,14 @@ def scrape_energybot_commercial_v2(zip_code: str = "75001", max_plans: int = 100
                         "last_updated": datetime.now(timezone.utc).isoformat()
                     }
                     plans.append(plan)
-                    # print(f"[EnergyBot v2] Scraped: {plan}")
+                    # logger.debug(f"[EnergyBot v2] Scraped: {plan}")
                     
                 except Exception as e:
-                    # print(f"[EnergyBot v2] Error parsing card: {e}")
+                    # logger.error(f"[EnergyBot v2] Error parsing card: {e}")
                     continue
 
         except Exception as e:
-            print(f"[EnergyBot v2] Navigation/Extraction error: {e}")
+            logger.error(f"[EnergyBot v2] Navigation/Extraction error: {e}")
             # Save screenshot for debugging
             try:
                 page.screenshot(path="logs/energybot_error.png")
@@ -166,12 +169,12 @@ def scrape_energybot_commercial_v2(zip_code: str = "75001", max_plans: int = 100
                 content = page.content()
                 with open("energybot_debug.html", "w", encoding="utf-8") as f:
                     f.write(content)
-                print("[EnergyBot v2] Saved debug HTML to energybot_debug.html")
+                logger.info("[EnergyBot v2] Saved debug HTML to energybot_debug.html")
                 browser.close()
             except:
                 pass
 
-    print(f"[EnergyBot v2] Successfully scraped {len(plans)} commercial plans")
+    logger.info(f"[EnergyBot v2] Successfully scraped {len(plans)} commercial plans")
     return plans[:max_plans]
 
 
@@ -182,15 +185,16 @@ def scrape_energybot_all_texas_v2() -> List[Dict]:
     Returns:
         List of unique commercial plans.
     """
-    print("[EnergyBot v2] Scraping Texas commercial plans")
+    logger.info("[EnergyBot v2] Scraping Texas commercial plans")
     plans = scrape_energybot_commercial_v2(zip_code="75001", max_plans=100)
 
-    print(f"[EnergyBot v2] Total commercial plans: {len(plans)}")
+    logger.info(f"[EnergyBot v2] Total commercial plans: {len(plans)}")
     return plans
 
 
 # For testing
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     print("Testing EnergyBot v2 scraper...")
     plans = scrape_energybot_commercial_v2()
 

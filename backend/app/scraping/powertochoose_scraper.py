@@ -2,15 +2,19 @@
 Live PowerToChoose.org scraper using Playwright for real-time pricing data.
 
 This scraper uses browser automation to fetch current electricity plans
-directly from the official PUCT website, ensuring data is always up-to-date.
+directly from the official PUCT website, ensuring data is always to-date.
 """
 from __future__ import annotations
 
 import re
+import logging
+import os
 from typing import List, Dict
 from datetime import datetime, timezone
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
+# Configure logging
+logger = logging.getLogger(__name__)
 
 def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residential", max_plans: int = 100) -> List[Dict]:
     """
@@ -27,13 +31,14 @@ def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residenti
     plans: List[Dict] = []
 
     # Ensure logs directory exists
-    import os
     if not os.path.exists("logs"):
         os.makedirs("logs")
 
     with sync_playwright() as p:
-        # Launch browser in headful mode for better debugging/stealth
-        browser = p.chromium.launch(headless=False)
+        # Launch browser in headless mode for production reliability
+        # Use env var HEADLESS=false for local debugging if needed
+        headless = os.getenv("HEADLESS", "true").lower() == "true"
+        browser = p.chromium.launch(headless=headless)
         context = browser.new_context(
             viewport={'width': 1920, 'height': 1080},
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -48,7 +53,7 @@ def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residenti
             pass
 
         try:
-            print(f"[PowerToChoose] Navigating to site...")
+            logger.info(f"[PowerToChoose] Navigating to site...")
             page.goto("https://www.powertochoose.org/", wait_until="domcontentloaded", timeout=60000)
 
             # Accept cookies if present
@@ -60,7 +65,7 @@ def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residenti
             # Select service type (Residential or Commercial)
             try:
                 if service_type == "Commercial":
-                    print(f"[PowerToChoose] Selecting Commercial service type...")
+                    logger.info(f"[PowerToChoose] Selecting Commercial service type...")
                     # Try multiple selectors for Commercial
                     selectors = [
                         'input[value="Commercial"]',
@@ -74,51 +79,51 @@ def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residenti
                         try:
                             page.click(selector, timeout=2000)
                             clicked = True
-                            print(f"[PowerToChoose] Successfully selected Commercial")
+                            logger.info(f"[PowerToChoose] Successfully selected Commercial")
                             break
                         except:
                             continue
                     if not clicked:
-                        print(f"[PowerToChoose] Could not find Commercial selector, using default")
+                        logger.warning(f"[PowerToChoose] Could not find Commercial selector, using default")
             except Exception as e:
-                print(f"[PowerToChoose] Error selecting Commercial: {e}")
+                logger.error(f"[PowerToChoose] Error selecting Commercial: {e}")
 
             # Enter zip code
-            print(f"[PowerToChoose] Entering zip code: {zip_code}")
+            logger.info(f"[PowerToChoose] Entering zip code: {zip_code}")
             page.fill('input[name="zip_code"]', zip_code)
             
             # Small delay
             page.wait_for_timeout(2000)
 
-            # Save HTML for inspection
-            with open('ptc_debug.html', 'w', encoding='utf-8') as f:
-                f.write(page.content())
-            print("[PowerToChoose] Saved HTML to ptc_debug.html")
+            # Save HTML for inspection (debug only)
+            # with open('ptc_debug.html', 'w', encoding='utf-8') as f:
+            #     f.write(page.content())
+            # logger.debug("[PowerToChoose] Saved HTML to ptc_debug.html")
 
             # Submit form directly via JS to avoid click issues
-            print("[PowerToChoose] Submitting form directly...")
+            logger.info("[PowerToChoose] Submitting form directly...")
             page.evaluate('document.getElementById("planForm").submit()')
 
             # Wait for navigation to results page
             try:
                 page.wait_for_url("**/Plan/Results", timeout=15000)
-                print(f"[PowerToChoose] Navigated to: {page.url}")
+                logger.info(f"[PowerToChoose] Navigated to: {page.url}")
             except:
-                print(f"[PowerToChoose] URL did not change to /Plan/Results. Current: {page.url}")
+                logger.warning(f"[PowerToChoose] URL did not change to /Plan/Results. Current: {page.url}")
 
             # Check for distributor selection modal (it might appear after submit if JS intercepts?)
             # Actually, if we submitted the form, we might be on the new page or the same page if validation failed.
             
             # Wait for results to load
-            print(f"[PowerToChoose] Waiting for results...")
+            logger.info(f"[PowerToChoose] Waiting for results...")
             try:
                 page.wait_for_selector('#dataTable tr.row', timeout=30000)
             except PlaywrightTimeout:
-                print("[PowerToChoose] Timeout waiting for plan selectors.")
+                logger.error("[PowerToChoose] Timeout waiting for plan selectors.")
                 # Save HTML for inspection
-                with open('ptc_results_debug.html', 'w', encoding='utf-8') as f:
+                with open('logs/ptc_results_debug.html', 'w', encoding='utf-8') as f:
                     f.write(page.content())
-                print("[PowerToChoose] Saved results page HTML to ptc_results_debug.html")
+                logger.info("[PowerToChoose] Saved results page HTML to logs/ptc_results_debug.html")
                 raise # Re-raise to trigger the outer exception handler (screenshot)
 
             # Give extra time for dynamic content
@@ -126,7 +131,7 @@ def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residenti
 
             # Parse results
             plan_rows = page.query_selector_all('#dataTable tbody tr.row')
-            print(f"[PowerToChoose] Found {len(plan_rows)} plans")
+            logger.info(f"[PowerToChoose] Found {len(plan_rows)} plans")
 
             for idx, row in enumerate(plan_rows[:max_plans]):
                 try:
@@ -194,21 +199,21 @@ def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residenti
                         })
 
                 except Exception as e:
-                    print(f"[PowerToChoose] Error parsing row {idx}: {e}")
+                    logger.error(f"[PowerToChoose] Error parsing row {idx}: {e}")
                     continue
 
         except PlaywrightTimeout:
-            print("[PowerToChoose] Timeout - site may be slow or down")
+            logger.error("[PowerToChoose] Timeout - site may be slow or down")
             page.screenshot(path="logs/ptc_timeout.png")
-            print("[PowerToChoose] Saved screenshot to logs/ptc_timeout.png")
+            logger.info("[PowerToChoose] Saved screenshot to logs/ptc_timeout.png")
         except Exception as e:
-            print(f"[PowerToChoose] Error: {e}")
+            logger.error(f"[PowerToChoose] Error: {e}")
             page.screenshot(path="logs/ptc_error.png")
-            print("[PowerToChoose] Saved screenshot to logs/ptc_error.png")
+            logger.info("[PowerToChoose] Saved screenshot to logs/ptc_error.png")
         finally:
             browser.close()
 
-    print(f"[PowerToChoose] Successfully scraped {len(plans)} plans")
+    logger.info(f"[PowerToChoose] Successfully scraped {len(plans)} plans")
     return plans
 
 
@@ -234,7 +239,7 @@ def scrape_powertochoose_all_texas(service_type: str = "Residential") -> List[Di
     seen_plans = set()
 
     for zip_code in zip_codes:
-        print(f"[PowerToChoose] Scraping {service_type} plans for zip code: {zip_code}")
+        logger.info(f"[PowerToChoose] Scraping {service_type} plans for zip code: {zip_code}")
         plans = scrape_powertochoose(zip_code, service_type=service_type, max_plans=50)
 
         # Deduplicate by provider + plan name + rate + service_type
@@ -244,5 +249,5 @@ def scrape_powertochoose_all_texas(service_type: str = "Residential") -> List[Di
                 seen_plans.add(key)
                 all_plans.append(plan)
 
-    print(f"[PowerToChoose] Total unique {service_type} plans: {len(all_plans)}")
+    logger.info(f"[PowerToChoose] Total unique {service_type} plans: {len(all_plans)}")
     return all_plans
