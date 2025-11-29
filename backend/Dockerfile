@@ -21,6 +21,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Playwright browsers (required because pip install overrides system playwright)
+# Install Playwright browsers and dependencies
+RUN playwright install-deps
 RUN playwright install chromium
 
 # Copy application code
