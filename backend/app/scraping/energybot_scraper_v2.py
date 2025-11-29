@@ -1,3 +1,30 @@
+"""
+EnergyBot.com scraper v2 - Uses JSON-LD structured data.
+
+This version extracts plan data from the JSON-LD structured data
+embedded in the page, which is more reliable than HTML parsing.
+"""
+from __future__ import annotations
+
+import json
+import re
+import os
+from typing import List, Dict
+from datetime import datetime, timezone
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
+
+# Force Playwright to look in the correct location on Render
+# This is a fallback in case the Docker ENV var is stripped
+if os.path.exists("/ms-playwright"):
+    os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "/ms-playwright"
+
+def scrape_energybot_commercial_v2(zip_code: str = "75001", max_plans: int = 100) -> List[Dict]:
+    """
+    Scrape commercial electricity plans from EnergyBot.com using JSON-LD data.
+
+    Args:
+        zip_code: Texas zip code (not used yet, but kept for future)
+        max_plans: Maximum number of plans to scrape
 
     Returns:
         List of plan dictionaries with provider_name, plan_name, rate, etc.
