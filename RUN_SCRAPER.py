@@ -116,3 +116,4 @@ print("2. Go to: http://localhost:8000/plans?service_type=Commercial")
 print("3. You should see your scraped plans in JSON format")
 print("\nOr check Railway: https://web-production-665ac.up.railway.app/plans?service_type=Commercial")
 print("="*80)
+
