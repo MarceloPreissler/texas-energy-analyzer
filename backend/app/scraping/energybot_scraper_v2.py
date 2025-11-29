@@ -158,21 +158,18 @@ def scrape_energybot_commercial_v2(zip_code: str = "75001", max_plans: int = 100
 
         except Exception as e:
             logger.error(f"[EnergyBot v2] Navigation/Extraction error: {e}")
-            # Save screenshot for debugging
+            # Save screenshot for debugging (if logs directory exists)
             try:
-                page.screenshot(path="logs/energybot_error.png")
-            except:
-                pass
+                import os
+                if os.path.exists("logs"):
+                    page.screenshot(path="logs/energybot_error.png")
+            except Exception as screenshot_err:
+                logger.debug(f"Could not save screenshot: {screenshot_err}")
         finally:
             try:
-                # Save debug HTML
-                content = page.content()
-                with open("energybot_debug.html", "w", encoding="utf-8") as f:
-                    f.write(content)
-                logger.info("[EnergyBot v2] Saved debug HTML to energybot_debug.html")
                 browser.close()
-            except:
-                pass
+            except Exception as close_err:
+                logger.debug(f"Error closing browser: {close_err}")
 
     logger.info(f"[EnergyBot v2] Successfully scraped {len(plans)} commercial plans")
     return plans[:max_plans]

@@ -79,6 +79,13 @@ export async function triggerScrape(
     service_type: serviceType
   };
   if (zipCode) params.zip_code = zipCode;
-  const res = await api.post('/plans/scrape', null, { params });
+
+  const apiKey = import.meta.env.VITE_API_KEY;
+
+  const headers: Record<string, string> = {
+    'X-API-Key': apiKey,
+  };
+
+  const res = await api.post('/plans/scrape', null, { params, headers });
   return res.data;
 }

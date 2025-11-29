@@ -24,7 +24,11 @@ interface Provider {
   website?: string | null;
 }
 
-const EnhancedPlanList: React.FC = () => {
+interface Props {
+  onRefresh: (date: Date) => void;
+}
+
+const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
   const queryClient = useQueryClient();
 
   // Filter state (temporary, not applied until search)
@@ -65,6 +69,7 @@ const EnhancedPlanList: React.FC = () => {
       // Invalidate and refetch all queries
       queryClient.invalidateQueries({ queryKey: ['plans'] });
       queryClient.invalidateQueries({ queryKey: ['providers'] });
+      onRefresh(new Date());
       alert('Data refreshed successfully!');
     } catch (error) {
       console.error('Error refreshing data:', error);

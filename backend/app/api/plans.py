@@ -53,7 +53,7 @@ def scrape_data(
     service_type: str = Query("Residential", description="Service type: 'Residential' or 'Commercial'"),
     zip_code: str | None = Query(None, description="Specific zip code (powertochoose only)"),
     db: Session = Depends(get_db),
-    # api_key: str = Depends(verify_api_key)  # Temporarily disabled for initial data load
+    api_key: str = Depends(verify_api_key)
 ):
     """
     Trigger a scrape of electricity plans and update the database.
@@ -75,21 +75,28 @@ def scrape_data(
 
     logger.info(f"Scrape request received - source: {source}, service_type: {service_type}, zip_code: {zip_code}")
 
-    if source == "powertochoose":
-        logger.info(f"Using live PowerToChoose scraper for {service_type} plans")
-        if zip_code:
-            plans = powertochoose_scraper.scrape_powertochoose(zip_code, service_type=service_type)
+    try:
+        if source == "powertochoose":
+            logger.info(f"Using live PowerToChoose scraper for {service_type} plans")
+            if zip_code:
+                plans = powertochoose_scraper.scrape_powertochoose(zip_code, service_type=service_type)
+            else:
+                plans = powertochoose_scraper.scrape_powertochoose_all_texas(service_type=service_type)
+        elif source == "energybot":
+            logger.info("Using EnergyBot scraper for commercial plans (REAL data only)")
+            plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
+        elif source == "commercial":
+            logger.warning("REMOVED: commercial_aggregator had fake sample data - using EnergyBot for REAL data")
+            plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
         else:
-            plans = powertochoose_scraper.scrape_powertochoose_all_texas(service_type=service_type)
-    elif source == "energybot":
-        logger.info("Using EnergyBot scraper for commercial plans (REAL data only)")
-        plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
-    elif source == "commercial":
-        logger.warning("REMOVED: commercial_aggregator had fake sample data - using EnergyBot for REAL data")
-        plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
-    else:
-        logger.info("Using legacy scrapers for residential plans")
-        plans = scraper.scrape_all()
+            logger.info("Using legacy scrapers for residential plans")
+            plans = scraper.scrape_all()
+    except Exception as scrape_error:
+        logger.error(f"Scraper failed for source '{source}': {scrape_error}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Scraping failed: {str(scrape_error)}"
+        )
 
     created_or_updated = 0
     # Insert provider and plan entries
