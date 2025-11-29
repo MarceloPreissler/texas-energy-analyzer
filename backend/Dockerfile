@@ -13,8 +13,12 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 
+# Set fixed location for Playwright browsers
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
 # Install Playwright browsers
 RUN pip install --user playwright && \
+    mkdir -p /ms-playwright && \
     python -m playwright install chromium && \
     python -m playwright install-deps chromium
 
@@ -22,6 +26,9 @@ RUN pip install --user playwright && \
 FROM python:3.11-slim
 
 WORKDIR /app
+
+# Set fixed location for Playwright browsers
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
@@ -47,7 +54,7 @@ RUN apt-get update && apt-get install -y \
 
 # Copy Python packages from builder
 COPY --from=builder /root/.local /root/.local
-COPY --from=builder /root/.cache/ms-playwright /root/.cache/ms-playwright
+COPY --from=builder /ms-playwright /ms-playwright
 
 # Make sure scripts in .local are usable
 ENV PATH=/root/.local/bin:$PATH
