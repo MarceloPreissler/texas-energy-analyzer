@@ -83,26 +83,16 @@ def scrape_data(
                 plans = powertochoose_scraper.scrape_powertochoose(zip_code, service_type=service_type)
             else:
                 plans = powertochoose_scraper.scrape_powertochoose_all_texas(service_type=service_type)
+        elif source == "energybot_enhanced":
+            logger.info("Using ENHANCED EnergyBot scraper with full navigation flow (RECOMMENDED)")
+            plans = energybot_business_enhanced.scrape_energybot_all_texas_enhanced()
         elif source == "energybot":
             logger.info("Using EnergyBot scraper for commercial plans (REAL data only)")
             plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
         elif source == "commercial":
-            logger.warning("REMOVED: commercial_aggregator had fake sample data - using EnergyBot for REAL data")
-            plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
+            logger.warning("Redirecting to energybot_enhanced (recommended for commercial plans)")
+            plans = energybot_business_enhanced.scrape_energybot_all_texas_enhanced()
         else:
-            plans = powertochoose_scraper.scrape_powertochoose_all_texas(service_type=service_type)
-    elif source == "energybot_enhanced":
-        logger.info("Using ENHANCED EnergyBot scraper with full navigation flow (RECOMMENDED)")
-        plans = energybot_business_enhanced.scrape_energybot_all_texas_enhanced()
-    elif source == "energybot":
-        logger.info("Using EnergyBot scraper for commercial plans (REAL data only)")
-        plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
-    elif source == "commercial":
-        logger.warning("Redirecting to energybot_enhanced (recommended for commercial plans)")
-        plans = energybot_business_enhanced.scrape_energybot_all_texas_enhanced()
-    else:
-        logger.info("Using legacy scrapers for residential plans")
-        plans = scraper.scrape_all()
             logger.info("Using legacy scrapers for residential plans")
             plans = scraper.scrape_all()
     except Exception as scrape_error:
