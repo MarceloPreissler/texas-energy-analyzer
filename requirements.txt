@@ -33,6 +33,9 @@ redis==6.4.0
 python-dotenv==1.0.0
 PyYAML==6.0.3
 
+# Testing
+pytest==8.3.2
+
 # Dependencies
 annotated-types==0.7.0
 anyio==4.11.0

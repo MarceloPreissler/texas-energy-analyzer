@@ -1,6 +1,6 @@
 # Texas Commercial Energy Market Analyzer
 
-This repository contains a full‑stack application for comparing small‑commercial energy plans in Texas.  The project includes a Python back‑end built with FastAPI and SQLAlchemy, a React front‑end, and a set of scrapers that gather plan data from public websites such as PowerChoiceTexas.  Use this application to benchmark plans from providers like Reliant, Gexa, Direct Energy and TXU.
+This repository contains a full‑stack application for comparing small‑commercial energy plans in Texas.  The project includes a Python back‑end built with FastAPI and SQLAlchemy, a React front‑end, and scrapers that now talk directly to the public PUCTX PowerToChoose API (with an HTML fallback) so every plan for a ZIP code can be imported on demand.
 
 ## Project layout
 
@@ -16,6 +16,8 @@ texas-energy-analyzer/
 │       ├── crud.py             # CRUD helper functions
 │       ├── api/
 │       │   └── plans.py        # Plan API endpoints
+│       ├── scrapers/
+│       │   └── powertochoose.py # PowerToChoose API + HTML fallback
 │       └── scraping/
 │           └── scraper.py      # Web scraping routines
 └── frontend/
@@ -70,13 +72,61 @@ npm run dev
 
 The React application will be available at <http://localhost:5173> and will call the FastAPI server at <http://localhost:8000> by default.
 
+> **API endpoint overrides**
+>
+> The front-end automatically detects whether it should talk to the local FastAPI server, the public Railway deployment, or an ngrok tunnel.  If you need to point a build at a different environment (for example, a staging API), set `VITE_API_BASE_URL` before running `npm run dev`/`npm run build`, or inject `window.__API_BASE_URL` on the page hosting the compiled bundle.
+
 ## Scraping data
 
-The scraper is triggered manually via the `/scrape` API endpoint or by running the function in `scraper.py`.  It fetches plan information from several public pages:
+### PowerToChoose ZIP imports
 
-- **Gexa vs TXU comparison** – sample plans include Gexa Eco Saver Plus 12 & 24 with 8.7–8.9 ¢/kWh and a $125 credit at 1,000 kWh, as well as TXU Smart Edge plans around 13.5 ¢/kWh with a $50 credit at 800 kWh【198457865270454†L229-L271】.
-- **Direct Energy** – includes Live Brighter Lite (15.9 ¢/kWh), Bright Secure (16.5 ¢/kWh), and Twelve Hour Power (23.6 ¢/kWh) with free electricity from 9 p.m. to 9 a.m. and a $135 early termination fee【829592562675793†L74-L113】.
-- **Reliant Energy** – offers plans like Power Savings 24 (14.9 ¢/kWh), Power Savings 12 (15.5 ¢/kWh), Basic Power 12 (17.2 ¢/kWh)【421074460517785†L110-L131】, and specialty plans such as Truly Free Weekends and Truly Free Nights【421074460517785†L110-L115】【421074460517785†L189-L207】.
-- **TXU Energy** – includes Clear Deal, Solar Value, Flex Forward, Free Nights & Solar Days, and Saver’s Discount plans with rates ranging from ~14 ¢/kWh to 23 ¢/kWh【636460671967574†L75-L108】【636460671967574†L113-L160】.
+The application now uses `backend/app/scrapers/powertochoose.py`, which first calls the public `https://api.powertochoose.org/api/PowerToChoose/plans` endpoint with `page_size=99999` and then falls back to an HTML parser that paginates through every table row on the results site.  Configure the scraper with optional environment variables:
 
-The scraping routines parse these pages, extract plan names, contract terms, rates at the 1,000 kWh tier, and special features, and insert or update entries in the database.
+- `POWERS_TO_CHOOSE_API_URL` – override the default API endpoint.
+- `POWERS_TO_CHOOSE_HTML_URL` – override the HTML results page URL.
+- `POWERS_TO_CHOOSE_PAGE_SIZE` – change the requested page size (defaults to `99999`).
+
+Trigger a live import with a JSON POST request:
+
+```bash
+curl -X POST http://localhost:8000/plans/scrape/powertochoose \
+  -H "Content-Type: application/json" \
+  -d '{"zip_code": "75214"}'
+```
+
+The endpoint upserts every returned plan (provider + plan name match) and responds with the number of rows processed.  Add `RUN_MIGRATIONS=true` if you need the automated migration runner to add the `cancellation_fee`, `renewable_percent`, and `ix_plans_zip_code` index to an existing database.
+
+### Legacy scrapers
+
+The general `/plans/scrape` route is still available for other sources (e.g., legacy residential feeds or EnergyBot commercial plans).  Supply the `source` query parameter (`legacy`, `powertochoose`, `energybot`, or `commercial`) and optional `zip_code` just as before.
+
+### Front‑end workflow
+
+Once both servers are running, open the dashboard at <http://localhost:5173>, enter a ZIP in the “View All Plans” card, and click the button.  The UI calls the new POST endpoint, refreshes the cache, and automatically fetches `/plans?zip_code=ZIP`.  All matching rows are displayed in the enhanced table with sorting, filtering, pagination, and the new renewable/cancellation columns.
+
+## Promoting changes to production
+
+Follow this short checklist whenever you need the public deployment (currently hosted on Railway and surfaced at <https://www.texasenergyanalyzer.com>) to pick up the latest code or data:
+
+1. **Merge and push** – land your changes in the default branch of this repository.  Railway watches the backend directory, so a push to the branch that the service is tracking is enough to trigger a build.
+2. **Force a backend redeploy (if necessary)** – in the Railway dashboard open the `Texas Energy Analyzer` project, select the backend service (`1f5f65cd-4ea4-4513-a335-4aa09828e1d8`), and click **Deploy**.  This step ensures the new CORS defaults (which already include `https://texasenergyanalyzer.com` and its `www` variant) are running in production.
+3. **Verify the API** – hit `https://web-production-665ac.up.railway.app/health` (or the custom domain’s `/health`) and `https://web-production-665ac.up.railway.app/docs` to confirm the FastAPI app started cleanly.  Watch the Railway logs for any migration output or traceback.
+4. **Run a scrape for the ZIP you care about** – from your workstation (or Railway’s web shell) issue:
+
+   ```bash
+   curl -X POST https://web-production-665ac.up.railway.app/plans/scrape/powertochoose \
+     -H "Content-Type: application/json" \
+     -d '{"zip_code": "75214"}'
+   ```
+
+   Wait for the JSON response that reports how many plans were upserted.
+5. **Reload the front-end** – visit <https://www.texasenergyanalyzer.com>, enter the same ZIP, and click **View All Plans**.  You should see the renewable/cancellation columns populate with the exact number of rows imported in the prior step.
+
+Because the API now whitelists both the apex domain and `www`, no additional environment tweaks are required after the redeploy—just follow the sequence above any time the live site appears empty.
+
+## Data sources & integrity
+
+- **PowerToChoose.org** – the official PUCT marketplace.  Every ZIP import first calls the JSON API and falls back to parsing the published HTML tables, so each rate, fee, and renewable percentage is exactly what providers file with the commission.
+- **EnergyBot.com** – used for additional commercial comparison data when available so we can validate provider names and plan URLs.
+
+No placeholder or assumed values are injected into the dataset.  If a field is missing from the upstream response it remains `null` in the database and UI, ensuring all surfaced information can be traced back to a verifiable public source.

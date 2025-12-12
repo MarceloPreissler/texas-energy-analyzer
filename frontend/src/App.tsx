@@ -36,16 +36,24 @@ const App: React.FC = () => {
       <div className="info-box">
         <h3>📊 About This Data</h3>
         <p>
-          <strong>Data Sources:</strong> Plans are aggregated from multiple trusted sources including{' '}
-          <a href="https://www.powerchoicetexas.org" target="_blank" rel="noopener noreferrer" style={{ color: '#2c5364' }}>
-            PowerChoiceTexas.org
-          </a>
-          {' '}comparison sites for residential plans and{' '}
-          <a href="https://www.energybot.com" target="_blank" rel="noopener noreferrer" style={{ color: '#2c5364' }}>
-            EnergyBot.com
-          </a>
-          {' '}for commercial plans. Data is automatically refreshed daily at 2:00 AM,
-          and you can manually refresh anytime using the "Refresh Data" button.
+          <strong>Data Sources:</strong>
+        </p>
+        <ul className="data-source-list">
+          <li>
+            <a href="https://www.powertochoose.org" target="_blank" rel="noopener noreferrer" style={{ color: '#2c5364' }}>
+              PowerToChoose.org (PUCT official feed)
+            </a>
+            {' '}via the public API + HTML fallback so every plan listed for a ZIP comes directly from the regulator's disclosure site.
+          </li>
+          <li>
+            <a href="https://www.energybot.com" target="_blank" rel="noopener noreferrer" style={{ color: '#2c5364' }}>
+              EnergyBot.com
+            </a>
+            {' '}for additional commercial comparison data used to cross-check offer details.
+          </li>
+        </ul>
+        <p className="data-integrity-note">
+          Every field displayed is scraped straight from these live sources—no placeholder, assumed, or fabricated values are inserted by the tool.
         </p>
         <p style={{ marginTop: '10px' }}>
           <strong>✅ Data Freshness:</strong> Plans shown reflect current offerings from multiple Texas electricity comparison sites.

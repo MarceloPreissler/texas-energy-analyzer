@@ -26,13 +26,15 @@ class PlanBase(BaseModel):
     monthly_bill_1000: Optional[float] = None
     monthly_bill_2000: Optional[float] = None
     early_termination_fee: Optional[float] = None
+    cancellation_fee: Optional[float] = None
     base_monthly_fee: Optional[float] = None
     renewable_percent: Optional[int] = None
     special_features: Optional[str] = None
 
 
 class PlanCreate(PlanBase):
-    provider_id: int
+    provider_id: Optional[int] = None
+    provider_name: Optional[str] = None
 
 
 class Plan(PlanBase):

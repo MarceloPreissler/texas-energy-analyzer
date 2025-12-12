@@ -9,7 +9,7 @@ This module defines the database schema for providers, plans, and TDUs.
 """
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Text
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Text, Index
 from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime
 
@@ -31,6 +31,9 @@ class Provider(Base):
 
 class Plan(Base):
     __tablename__ = "plans"
+    __table_args__ = (
+        Index("ix_plans_zip_code", "zip_code"),
+    )
 
     id: int = Column(Integer, primary_key=True, index=True)
     provider_id: int = Column(Integer, ForeignKey("providers.id"), nullable=False)
@@ -46,6 +49,7 @@ class Plan(Base):
     monthly_bill_1000: float = Column(Float, nullable=True)
     monthly_bill_2000: float = Column(Float, nullable=True)
     early_termination_fee: float = Column(Float, nullable=True)
+    cancellation_fee: float = Column(Float, nullable=True)
     base_monthly_fee: float = Column(Float, nullable=True)
     renewable_percent: int = Column(Integer, nullable=True)
     special_features: str = Column(String, nullable=True)
