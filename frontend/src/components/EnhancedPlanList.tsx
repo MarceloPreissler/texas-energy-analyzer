@@ -8,7 +8,6 @@ interface Plan {
   id: number;
   provider_id: number;
   plan_name: string;
-  plan_url?: string | null;
   plan_type?: string | null;
   service_type?: string | null;
   zip_code?: string | null;
@@ -27,7 +26,6 @@ interface Plan {
 interface Provider {
   id: number;
   name: string;
-  website?: string | null;
 }
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100];
@@ -612,3 +610,5 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
 };
 
 export default EnhancedPlanList;
+
+// Force rebuild
