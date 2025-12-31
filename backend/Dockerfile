@@ -1,4 +1,5 @@
 # Use official Playwright image which includes Python and pre-installed browsers
+# Version: 2024-12-30-v2 (force rebuild)
 FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app
@@ -33,5 +34,5 @@ RUN mkdir -p /app/data
 # Expose port
 EXPOSE 8000
 
-# Run the application
-CMD sh -c "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+# Run the application with browser check/install at startup
+CMD sh -c "playwright install chromium 2>/dev/null || true && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
