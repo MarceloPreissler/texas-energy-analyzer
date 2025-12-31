@@ -3,6 +3,9 @@ FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app
 
+# Set Playwright browser path to use the pre-installed browsers
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
 # Install system dependencies for psycopg2 and other packages
 RUN apt-get update && apt-get install -y \
     postgresql-client \
