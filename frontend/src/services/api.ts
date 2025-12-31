@@ -2,10 +2,9 @@ import axios from 'axios';
 
 // Detect environment and set appropriate API base URL
 const hostname = window.location.hostname;
+const protocol = window.location.protocol;
 
-// Allow explicit overrides before running environment heuristics.  This makes
-// it trivial to point a preview build at a staging API without editing the
-// source bundle.
+// Allow explicit overrides before running environment heuristics.
 const envApiBaseUrl = (import.meta as any)?.env?.VITE_API_BASE_URL;
 const windowApiOverride = (window as any)?.__API_BASE_URL;
 
@@ -23,23 +22,18 @@ if (envApiBaseUrl) {
 } else if (windowApiOverride) {
   API_BASE_URL = windowApiOverride;
 } else if (isProduction || isVercelPreview || isCustomDomain) {
-  // Production: Use Railway backend (works 24/7, no computer needed)
+  // Production: Use Railway backend
   API_BASE_URL = 'https://web-production-665ac.up.railway.app';
 } else if (isNgrok) {
   // Ngrok tunnel: use local backend
   API_BASE_URL = 'http://10.0.0.16:8000';
 } else if (isLocalhost) {
-  // Localhost: use Vite proxy (empty string for relative URLs)
+  // Localhost: use Vite proxy
   API_BASE_URL = '';
 } else {
   // Fallback: if we can't detect, assume production and use Railway
   console.warn('Unable to detect environment, defaulting to production Railway');
   API_BASE_URL = 'https://web-production-665ac.up.railway.app';
-// Use environment variable if available (Vite replaces this at build time)
-// Fallback to Render backend if not set
-const API_BASE_URL = (import.meta.env.VITE_API_URL || '').trim();
-if (!API_BASE_URL) {
-  console.error("VITE_API_URL is not defined! API calls will fail.");
 }
 
 console.log('API Base URL:', API_BASE_URL); // Debug log
@@ -78,7 +72,6 @@ interface Plan {
   service_type?: string | null;
   zip_code?: string | null;
   contract_months?: number | null;
-  plan_url?: string | null;
   rate_500_cents?: number | null;
   rate_1000_cents?: number | null;
   rate_2000_cents?: number | null;

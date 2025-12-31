@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchPlans, fetchProviders, triggerScrape, scrapePowerToChoose } from '../services/api';
 import PlanComparison from './PlanComparison';
 import PriceAnalytics from './PriceAnalytics';
+import MarketAnalytics from './MarketAnalytics';
 
 interface Plan {
   id: number;
@@ -41,7 +42,6 @@ type SortField = (typeof SORT_FIELDS)[number]['value'];
 
 type SortDirection = 'asc' | 'desc';
 
-const EnhancedPlanList: React.FC = () => {
 interface Props {
   onRefresh: (date: Date) => void;
 }
@@ -144,20 +144,6 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
     setCurrentPage(1);
   };
 
-  const handleRefreshData = async () => {
-    setIsRefreshing(true);
-    try {
-      await triggerScrape(serviceTypeFilter || 'Residential', zipCodeFilter);
-      queryClient.invalidateQueries({ queryKey: ['plans'] });
-      alert('Data refresh scheduled.');
-    } catch (error) {
-      console.error('Error refreshing data:', error);
-      alert('Unable to refresh data. Check logs for details.');
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
   const handleViewAllPlans = async () => {
     if (!zipInput || zipInput.length !== 5) {
       setScrapeError('Enter a valid 5-digit Texas ZIP code.');
@@ -196,18 +182,6 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
 
   const getProviderName = (plan: Plan) => {
     return providers?.find((p) => p.id === plan.provider_id)?.name || 'Unknown';
-  };
-
-  const getRateClass = (rate: number | null | undefined) => {
-    if (!rate) return '';
-    if (rate < 12) return 'rate-good';
-    if (rate < 15) return 'rate-warning';
-    return 'rate-high';
-  };
-
-  const calculateMonthlyCost = (rate: number | null | undefined) => {
-    if (!rate) return 0;
-    return (usage * rate) / 100 + (useCustomBaseFee ? baseFee : 9.95);
   };
 
   const processedPlans = useMemo(() => {
@@ -605,6 +579,8 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
       )}
 
       {plans && plans.length > 0 && providers && <PriceAnalytics plans={plans} providers={providers} />}
+
+      {plans && plans.length > 0 && providers && <MarketAnalytics plans={plans} providers={providers} />}
     </>
   );
 };
