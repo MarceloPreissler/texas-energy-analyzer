@@ -10,8 +10,9 @@ import {
   ArcElement,
   PointElement,
   LineElement,
+  Filler,
 } from 'chart.js';
-import { Bar, Pie, Line } from 'react-chartjs-2';
+import { Bar, Doughnut } from 'react-chartjs-2';
 
 ChartJS.register(
   CategoryScale,
@@ -22,7 +23,8 @@ ChartJS.register(
   Legend,
   ArcElement,
   PointElement,
-  LineElement
+  LineElement,
+  Filler
 );
 
 interface Plan {
@@ -30,7 +32,10 @@ interface Plan {
   provider_id: number;
   plan_name: string;
   plan_type?: string | null;
+  service_type?: string | null;
+  contract_months?: number | null;
   rate_1000_cents?: number | null;
+  renewable_percent?: number | null;
 }
 
 interface Provider {
@@ -45,75 +50,123 @@ interface Props {
 
 const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
   const analytics = useMemo(() => {
-    const plansWithRates = plans.filter(p => p.rate_1000_cents);
+    const plansWithRates = plans.filter(p => p.rate_1000_cents && p.rate_1000_cents > 0);
 
-    // Price distribution (histogram)
-    const priceRanges = {
-      '< 10¢': 0,
-      '10-12¢': 0,
-      '12-14¢': 0,
-      '14-16¢': 0,
-      '> 16¢': 0,
-    };
+    if (plansWithRates.length === 0) {
+      return null;
+    }
+
+    // Calculate statistics
+    const rates = plansWithRates.map(p => p.rate_1000_cents!).sort((a, b) => a - b);
+    const n = rates.length;
+    const min = rates[0];
+    const max = rates[n - 1];
+    const sum = rates.reduce((a, b) => a + b, 0);
+    const mean = sum / n;
+    const median = n % 2 === 0 ? (rates[n / 2 - 1] + rates[n / 2]) / 2 : rates[Math.floor(n / 2)];
+
+    // Price distribution with finer granularity
+    const priceRanges = [
+      { label: '< 6¢', min: 0, max: 6, count: 0, color: '#10b981' },
+      { label: '6-8¢', min: 6, max: 8, count: 0, color: '#22c55e' },
+      { label: '8-10¢', min: 8, max: 10, count: 0, color: '#84cc16' },
+      { label: '10-12¢', min: 10, max: 12, count: 0, color: '#eab308' },
+      { label: '12-14¢', min: 12, max: 14, count: 0, color: '#f97316' },
+      { label: '> 14¢', min: 14, max: Infinity, count: 0, color: '#ef4444' },
+    ];
 
     plansWithRates.forEach(plan => {
       const rate = plan.rate_1000_cents!;
-      if (rate < 10) priceRanges['< 10¢']++;
-      else if (rate < 12) priceRanges['10-12¢']++;
-      else if (rate < 14) priceRanges['12-14¢']++;
-      else if (rate < 16) priceRanges['14-16¢']++;
-      else priceRanges['> 16¢']++;
+      const bucket = priceRanges.find(b => rate >= b.min && rate < b.max);
+      if (bucket) bucket.count++;
     });
 
-    // Provider comparison (average rate by provider)
-    const providerRates: Record<string, number[]> = {};
+    // Provider comparison (average and best rate by provider)
+    const providerRates: Record<string, { rates: number[], planCount: number }> = {};
     plansWithRates.forEach(plan => {
       const provider = providers.find(p => p.id === plan.provider_id);
       if (provider) {
         if (!providerRates[provider.name]) {
-          providerRates[provider.name] = [];
+          providerRates[provider.name] = { rates: [], planCount: 0 };
         }
-        providerRates[provider.name].push(plan.rate_1000_cents!);
+        providerRates[provider.name].rates.push(plan.rate_1000_cents!);
+        providerRates[provider.name].planCount++;
       }
     });
 
     const providerAvgs = Object.entries(providerRates)
-      .map(([name, rates]) => ({
+      .map(([name, data]) => ({
         name,
-        avgRate: rates.reduce((a, b) => a + b, 0) / rates.length,
-        minRate: Math.min(...rates),
-        count: rates.length,
+        avgRate: data.rates.reduce((a, b) => a + b, 0) / data.rates.length,
+        minRate: Math.min(...data.rates),
+        maxRate: Math.max(...data.rates),
+        count: data.planCount,
       }))
-      .sort((a, b) => a.avgRate - b.avgRate)
-      .slice(0, 10); // Top 10 providers
+      .filter(p => p.count >= 1)
+      .sort((a, b) => a.minRate - b.minRate)
+      .slice(0, 12);
 
     // Plan type distribution
     const planTypes: Record<string, number> = {};
-    plans.forEach(plan => {
-      const type = plan.plan_type || 'Unknown';
+    plansWithRates.forEach(plan => {
+      const type = plan.plan_type || 'Other';
       planTypes[type] = (planTypes[type] || 0) + 1;
     });
 
+    // Service type breakdown
+    const residential = plansWithRates.filter(p => p.service_type === 'Residential');
+    const commercial = plansWithRates.filter(p => p.service_type === 'Commercial');
+
+    // Contract term analysis
+    const contractTerms: Record<string, { count: number, avgRate: number }> = {};
+    plansWithRates.forEach(plan => {
+      const term = plan.contract_months || 0;
+      const termLabel = term === 0 ? 'Month-to-Month' : `${term} Months`;
+      if (!contractTerms[termLabel]) {
+        contractTerms[termLabel] = { count: 0, avgRate: 0 };
+      }
+      contractTerms[termLabel].count++;
+      contractTerms[termLabel].avgRate += plan.rate_1000_cents!;
+    });
+
+    Object.keys(contractTerms).forEach(key => {
+      contractTerms[key].avgRate = contractTerms[key].avgRate / contractTerms[key].count;
+    });
+
     return {
+      total: n,
+      min,
+      max,
+      mean,
+      median,
       priceRanges,
       providerAvgs,
       planTypes,
+      residential: residential.length,
+      commercial: commercial.length,
+      contractTerms,
     };
   }, [plans, providers]);
 
+  if (!analytics) {
+    return (
+      <div className="price-analytics-container">
+        <div className="analytics-card glass">
+          <p>No rate data available for analysis</p>
+        </div>
+      </div>
+    );
+  }
+
   const priceDistributionData = {
-    labels: Object.keys(analytics.priceRanges),
+    labels: analytics.priceRanges.map(r => r.label),
     datasets: [
       {
         label: 'Number of Plans',
-        data: Object.values(analytics.priceRanges),
-        backgroundColor: [
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(255, 206, 86, 0.6)',
-          'rgba(255, 159, 64, 0.6)',
-          'rgba(255, 99, 132, 0.6)',
-        ],
+        data: analytics.priceRanges.map(r => r.count),
+        backgroundColor: analytics.priceRanges.map(r => r.color),
+        borderRadius: 8,
+        borderSkipped: false,
       },
     ],
   };
@@ -122,34 +175,44 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
     labels: analytics.providerAvgs.map(p => p.name),
     datasets: [
       {
-        label: 'Average Rate (¢/kWh)',
-        data: analytics.providerAvgs.map(p => p.avgRate),
-        backgroundColor: 'rgba(54, 162, 235, 0.6)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1,
+        label: 'Best Rate',
+        data: analytics.providerAvgs.map(p => p.minRate),
+        backgroundColor: 'rgba(16, 185, 129, 0.85)',
+        borderRadius: 6,
       },
       {
-        label: 'Best Rate (¢/kWh)',
-        data: analytics.providerAvgs.map(p => p.minRate),
-        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1,
+        label: 'Average Rate',
+        data: analytics.providerAvgs.map(p => p.avgRate),
+        backgroundColor: 'rgba(59, 130, 246, 0.7)',
+        borderRadius: 6,
       },
     ],
   };
+
+  const planTypeColors = [
+    '#3b82f6', '#10b981', '#f97316', '#8b5cf6', '#ec4899', '#06b6d4'
+  ];
 
   const planTypeData = {
     labels: Object.keys(analytics.planTypes),
     datasets: [
       {
         data: Object.values(analytics.planTypes),
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.6)',
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(255, 206, 86, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(153, 102, 255, 0.6)',
-        ],
+        backgroundColor: planTypeColors.slice(0, Object.keys(analytics.planTypes).length),
+        borderWidth: 0,
+        hoverOffset: 8,
+      },
+    ],
+  };
+
+  const serviceTypeData = {
+    labels: ['Residential', 'Commercial'],
+    datasets: [
+      {
+        data: [analytics.residential, analytics.commercial],
+        backgroundColor: ['#3b82f6', '#10b981'],
+        borderWidth: 0,
+        hoverOffset: 8,
       },
     ],
   };
@@ -160,39 +223,133 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
     plugins: {
       legend: {
         position: 'top' as const,
+        labels: {
+          color: '#64748b',
+          font: { size: 12 },
+          padding: 16,
+        },
+      },
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { color: '#64748b' },
+      },
+      y: {
+        grid: { color: 'rgba(100, 116, 139, 0.1)' },
+        ticks: { color: '#64748b' },
+      },
+    },
+  };
+
+  const horizontalChartOptions = {
+    ...chartOptions,
+    indexAxis: 'y' as const,
+    scales: {
+      x: {
+        grid: { color: 'rgba(100, 116, 139, 0.1)' },
+        ticks: { color: '#64748b' },
+      },
+      y: {
+        grid: { display: false },
+        ticks: { color: '#64748b', font: { size: 11 } },
+      },
+    },
+  };
+
+  const doughnutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '60%',
+    plugins: {
+      legend: {
+        position: 'right' as const,
+        labels: {
+          color: '#64748b',
+          font: { size: 11 },
+          padding: 12,
+          usePointStyle: true,
+          pointStyle: 'circle',
+        },
       },
     },
   };
 
   return (
-    <div className="analytics-container">
-      <div className="card">
-        <h2 className="card-title">📊 Price Distribution</h2>
-        <div style={{ height: '300px', padding: '20px', backgroundColor: 'white', borderRadius: '8px' }}>
-          <Bar data={priceDistributionData} options={chartOptions} />
+    <div className="price-analytics-section">
+      <h2 className="section-title">
+        <span className="icon">📈</span>
+        Retail Plan Analytics
+      </h2>
+      <p className="section-subtitle">
+        Statistical analysis of {analytics.total} electricity plans from database
+      </p>
+
+      {/* Quick Stats Row */}
+      <div className="quick-stats-row">
+        <div className="quick-stat">
+          <span className="quick-stat-value green">{analytics.min.toFixed(2)}¢</span>
+          <span className="quick-stat-label">Lowest Rate</span>
+        </div>
+        <div className="quick-stat">
+          <span className="quick-stat-value blue">{analytics.mean.toFixed(2)}¢</span>
+          <span className="quick-stat-label">Average Rate</span>
+        </div>
+        <div className="quick-stat">
+          <span className="quick-stat-value purple">{analytics.median.toFixed(2)}¢</span>
+          <span className="quick-stat-label">Median Rate</span>
+        </div>
+        <div className="quick-stat">
+          <span className="quick-stat-value orange">{analytics.max.toFixed(2)}¢</span>
+          <span className="quick-stat-label">Highest Rate</span>
+        </div>
+        <div className="quick-stat">
+          <span className="quick-stat-value">{analytics.total}</span>
+          <span className="quick-stat-label">Total Plans</span>
         </div>
       </div>
 
-      <div className="card">
-        <h2 className="card-title">🏢 Provider Comparison (Top 10)</h2>
-        <div style={{ height: '400px', padding: '20px', backgroundColor: 'white', borderRadius: '8px' }}>
-          <Bar
-            data={providerComparisonData}
-            options={{
-              ...chartOptions,
-              indexAxis: 'y' as const,
-            }}
-          />
+      {/* Charts Grid */}
+      <div className="analytics-charts-grid">
+        <div className="analytics-card glass">
+          <h3 className="analytics-card-title">Price Distribution</h3>
+          <div className="chart-wrapper">
+            <Bar data={priceDistributionData} options={chartOptions} />
+          </div>
         </div>
-        <p style={{ marginTop: '10px', fontSize: '0.85em', color: '#666' }}>
-          Showing average and best rates for providers with the most plans
-        </p>
-      </div>
 
-      <div className="card">
-        <h2 className="card-title">📋 Plan Type Distribution</h2>
-        <div style={{ height: '300px', padding: '20px', backgroundColor: 'white', borderRadius: '8px' }}>
-          <Pie data={planTypeData} options={chartOptions} />
+        <div className="analytics-card glass">
+          <h3 className="analytics-card-title">Plan Type Breakdown</h3>
+          <div className="chart-wrapper-doughnut">
+            <Doughnut data={planTypeData} options={doughnutOptions} />
+          </div>
+        </div>
+
+        <div className="analytics-card glass wide">
+          <h3 className="analytics-card-title">Provider Rate Comparison (Top 12)</h3>
+          <div className="chart-wrapper-tall">
+            <Bar data={providerComparisonData} options={horizontalChartOptions} />
+          </div>
+          <p className="chart-footnote">
+            Rates shown in ¢/kWh at 1,000 kWh usage level
+          </p>
+        </div>
+
+        <div className="analytics-card glass">
+          <h3 className="analytics-card-title">Service Type Distribution</h3>
+          <div className="chart-wrapper-doughnut">
+            <Doughnut data={serviceTypeData} options={doughnutOptions} />
+          </div>
+          <div className="service-type-stats">
+            <div className="service-stat">
+              <span className="service-count">{analytics.residential}</span>
+              <span className="service-label">Residential</span>
+            </div>
+            <div className="service-stat">
+              <span className="service-count">{analytics.commercial}</span>
+              <span className="service-label">Commercial</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

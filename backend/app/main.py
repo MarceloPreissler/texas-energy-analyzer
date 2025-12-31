@@ -22,7 +22,7 @@ from slowapi.errors import RateLimitExceeded
 
 from .database import engine
 from . import models
-from .api import plans as plans_router, admin as admin_router, tdus as tdus_router
+from .api import plans as plans_router, admin as admin_router, tdus as tdus_router, ercot as ercot_router
 from .scheduler import start_scheduler, stop_scheduler
 from .logging_config import setup_logging
 
@@ -139,6 +139,7 @@ app.add_middleware(
 app.include_router(plans_router.router)
 app.include_router(admin_router.router)
 app.include_router(tdus_router.router)
+app.include_router(ercot_router.router)
 
 
 @app.get("/")
@@ -154,6 +155,10 @@ async def read_root(request: Request):
             "tdus": "/tdus",
             "tdu_summary": "/tdus/summary",
             "tdu_cost_calculator": "/tdus/calculate-cost/{tdu_name}?kwh=1000",
+            "ercot_summary": "/ercot/summary",
+            "ercot_grid_status": "/ercot/grid-status",
+            "ercot_fuel_mix": "/ercot/fuel-mix",
+            "ercot_prices": "/ercot/prices",
             "scrape": "/plans/scrape (POST)",
             "docs": "/docs"
         }

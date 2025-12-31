@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import EnhancedPlanList from './components/EnhancedPlanList';
+import ErcotDashboard from './components/ErcotDashboard';
 import './App.css';
 
 const App: React.FC = () => {
@@ -24,8 +25,8 @@ const App: React.FC = () => {
   return (
     <div className="app-container">
       <div className="app-header">
-        <h1>⚡ Texas Energy Market Analyzer</h1>
-        <p>Internal Tool for Tracking, Comparing, and Analyzing Electricity Rates from ERCOT Energy Providers</p>
+        <h1>Texas Energy Market Analyzer</h1>
+        <p>Professional Analytics for Texas Electricity Markets - Residential & Commercial</p>
       </div>
 
       <div className="timestamp">
@@ -33,39 +34,46 @@ const App: React.FC = () => {
         <span className="status-indicator"></span>
       </div>
 
+      {/* ERCOT Real-Time Grid Dashboard */}
+      <ErcotDashboard />
+
       <div className="info-box">
-        <h3>📊 About This Data</h3>
+        <h3>Data Sources & Methodology</h3>
         <p>
-          <strong>Data Sources:</strong>
+          <strong>Live Data Sources:</strong>
         </p>
         <ul className="data-source-list">
           <li>
-            <a href="https://www.powertochoose.org" target="_blank" rel="noopener noreferrer" style={{ color: '#2c5364' }}>
-              PowerToChoose.org (PUCT official feed)
+            <a href="https://www.ercot.com" target="_blank" rel="noopener noreferrer" style={{ color: '#2c5364' }}>
+              ERCOT.com
             </a>
-            {' '}via the public API + HTML fallback so every plan listed for a ZIP comes directly from the regulator's disclosure site.
+            {' '}- Real-time grid status, wholesale prices, fuel mix, and demand/capacity data directly from the Electric Reliability Council of Texas public APIs.
           </li>
           <li>
-            <a href="https://www.energybot.com" target="_blank" rel="noopener noreferrer" style={{ color: '#2c5364' }}>
-              EnergyBot.com
+            <a href="https://www.powertochoose.org" target="_blank" rel="noopener noreferrer" style={{ color: '#2c5364' }}>
+              PowerToChoose.org
             </a>
-            {' '}for additional commercial comparison data used to cross-check offer details.
+            {' '}- Official PUCT (Public Utility Commission of Texas) retail electricity plan database via public API + HTML fallback.
+          </li>
+          <li>
+            <a href="https://www.electricityplans.com" target="_blank" rel="noopener noreferrer" style={{ color: '#2c5364' }}>
+              ElectricityPlans.com
+            </a>
+            {' '}- Commercial electricity rate data for business customers across Texas TDU service areas.
           </li>
         </ul>
         <p className="data-integrity-note">
-          Every field displayed is scraped straight from these live sources—no placeholder, assumed, or fabricated values are inserted by the tool.
+          All data is sourced directly from official and verified sources. No estimates, mock data, or fabricated values.
         </p>
         <p style={{ marginTop: '10px' }}>
-          <strong>✅ Data Freshness:</strong> Plans shown reflect current offerings from multiple Texas electricity comparison sites.
-          However, rates can change frequently.
+          <strong>Refresh Rate:</strong> ERCOT grid data updates every 5 minutes. Retail plan data reflects current market offerings.
         </p>
         <p style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #e0e0e0' }}>
-          <strong>📋 Disclosure:</strong> This tool was created for analysis and informational purposes to assess
-          the most current information in the energy market efficiently and effectively. For enrollment and final
-          rate verification, please contact providers directly or visit their official websites.
+          <strong>Disclosure:</strong> This tool is for analysis and informational purposes. For enrollment and final
+          rate verification, contact providers directly or visit their official websites.
         </p>
         <p style={{ marginTop: '15px', fontSize: '0.75em', color: '#999', fontStyle: 'italic' }}>
-          Created by Marcelo Preissler and Claude Code
+          Created by Marcelo Preissler with Claude Code
         </p>
       </div>
 

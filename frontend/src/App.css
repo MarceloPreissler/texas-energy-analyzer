@@ -911,3 +911,557 @@ body {
     transform: rotate(90deg);
   }
 }
+
+/* ===============================================
+   ERCOT REAL-TIME DASHBOARD STYLES
+   =============================================== */
+
+.ercot-dashboard {
+  margin-bottom: 30px;
+  animation: fadeIn 0.6s ease;
+}
+
+.ercot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.ercot-title-section {
+  flex: 1;
+}
+
+.ercot-title {
+  color: white;
+  font-size: 1.8em;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ercot-logo {
+  font-size: 1.2em;
+}
+
+.ercot-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95em;
+  margin: 0;
+}
+
+.ercot-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.last-updated {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85em;
+}
+
+.source-link {
+  color: #60a5fa;
+  font-size: 0.85em;
+  text-decoration: none;
+}
+
+.source-link:hover {
+  text-decoration: underline;
+}
+
+/* Grid Status Hero */
+.grid-status-hero {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.grid-health-indicator {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+  border: 3px solid;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.health-icon {
+  font-size: 2.5em;
+  margin-bottom: 8px;
+}
+
+.health-status {
+  font-size: 1.4em;
+  font-weight: 700;
+}
+
+.health-label {
+  color: #64748b;
+  font-size: 0.85em;
+  margin-top: 4px;
+}
+
+.grid-metrics {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.metric-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+}
+
+.metric-card.demand {
+  border-left: 4px solid #3b82f6;
+}
+
+.metric-card.capacity {
+  border-left: 4px solid #10b981;
+}
+
+.metric-card.reserves {
+  border-left: 4px solid #8b5cf6;
+}
+
+.metric-card.margin {
+  border-left: 4px solid #f97316;
+}
+
+.metric-icon {
+  font-size: 2em;
+}
+
+.metric-content {
+  flex: 1;
+}
+
+.metric-value {
+  font-size: 1.6em;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.metric-label {
+  color: #64748b;
+  font-size: 0.85em;
+  margin-top: 2px;
+}
+
+/* ERCOT Charts Row */
+.ercot-charts-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.ercot-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.ercot-card .card-title {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.title-icon {
+  font-size: 1.1em;
+}
+
+/* Fuel Mix Card */
+.fuel-mix-content {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.fuel-chart-container {
+  width: 200px;
+  height: 200px;
+  flex-shrink: 0;
+}
+
+.fuel-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fuel-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.fuel-stat-value {
+  font-size: 1.8em;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.fuel-stat.renewable .fuel-stat-value {
+  color: #10b981;
+}
+
+.fuel-stat-label {
+  color: #64748b;
+  font-size: 0.85em;
+}
+
+.fuel-breakdown {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.fuel-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fuel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.fuel-name {
+  color: #64748b;
+  font-size: 0.9em;
+  flex: 1;
+}
+
+.fuel-value {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.9em;
+}
+
+/* Prices Card */
+.prices-chart-container {
+  height: 200px;
+  margin-bottom: 16px;
+}
+
+.price-summary {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.price-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.price-label {
+  color: #64748b;
+  font-size: 0.85em;
+}
+
+.price-value {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 1.1em;
+}
+
+.price-value.highlight {
+  color: #10b981;
+}
+
+/* Info Banner */
+.ercot-info-banner {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.info-icon {
+  font-size: 1.2em;
+  flex-shrink: 0;
+}
+
+.info-content {
+  color: #334155;
+  font-size: 0.9em;
+  line-height: 1.6;
+}
+
+/* Loading and Error States */
+.ercot-loading,
+.ercot-error {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 48px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.retry-btn {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.retry-btn:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+/* Chart Container Fix - Prevent overflow */
+.chart-container {
+  height: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-container.small {
+  height: 180px;
+}
+
+.chart-container canvas {
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Analytics Card Chart Fix */
+.analytics-card .chart-container {
+  margin-top: 10px;
+}
+
+/* Responsive ERCOT */
+@media (max-width: 768px) {
+  .ercot-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ercot-meta {
+    align-items: flex-start;
+  }
+
+  .grid-status-hero {
+    flex-direction: column;
+  }
+
+  .grid-health-indicator {
+    width: 100%;
+  }
+
+  .ercot-charts-row {
+    grid-template-columns: 1fr;
+  }
+
+  .fuel-mix-content {
+    flex-direction: column;
+  }
+
+  .fuel-chart-container {
+    width: 100%;
+    max-width: 250px;
+    margin: 0 auto;
+  }
+}
+
+/* ===============================================
+   PRICE ANALYTICS SECTION STYLES
+   =============================================== */
+
+.price-analytics-section {
+  margin-top: 40px;
+  animation: fadeIn 0.6s ease;
+}
+
+.section-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1em;
+  margin-top: -20px;
+  margin-bottom: 24px;
+}
+
+/* Quick Stats Row */
+.quick-stats-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.quick-stat {
+  flex: 1;
+  min-width: 140px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 16px 20px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.quick-stat-value {
+  display: block;
+  font-size: 1.8em;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.quick-stat-value.green { color: #10b981; }
+.quick-stat-value.blue { color: #3b82f6; }
+.quick-stat-value.purple { color: #8b5cf6; }
+.quick-stat-value.orange { color: #f97316; }
+
+.quick-stat-label {
+  display: block;
+  color: #64748b;
+  font-size: 0.85em;
+  margin-top: 4px;
+}
+
+/* Analytics Charts Grid */
+.analytics-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.analytics-card.wide {
+  grid-column: span 2;
+}
+
+.analytics-card-title {
+  font-size: 1em;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 16px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.chart-wrapper {
+  height: 250px;
+  position: relative;
+}
+
+.chart-wrapper-doughnut {
+  height: 220px;
+  position: relative;
+}
+
+.chart-wrapper-tall {
+  height: 350px;
+  position: relative;
+}
+
+.chart-footnote {
+  color: #64748b;
+  font-size: 0.8em;
+  margin-top: 12px;
+  text-align: center;
+}
+
+/* Service Type Stats */
+.service-type-stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.service-stat {
+  text-align: center;
+}
+
+.service-count {
+  display: block;
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.service-label {
+  color: #64748b;
+  font-size: 0.85em;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .quick-stats-row {
+    flex-direction: column;
+  }
+
+  .quick-stat {
+    min-width: 100%;
+  }
+
+  .analytics-charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-card.wide {
+    grid-column: span 1;
+  }
+}
