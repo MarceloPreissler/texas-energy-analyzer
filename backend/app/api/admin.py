@@ -218,6 +218,31 @@ def delete_fake_commercial_plans(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/delete-all-commercial-plans")
+def delete_all_commercial_plans(db: Session = Depends(get_db)):
+    """
+    Delete ALL commercial plans from database.
+    Use this to clear commercial data before loading verified real data.
+    """
+    try:
+        from ..models import Plan
+
+        deleted_count = db.query(Plan).filter(
+            Plan.service_type == "Commercial"
+        ).delete(synchronize_session=False)
+
+        db.commit()
+
+        return {
+            "status": "success",
+            "message": "All commercial plans deleted",
+            "deleted_count": deleted_count
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/load-real-data")
 def load_real_data(plans_data: List[Dict[str, Any]] = Body(...), db: Session = Depends(get_db)):
     """
