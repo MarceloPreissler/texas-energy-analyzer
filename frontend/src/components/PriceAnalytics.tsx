@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -27,6 +27,9 @@ ChartJS.register(
   Filler
 );
 
+// API base URL for fetching all plans
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://web-production-665ac.up.railway.app';
+
 interface Plan {
   id: number;
   provider_id: number;
@@ -49,6 +52,36 @@ interface Props {
 }
 
 const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
+  // State for all plans (unfiltered) for Service Type Distribution
+  const [allPlansServiceTypes, setAllPlansServiceTypes] = useState<{ residential: number; commercial: number; total: number }>({
+    residential: 0,
+    commercial: 0,
+    total: 0,
+  });
+
+  // Fetch all plans for Service Type Distribution (ignores filters)
+  useEffect(() => {
+    const fetchAllPlans = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/plans/?limit=10000`);
+        if (response.ok) {
+          const allPlans = await response.json();
+          const residential = allPlans.filter((p: Plan) => p.service_type === 'Residential').length;
+          const commercial = allPlans.filter((p: Plan) => p.service_type === 'Commercial').length;
+          setAllPlansServiceTypes({
+            residential,
+            commercial,
+            total: allPlans.length,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch all plans for service type distribution:', error);
+      }
+    };
+
+    fetchAllPlans();
+  }, []);
+
   const analytics = useMemo(() => {
     const plansWithRates = plans.filter(p => p.rate_1000_cents && p.rate_1000_cents > 0);
 
@@ -113,10 +146,6 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
       planTypes[type] = (planTypes[type] || 0) + 1;
     });
 
-    // Service type breakdown
-    const residential = plansWithRates.filter(p => p.service_type === 'Residential');
-    const commercial = plansWithRates.filter(p => p.service_type === 'Commercial');
-
     // Contract term analysis
     const contractTerms: Record<string, { count: number, avgRate: number }> = {};
     plansWithRates.forEach(plan => {
@@ -142,8 +171,6 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
       priceRanges,
       providerAvgs,
       planTypes,
-      residential: residential.length,
-      commercial: commercial.length,
       contractTerms,
     };
   }, [plans, providers]);
@@ -205,11 +232,12 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
     ],
   };
 
+  // Use ALL plans for Service Type Distribution (not filtered)
   const serviceTypeData = {
     labels: ['Residential', 'Commercial'],
     datasets: [
       {
-        data: [analytics.residential, analytics.commercial],
+        data: [allPlansServiceTypes.residential, allPlansServiceTypes.commercial],
         backgroundColor: ['#3b82f6', '#10b981'],
         borderWidth: 0,
         hoverOffset: 8,
@@ -224,7 +252,7 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
       legend: {
         position: 'top' as const,
         labels: {
-          color: '#64748b',
+          color: '#ffffff',
           font: { size: 12 },
           padding: 16,
         },
@@ -233,11 +261,11 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { color: '#64748b' },
+        ticks: { color: '#ffffff' },
       },
       y: {
-        grid: { color: 'rgba(100, 116, 139, 0.1)' },
-        ticks: { color: '#64748b' },
+        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+        ticks: { color: '#ffffff' },
       },
     },
   };
@@ -247,12 +275,12 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
     indexAxis: 'y' as const,
     scales: {
       x: {
-        grid: { color: 'rgba(100, 116, 139, 0.1)' },
-        ticks: { color: '#64748b' },
+        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+        ticks: { color: '#ffffff' },
       },
       y: {
         grid: { display: false },
-        ticks: { color: '#64748b', font: { size: 11 } },
+        ticks: { color: '#ffffff', font: { size: 11 } },
       },
     },
   };
@@ -265,7 +293,7 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
       legend: {
         position: 'right' as const,
         labels: {
-          color: '#64748b',
+          color: '#ffffff',
           font: { size: 11 },
           padding: 12,
           usePointStyle: true,
@@ -325,20 +353,23 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
         </div>
 
         <div className="analytics-card glass">
-          <h3 className="analytics-card-title">Service Type Distribution</h3>
+          <h3 className="analytics-card-title">Service Type Distribution (All Plans)</h3>
           <div className="chart-wrapper-doughnut">
             <Doughnut data={serviceTypeData} options={doughnutOptions} />
           </div>
           <div className="service-type-stats">
             <div className="service-stat">
-              <span className="service-count">{analytics.residential}</span>
+              <span className="service-count">{allPlansServiceTypes.residential}</span>
               <span className="service-label">Residential</span>
             </div>
             <div className="service-stat">
-              <span className="service-count">{analytics.commercial}</span>
+              <span className="service-count">{allPlansServiceTypes.commercial}</span>
               <span className="service-label">Commercial</span>
             </div>
           </div>
+          <p className="chart-footnote" style={{ marginTop: '8px', fontSize: '0.75em', color: 'var(--text-muted)' }}>
+            Shows all {allPlansServiceTypes.total} plans in database
+          </p>
         </div>
 
         <div className="analytics-card glass full-width">
