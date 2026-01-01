@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import re
+from datetime import datetime
 from typing import Any, Dict, Iterable, List
 
 import requests
@@ -25,8 +26,27 @@ HTML_URL = os.getenv(
 PAGE_SIZE = int(os.getenv("POWERS_TO_CHOOSE_PAGE_SIZE", "99999"))
 USER_AGENT = os.getenv(
     "POWERS_TO_CHOOSE_USER_AGENT",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
 )
+
+# Full browser-like headers to bypass Cloudflare
+BROWSER_HEADERS = {
+    "User-Agent": USER_AGENT,
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive",
+    "Cache-Control": "no-cache",
+    "Pragma": "no-cache",
+    "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+    "Sec-Ch-Ua-Mobile": "?0",
+    "Sec-Ch-Ua-Platform": '"Windows"',
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-site",
+    "Origin": "https://www.powertochoose.org",
+    "Referer": "https://www.powertochoose.org/",
+}
 
 
 class _APIError(RuntimeError):
@@ -63,10 +83,31 @@ def _scrape_via_api(zip_code: str, estimated_use: int) -> List[schemas.PlanCreat
         "page_num": 1,
         "page_size": PAGE_SIZE,
     }
-    headers = {"User-Agent": USER_AGENT}
-    response = requests.get(API_URL, params=params, headers=headers, timeout=30)
-    response.raise_for_status()
-    payload = response.json()
+
+    # Create a session with retry logic
+    session = requests.Session()
+
+    # Try with full browser headers first
+    for attempt in range(3):
+        try:
+            response = session.get(
+                API_URL,
+                params=params,
+                headers=BROWSER_HEADERS,
+                timeout=60,
+                verify=True
+            )
+            response.raise_for_status()
+            payload = response.json()
+            break
+        except (requests.exceptions.SSLError, requests.exceptions.ConnectionError) as e:
+            logger.warning(f"API attempt {attempt + 1} failed: {e}")
+            if attempt == 2:
+                raise
+            import time
+            time.sleep(2)  # Wait before retry
+    else:
+        raise _APIError("All API attempts failed")
     plan_payload: Iterable[Dict[str, Any]]
     if isinstance(payload, dict):
         plan_payload = payload.get("data") or payload.get("plans") or payload.get("items") or []
@@ -140,6 +181,12 @@ def _plan_from_payload(raw: Dict[str, Any], zip_code: str) -> schemas.PlanCreate
     plan_url = _coalesce(raw, ["planUrl", "planURL", "plan_url"])
     special_features = _coalesce(raw, ["specialFeatures", "features", "planFeatures"]) or raw.get("description")
 
+    # Try to extract rate effective/start date
+    rate_start_date = _parse_date(_coalesce(raw, [
+        "effectiveDate", "effective_date", "startDate", "start_date",
+        "rateEffectiveDate", "planStartDate", "validFrom"
+    ]))
+
     monthly_bill_1000 = _calculate_monthly_bill(rate_1000, 1000)
     monthly_bill_2000 = _calculate_monthly_bill(rate_2000, 2000)
 
@@ -160,6 +207,7 @@ def _plan_from_payload(raw: Dict[str, Any], zip_code: str) -> schemas.PlanCreate
         cancellation_fee=cancellation_fee,
         renewable_percent=renewable_percent,
         special_features=special_features,
+        rate_start_date=rate_start_date,
     )
 
 
@@ -271,6 +319,24 @@ def _extract_features(text: str) -> str | None:
     if "solar" in text.lower() or "renewable" in text.lower():
         snippets.append("High Renewable Content")
     return ", ".join(snippets) if snippets else None
+
+
+def _parse_date(value: Any) -> datetime | None:
+    """Parse a date string into a datetime object."""
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value
+    try:
+        # Try common date formats
+        for fmt in ["%Y-%m-%d", "%Y-%m-%dT%H:%M:%S", "%m/%d/%Y", "%d/%m/%Y", "%Y/%m/%d"]:
+            try:
+                return datetime.strptime(str(value).split("T")[0].split()[0], fmt)
+            except ValueError:
+                continue
+        return None
+    except Exception:
+        return None
 
 
 def _calculate_monthly_bill(rate_cents: float | None, usage_kwh: int) -> float | None:

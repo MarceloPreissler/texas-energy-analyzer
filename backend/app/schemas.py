@@ -30,6 +30,7 @@ class PlanBase(BaseModel):
     base_monthly_fee: Optional[float] = None
     renewable_percent: Optional[int] = None
     special_features: Optional[str] = None
+    rate_start_date: Optional[datetime] = None
 
 
 class PlanCreate(PlanBase):

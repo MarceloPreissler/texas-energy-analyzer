@@ -53,6 +53,7 @@ class Plan(Base):
     base_monthly_fee: float = Column(Float, nullable=True)
     renewable_percent: int = Column(Integer, nullable=True)
     special_features: str = Column(String, nullable=True)
+    rate_start_date: datetime = Column(DateTime, nullable=True)  # When the rate becomes effective
     last_updated: datetime = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     provider = relationship("Provider", back_populates="plans")
