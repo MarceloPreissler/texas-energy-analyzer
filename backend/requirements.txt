@@ -17,3 +17,4 @@ python-multipart
 email-validator
 jinja2
 slowapi
+httpx
