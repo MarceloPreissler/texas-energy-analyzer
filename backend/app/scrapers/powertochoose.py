@@ -186,11 +186,42 @@ def _plan_from_payload(raw: Dict[str, Any], zip_code: str) -> schemas.PlanCreate
     plan_url = _coalesce(raw, ["planUrl", "planURL", "plan_url"])
     special_features = _coalesce(raw, ["specialFeatures", "features", "planFeatures"]) or raw.get("description")
 
-    # Try to extract rate effective/start date
+    # Try to extract rate effective/start date - check many possible field names
     rate_start_date = _parse_date(_coalesce(raw, [
-        "effectiveDate", "effective_date", "startDate", "start_date",
-        "rateEffectiveDate", "planStartDate", "validFrom"
+        # PowerToChoose API fields
+        "effectiveDate", "effective_date", "EffectiveDate",
+        "startDate", "start_date", "StartDate",
+        "rateEffectiveDate", "RateEffectiveDate", "rate_effective_date",
+        "planStartDate", "PlanStartDate", "plan_start_date",
+        "validFrom", "ValidFrom", "valid_from",
+        # Additional common API field names
+        "priceEffectiveDate", "PriceEffectiveDate", "price_effective_date",
+        "rateStartDate", "RateStartDate", "rate_start_date",
+        "dateEffective", "DateEffective", "date_effective",
+        "offerStartDate", "OfferStartDate", "offer_start_date",
+        "planEffectiveDate", "PlanEffectiveDate", "plan_effective_date",
+        "effectiveDt", "EffectiveDt", "effective_dt",
+        "startDt", "StartDt", "start_dt",
+        "beginDate", "BeginDate", "begin_date",
+        "activationDate", "ActivationDate", "activation_date",
+        # Camel case variations
+        "rateDate", "RateDate", "rate_date",
+        "priceDate", "PriceDate", "price_date",
     ]))
+
+    # If no date found in primary fields, try to extract from nested objects
+    if not rate_start_date:
+        # Check nested rate/pricing objects
+        for nested_key in ["rate", "rates", "pricing", "price", "offer", "plan"]:
+            nested = raw.get(nested_key) or raw.get(nested_key.capitalize())
+            if isinstance(nested, dict):
+                nested_date = _coalesce(nested, [
+                    "effectiveDate", "startDate", "validFrom", "date", "effective"
+                ])
+                if nested_date:
+                    rate_start_date = _parse_date(nested_date)
+                    if rate_start_date:
+                        break
 
     monthly_bill_1000 = _calculate_monthly_bill(rate_1000, 1000)
     monthly_bill_2000 = _calculate_monthly_bill(rate_2000, 2000)
@@ -332,13 +363,56 @@ def _parse_date(value: Any) -> datetime | None:
         return None
     if isinstance(value, datetime):
         return value
+
+    str_value = str(value).strip()
+    if not str_value:
+        return None
+
     try:
-        # Try common date formats
-        for fmt in ["%Y-%m-%d", "%Y-%m-%dT%H:%M:%S", "%m/%d/%Y", "%d/%m/%Y", "%Y/%m/%d"]:
+        # Handle Unix timestamps (milliseconds or seconds)
+        if str_value.isdigit():
+            timestamp = int(str_value)
+            # If it's in milliseconds (13 digits), convert to seconds
+            if timestamp > 10000000000:
+                timestamp = timestamp // 1000
+            return datetime.fromtimestamp(timestamp)
+
+        # Clean up the string - remove timezone info for parsing
+        clean_value = str_value.split("T")[0].split()[0].replace("Z", "")
+
+        # Try many common date formats
+        date_formats = [
+            "%Y-%m-%d",           # 2024-01-15
+            "%Y-%m-%dT%H:%M:%S",  # 2024-01-15T12:00:00
+            "%Y-%m-%dT%H:%M:%SZ", # 2024-01-15T12:00:00Z
+            "%Y-%m-%dT%H:%M:%S.%f", # 2024-01-15T12:00:00.000
+            "%m/%d/%Y",           # 01/15/2024
+            "%m-%d-%Y",           # 01-15-2024
+            "%d/%m/%Y",           # 15/01/2024
+            "%d-%m-%Y",           # 15-01-2024
+            "%Y/%m/%d",           # 2024/01/15
+            "%b %d, %Y",          # Jan 15, 2024
+            "%B %d, %Y",          # January 15, 2024
+            "%d %b %Y",           # 15 Jan 2024
+            "%d %B %Y",           # 15 January 2024
+            "%m.%d.%Y",           # 01.15.2024
+            "%d.%m.%Y",           # 15.01.2024
+            "%Y.%m.%d",           # 2024.01.15
+        ]
+
+        for fmt in date_formats:
             try:
-                return datetime.strptime(str(value).split("T")[0].split()[0], fmt)
+                return datetime.strptime(clean_value, fmt)
             except ValueError:
                 continue
+
+        # Try parsing with just the date portion
+        for fmt in date_formats:
+            try:
+                return datetime.strptime(str_value.split()[0], fmt)
+            except ValueError:
+                continue
+
         return None
     except Exception:
         return None

@@ -8,19 +8,19 @@
 
 :root {
   /* Color Palette - Very Dark Green Theme */
-  --bg-primary: #050a08;
-  --bg-secondary: #081210;
-  --bg-card: rgba(8, 18, 14, 0.95);
-  --bg-card-hover: rgba(12, 24, 20, 0.98);
-  --bg-input: rgba(10, 20, 16, 0.9);
+  --bg-primary: #030604;
+  --bg-secondary: #050a08;
+  --bg-card: rgba(3, 8, 6, 0.97);
+  --bg-card-hover: rgba(6, 12, 10, 0.98);
+  --bg-input: rgba(5, 10, 8, 0.95);
 
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-accent: rgba(255, 255, 255, 0.15);
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-accent: rgba(255, 255, 255, 0.18);
   --border-glow: rgba(52, 211, 153, 0.3);
 
   --text-primary: #ffffff;
-  --text-secondary: #b8c5c0;
-  --text-muted: #7a8a85;
+  --text-secondary: #d0ddd8;
+  --text-muted: #a8b8b2;
 
   /* Brighter accent colors for visibility */
   --accent-primary: #4ade80;
@@ -307,7 +307,7 @@ body::before {
 }
 
 .filter-group label {
-  color: var(--text-muted);
+  color: var(--text-primary);
   font-weight: 600;
   font-size: 0.85em;
   text-transform: uppercase;
@@ -2015,8 +2015,9 @@ body::before {
    SYSTEM HEALTH STATUS
    =============================================== */
 .system-health-card {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.05));
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(5, 150, 105, 0.03));
   border: 1px solid rgba(16, 185, 129, 0.2);
+  overflow: hidden;
 }
 
 .health-header {
@@ -2026,6 +2027,8 @@ body::before {
   margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .health-badge {
@@ -2039,19 +2042,20 @@ body::before {
 
 .health-metrics {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
   margin-bottom: 16px;
 }
 
 .health-metric {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: rgba(15, 23, 42, 0.5);
-  border-radius: 10px;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
   border: 1px solid var(--border-subtle);
+  min-width: 0;
 }
 
 .metric-indicator {
@@ -2064,43 +2068,52 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .metric-label {
-  font-size: 0.75em;
-  color: var(--text-muted);
+  font-size: 0.7em;
+  color: var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .metric-value {
-  font-size: 0.9em;
+  font-size: 0.85em;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .health-stats {
   display: flex;
   justify-content: space-around;
-  padding: 16px 0;
+  padding: 12px 8px;
   margin-bottom: 12px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .health-stat-item {
   text-align: center;
+  min-width: 60px;
 }
 
 .stat-number {
   display: block;
-  font-size: 1.5em;
+  font-size: 1.3em;
   font-weight: 700;
   color: #4ade80;
 }
 
 .stat-label {
-  font-size: 0.8em;
-  color: var(--text-muted);
+  font-size: 0.75em;
+  color: var(--text-primary);
 }
 
 .health-footer {
@@ -2109,11 +2122,13 @@ body::before {
   align-items: center;
   padding-top: 12px;
   border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .last-check {
-  font-size: 0.8em;
-  color: var(--text-muted);
+  font-size: 0.75em;
+  color: var(--text-secondary);
 }
 
 .refresh-health-btn {
