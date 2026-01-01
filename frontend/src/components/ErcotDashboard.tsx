@@ -324,7 +324,6 @@ const ErcotDashboard: React.FC = () => {
 
         <div className="grid-metrics">
           <div className="metric-card demand">
-            <div className="metric-icon">📊</div>
             <div className="metric-content">
               <div className="metric-value">{formatMW(grid_status.current_demand_mw)}</div>
               <div className="metric-label">Current Demand</div>
@@ -332,7 +331,6 @@ const ErcotDashboard: React.FC = () => {
           </div>
 
           <div className="metric-card capacity">
-            <div className="metric-icon">🏭</div>
             <div className="metric-content">
               <div className="metric-value">{formatMW(grid_status.total_capacity_mw)}</div>
               <div className="metric-label">Total Capacity</div>
@@ -340,7 +338,6 @@ const ErcotDashboard: React.FC = () => {
           </div>
 
           <div className="metric-card reserves">
-            <div className="metric-icon">🔋</div>
             <div className="metric-content">
               <div className="metric-value">{formatMW(grid_status.available_reserve_mw)}</div>
               <div className="metric-label">Available Reserves</div>
@@ -348,7 +345,6 @@ const ErcotDashboard: React.FC = () => {
           </div>
 
           <div className="metric-card margin">
-            <div className="metric-icon">📈</div>
             <div className="metric-content">
               <div className="metric-value">{grid_status.reserve_margin_percent.toFixed(1)}%</div>
               <div className="metric-label">Reserve Margin</div>
@@ -433,7 +429,6 @@ const ErcotDashboard: React.FC = () => {
 
         <div className="ercot-card prices-card">
           <h3 className="card-title">
-            <span className="title-icon">💰</span>
             Real-Time Wholesale Prices ($/MWh)
           </h3>
           <div className="prices-chart-container">
@@ -477,7 +472,6 @@ const ErcotDashboard: React.FC = () => {
 
       {/* Info Banner */}
       <div className="ercot-info-banner">
-        <div className="info-icon">ℹ️</div>
         <div className="info-content">
           <strong>About ERCOT:</strong> The Electric Reliability Council of Texas manages the flow of electric
           power to more than 26 million Texas customers, representing about 90% of the state's electric load.
