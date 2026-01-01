@@ -21,6 +21,7 @@ interface Plan {
   monthly_bill_2000?: number | null;
   early_termination_fee?: number | null;
   cancellation_fee?: number | null;
+  base_monthly_fee?: number | null;
   renewable_percent?: number | null;
   special_features?: string | null;
   rate_start_date?: string | null;
@@ -88,6 +89,7 @@ const parseSpecialFeatures = (features: string | null | undefined): { source: st
 interface Provider {
   id: number;
   name: string;
+  website?: string | null;
 }
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100];
@@ -316,52 +318,101 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
   const downloadCSV = () => {
     if (!processedPlans.length) return;
 
+    // All available data fields - comprehensive export
     const headers = [
-      'Provider',
+      // Identification
+      'Plan ID',
+      'Provider ID',
+      'Provider Name',
+      'Provider Website',
       'Plan Name',
+      'Plan URL',
+
+      // Classification
       'Plan Type',
       'Service Type',
       'ZIP Code',
-      'TDU',
-      'Contract Months',
-      'Rate 500 kWh (cents)',
-      'Rate 1000 kWh (cents)',
-      'Rate 2000 kWh (cents)',
-      'Monthly Bill 1000 kWh',
-      'Monthly Bill 2000 kWh',
+      'TDU Area',
+
+      // Contract Details
+      'Contract Length (Months)',
+
+      // Rate Tiers (cents per kWh)
+      'Rate @ 500 kWh (cents)',
+      'Rate @ 1000 kWh (cents)',
+      'Rate @ 2000 kWh (cents)',
+
+      // Monthly Bill Estimates
+      'Est. Monthly Bill @ 1000 kWh',
+      'Est. Monthly Bill @ 2000 kWh',
+      'Calculated Bill @ Current Usage',
+
+      // Fees
+      'Base Monthly Fee',
       'Early Termination Fee',
       'Cancellation Fee',
+
+      // Green Energy
       'Renewable Percent',
+
+      // Dates
       'Rate Start Date',
       'Last Updated',
-      'Source',
-      'Plan URL'
+
+      // Source Information
+      'Data Source',
+      'Special Features / Notes'
     ];
 
     const rows = processedPlans.map((plan) => {
       const providerName = getProviderName(plan);
+      const provider = providers?.find((p) => p.id === plan.provider_id);
       const { source, tdu } = parseSpecialFeatures(plan.special_features);
+      const calculatedBill = plan.rate_1000_cents ? calculateMonthlyCost(plan.rate_1000_cents) : null;
 
       return [
+        // Identification
+        plan.id,
+        plan.provider_id,
         providerName,
+        provider?.website || '',
         plan.plan_name,
+        plan.plan_url || '',
+
+        // Classification
         plan.plan_type || '',
         plan.service_type || '',
         plan.zip_code || '',
         tdu,
+
+        // Contract Details
         plan.contract_months ?? '',
+
+        // Rate Tiers
         plan.rate_500_cents ?? '',
         plan.rate_1000_cents ?? '',
         plan.rate_2000_cents ?? '',
+
+        // Monthly Bill Estimates
         plan.monthly_bill_1000 ?? '',
         plan.monthly_bill_2000 ?? '',
+        calculatedBill ? calculatedBill.toFixed(2) : '',
+
+        // Fees
+        plan.base_monthly_fee ?? '',
         plan.early_termination_fee ?? '',
         plan.cancellation_fee ?? '',
+
+        // Green Energy
         plan.renewable_percent ?? '',
+
+        // Dates
         plan.rate_start_date || '',
         plan.last_updated || '',
+
+        // Source Information
         source,
-        plan.plan_url || ''
+        plan.special_features || ''
       ];
     });
 
