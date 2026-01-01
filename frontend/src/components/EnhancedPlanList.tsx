@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchPlans, fetchProviders, triggerScrape, scrapePowerToChoose } from '../services/api';
 import PlanComparison from './PlanComparison';
 import PriceAnalytics from './PriceAnalytics';
 import MarketAnalytics from './MarketAnalytics';
 import SystemHealthStatus from './SystemHealthStatus';
+import { validateTexasZip, sanitizeZipInput, getZipErrorMessage, ZipValidationResult } from '../utils/zipCodeValidation';
 
 interface Plan {
   id: number;
@@ -133,7 +134,10 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isScraping, setIsScraping] = useState(false);
   const [zipInput, setZipInput] = useState('75214');
+  const [zipValidation, setZipValidation] = useState<ZipValidationResult>(() => validateTexasZip('75214'));
   const [scrapeError, setScrapeError] = useState<string | null>(null);
+  const [scrapeSuccess, setScrapeSuccess] = useState<string | null>(null);
+  const [filterZipValidation, setFilterZipValidation] = useState<ZipValidationResult>(() => validateTexasZip(''));
 
   const [planNameSearch, setPlanNameSearch] = useState('');
   const [providerSearch, setProviderSearch] = useState('');
@@ -208,24 +212,63 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
     setCurrentPage(1);
   };
 
+  // Handle ZIP input changes with validation
+  const handleZipInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const sanitized = sanitizeZipInput(e.target.value);
+    setZipInput(sanitized);
+    setZipValidation(validateTexasZip(sanitized));
+    setScrapeError(null);
+    setScrapeSuccess(null);
+  }, []);
+
+  // Handle filter ZIP input changes with validation
+  const handleFilterZipChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const sanitized = sanitizeZipInput(e.target.value);
+    setTempZipCodeFilter(sanitized);
+    setFilterZipValidation(validateTexasZip(sanitized));
+  }, []);
+
   const handleViewAllPlans = async () => {
-    if (!zipInput || zipInput.length !== 5) {
-      setScrapeError('Enter a valid 5-digit Texas ZIP code.');
+    // Validate ZIP before proceeding
+    const validation = validateTexasZip(zipInput);
+    setZipValidation(validation);
+
+    if (!validation.isValid) {
+      if (!zipInput) {
+        setScrapeError('Please enter a Texas ZIP code.');
+      } else if (zipInput.length < 5) {
+        setScrapeError('Please enter a complete 5-digit ZIP code.');
+      } else if (!validation.isTexas) {
+        setScrapeError(validation.errorMessage || 'This is not a valid Texas ZIP code.');
+      } else {
+        setScrapeError('Please enter a valid Texas ZIP code.');
+      }
       return;
     }
 
     setScrapeError(null);
+    setScrapeSuccess(null);
     setIsScraping(true);
+
     try {
-      await scrapePowerToChoose(zipInput);
+      const result = await scrapePowerToChoose(zipInput);
       setTempZipCodeFilter(zipInput);
       setZipCodeFilter(zipInput);
       setServiceTypeFilter('Residential');
+      setTempServiceTypeFilter('Residential');
       queryClient.invalidateQueries({ queryKey: ['plans'] });
       setCurrentPage(1);
+
+      // Show success message with plan count
+      const planCount = result?.plans_processed || 0;
+      if (planCount > 0) {
+        setScrapeSuccess(`Successfully loaded ${planCount} plans for ZIP ${zipInput}`);
+      } else {
+        setScrapeError('No plans found for this ZIP code. The area may not have competitive electricity options.');
+      }
     } catch (error) {
       console.error('PowerToChoose scrape failed:', error);
-      setScrapeError('Unable to retrieve plans from PowerToChoose. Try again in a few minutes.');
+      setScrapeError(getZipErrorMessage(error));
     } finally {
       setIsScraping(false);
     }
@@ -623,20 +666,74 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
       <div className="card zip-card">
         <h2 className="card-title">PowerToChoose Live Import</h2>
         <div className="zip-actions">
-          <input
-            type="text"
-            value={zipInput}
-            maxLength={5}
-            onChange={(e) => setZipInput(e.target.value)}
-            placeholder="Enter Texas ZIP"
-          />
-          <button onClick={handleViewAllPlans} disabled={isScraping}>
-            {isScraping ? 'Importing…' : 'View All Plans'}
+          <div className="zip-input-wrapper">
+            <input
+              type="text"
+              value={zipInput}
+              maxLength={5}
+              onChange={handleZipInputChange}
+              onKeyDown={(e) => e.key === 'Enter' && !isScraping && handleViewAllPlans()}
+              placeholder="Enter Texas ZIP"
+              className={`zip-input ${
+                zipInput.length === 5
+                  ? zipValidation.isValid
+                    ? 'zip-valid'
+                    : 'zip-invalid'
+                  : ''
+              }`}
+              aria-label="Texas ZIP code"
+              aria-describedby="zip-helper"
+            />
+            {zipInput.length === 5 && (
+              <span className={`zip-indicator ${zipValidation.isValid ? 'valid' : 'invalid'}`}>
+                {zipValidation.isValid ? '✓' : '✗'}
+              </span>
+            )}
+          </div>
+          <button
+            onClick={handleViewAllPlans}
+            disabled={isScraping || (zipInput.length === 5 && !zipValidation.isValid)}
+            className={isScraping ? 'loading' : ''}
+          >
+            {isScraping ? (
+              <>
+                <span className="spinner"></span>
+                Importing…
+              </>
+            ) : (
+              'View All Plans'
+            )}
           </button>
         </div>
-        {scrapeError && <p className="error-text">{scrapeError}</p>}
-        <p className="helper-text">
-          We use the official PowerToChoose API with a 99,999 plan page size. If the API is unavailable we fall back to HTML scraping and automatically paginate through every result.
+        {scrapeError && (
+          <div className="zip-message error">
+            <span className="message-icon">⚠</span>
+            <span>{scrapeError}</span>
+            {zipValidation.suggestion && (
+              <button
+                className="suggestion-btn"
+                onClick={() => {
+                  const suggested = zipValidation.suggestion?.match(/\d{5}/)?.[0];
+                  if (suggested) {
+                    setZipInput(suggested);
+                    setZipValidation(validateTexasZip(suggested));
+                    setScrapeError(null);
+                  }
+                }}
+              >
+                {zipValidation.suggestion}
+              </button>
+            )}
+          </div>
+        )}
+        {scrapeSuccess && (
+          <div className="zip-message success">
+            <span className="message-icon">✓</span>
+            <span>{scrapeSuccess}</span>
+          </div>
+        )}
+        <p className="helper-text" id="zip-helper">
+          Enter a Texas ZIP code (75xxx-79xxx) to fetch residential plans from the official PowerToChoose.org database. Press Enter or click the button to search.
         </p>
       </div>
 
@@ -652,7 +749,29 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
           </div>
           <div className="filter-group">
             <label>ZIP Code</label>
-            <input value={tempZipCodeFilter} maxLength={5} onChange={(e) => setTempZipCodeFilter(e.target.value)} />
+            <div className="zip-input-wrapper filter-zip">
+              <input
+                value={tempZipCodeFilter}
+                maxLength={5}
+                onChange={handleFilterZipChange}
+                placeholder="e.g. 75214"
+                className={`${
+                  tempZipCodeFilter.length === 5
+                    ? filterZipValidation.isValid
+                      ? 'zip-valid'
+                      : 'zip-invalid'
+                    : ''
+                }`}
+              />
+              {tempZipCodeFilter.length === 5 && (
+                <span className={`zip-indicator small ${filterZipValidation.isValid ? 'valid' : 'invalid'}`}>
+                  {filterZipValidation.isValid ? '✓' : '✗'}
+                </span>
+              )}
+            </div>
+            {tempZipCodeFilter.length === 5 && !filterZipValidation.isValid && (
+              <span className="filter-zip-error">Not a Texas ZIP</span>
+            )}
           </div>
           <div className="filter-group">
             <label>Provider</label>

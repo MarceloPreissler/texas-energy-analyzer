@@ -604,6 +604,131 @@ body::before {
   cursor: not-allowed;
 }
 
+.zip-actions button.loading {
+  position: relative;
+  padding-left: 40px;
+}
+
+.zip-actions .spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ZIP Input Wrapper with Validation */
+.zip-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.zip-input-wrapper.filter-zip {
+  max-width: 120px;
+}
+
+.zip-input-wrapper input {
+  width: 100%;
+  padding-right: 35px;
+}
+
+.zip-input-wrapper input.zip-valid {
+  border-color: var(--accent-green) !important;
+  background: rgba(74, 222, 128, 0.08);
+}
+
+.zip-input-wrapper input.zip-invalid {
+  border-color: var(--accent-red) !important;
+  background: rgba(252, 165, 165, 0.08);
+}
+
+.zip-indicator {
+  position: absolute;
+  right: 10px;
+  font-size: 1.1em;
+  font-weight: bold;
+  transition: all var(--transition-fast);
+}
+
+.zip-indicator.valid {
+  color: var(--accent-green);
+  text-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+}
+
+.zip-indicator.invalid {
+  color: var(--accent-red);
+  text-shadow: 0 0 8px rgba(252, 165, 165, 0.5);
+}
+
+.zip-indicator.small {
+  font-size: 0.9em;
+  right: 8px;
+}
+
+/* ZIP Validation Messages */
+.zip-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.zip-message.error {
+  background: rgba(252, 165, 165, 0.1);
+  border: 1px solid rgba(252, 165, 165, 0.3);
+  color: var(--accent-red);
+}
+
+.zip-message.success {
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  color: var(--accent-green);
+}
+
+.zip-message .message-icon {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.zip-message .suggestion-btn {
+  margin-left: auto;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.zip-message .suggestion-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--accent-primary);
+}
+
+/* Filter ZIP Error */
+.filter-zip-error {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.75em;
+  color: var(--accent-red);
+  font-weight: 500;
+}
+
 /* ===============================================
    HELPER TEXTS & MESSAGES
    =============================================== */
