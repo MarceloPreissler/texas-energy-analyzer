@@ -24,10 +24,15 @@ const App: React.FC = () => {
 
   return (
     <div className="app-container">
-      <div className="app-header">
-        <h1>Texas Energy Market Analyzer</h1>
-        <p>Professional Analytics for Texas Electricity Markets - Residential & Commercial</p>
+      {/* Top Banner */}
+      <div className="top-banner">
+        <div className="banner-content">
+          <h1 className="banner-title">Texas Energy Market Analyzer</h1>
+          <p className="banner-subtitle">Professional Analytics for Texas Electricity Markets - Residential & Commercial</p>
+        </div>
       </div>
+
+      <div className="banner-divider"></div>
 
       <div className="timestamp">
         Data Last Refreshed: {formatTime(lastRefresh)}
