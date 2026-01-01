@@ -4,6 +4,7 @@ import { fetchPlans, fetchProviders, triggerScrape, scrapePowerToChoose } from '
 import PlanComparison from './PlanComparison';
 import PriceAnalytics from './PriceAnalytics';
 import MarketAnalytics from './MarketAnalytics';
+import SystemHealthStatus from './SystemHealthStatus';
 
 interface Plan {
   id: number;
@@ -572,21 +573,7 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
       <div className="dashboard">
         {summaryStats && (
           <>
-            <div className="card">
-              <h2 className="card-title">Market Overview</h2>
-              <div className="summary-stat">
-                <div>Lowest Rate</div>
-                <strong>{summaryStats.lowestRate.toFixed(1)}¢/kWh</strong>
-              </div>
-              <div className="summary-stat">
-                <div>Average Rate</div>
-                <strong>{summaryStats.avgRate}¢/kWh</strong>
-              </div>
-              <div className="summary-stat">
-                <div>Plans Available</div>
-                <strong>{summaryStats.totalPlans}</strong>
-              </div>
-            </div>
+            <SystemHealthStatus />
 
             <div className="card">
               <h2 className="card-title">Savings Potential</h2>
