@@ -3,6 +3,8 @@ FastAPI router for ERCOT real-time grid data.
 
 Fetches live data from ERCOT's public APIs for grid conditions,
 fuel mix, and settlement point prices.
+
+Version: 1.1.0 - Updated Jan 2026
 """
 from __future__ import annotations
 
