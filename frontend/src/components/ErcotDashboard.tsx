@@ -58,10 +58,6 @@ interface ErcotSummary {
 
 const API_BASE_URL = 'https://web-production-665ac.up.railway.app';
 
-// Direct ERCOT API URLs
-const ERCOT_SUPPLY_DEMAND_URL = 'https://www.ercot.com/api/1/services/read/dashboards/supply-demand.json';
-const ERCOT_FUEL_MIX_URL = 'https://www.ercot.com/api/1/services/read/dashboards/fuel-mix.json';
-
 const fetchErcotSummary = async (): Promise<ErcotSummary> => {
   const now = new Date().toISOString();
 
@@ -70,107 +66,65 @@ const fetchErcotSummary = async (): Promise<ErcotSummary> => {
     const response = await fetch(`${API_BASE_URL}/ercot/summary`);
     if (response.ok) {
       const data = await response.json();
-      // Verify we got real data (not zeros)
       if (data.grid_status?.current_demand_mw > 0) {
         return data;
       }
     }
   } catch (e) {
-    console.log('Backend ERCOT API unavailable, trying direct ERCOT fetch');
+    console.log('Backend ERCOT API unavailable');
   }
 
-  // Try direct ERCOT API fetch
+  // Throw error - we'll show market stats fallback in the component
+  throw new Error('ERCOT API unavailable');
+};
+
+// Fetch market stats from our plans database
+const fetchMarketStats = async () => {
   try {
-    const [supplyRes, fuelRes] = await Promise.all([
-      fetch(ERCOT_SUPPLY_DEMAND_URL, {
-        headers: { 'User-Agent': 'TexasEnergyAnalyzer/1.0' },
-        mode: 'cors'
-      }),
-      fetch(ERCOT_FUEL_MIX_URL, {
-        headers: { 'User-Agent': 'TexasEnergyAnalyzer/1.0' },
-        mode: 'cors'
-      })
-    ]);
+    const response = await fetch(`${API_BASE_URL}/plans/?limit=5000`);
+    if (response.ok) {
+      const plans = await response.json();
 
-    if (supplyRes.ok && fuelRes.ok) {
-      const supplyData = await supplyRes.json();
-      const fuelData = await fuelRes.json();
+      // Calculate real statistics from our database
+      const plansWithRates = plans.filter((p: any) => p.rate_1000_cents && p.rate_1000_cents > 0);
+      if (plansWithRates.length === 0) return null;
 
-      // Parse supply/demand
-      const records = supplyData.data || [];
-      let current = records.find((r: any) => r.forecast === 0) || records[records.length - 1] || {};
-      const capacity = parseFloat(current.capacity || 0);
-      const demand = parseFloat(current.demand || 0);
-      const available = capacity - demand;
-      const margin = capacity > 0 ? (available / capacity * 100) : 0;
+      const rates = plansWithRates.map((p: any) => p.rate_1000_cents);
+      const avgRate = rates.reduce((a: number, b: number) => a + b, 0) / rates.length;
+      const minRate = Math.min(...rates);
+      const maxRate = Math.max(...rates);
 
-      // Parse fuel mix
-      const currentGen = fuelData.currentGen || {};
-      const getLatestMW = (arr: any[]) => {
-        if (!arr || !arr.length) return 0;
-        return parseFloat(arr[arr.length - 1]?.gen || 0);
-      };
+      // Count by service type
+      const residential = plansWithRates.filter((p: any) => p.service_type === 'Residential').length;
+      const commercial = plansWithRates.filter((p: any) => p.service_type === 'Commercial').length;
 
-      const wind = getLatestMW(currentGen.Wind);
-      const solar = getLatestMW(currentGen.Solar);
-      const gas = getLatestMW(currentGen.Gas || currentGen['Natural Gas']);
-      const coal = getLatestMW(currentGen['Coal and Lignite'] || currentGen.Coal);
-      const nuclear = getLatestMW(currentGen.Nuclear);
-      const hydro = getLatestMW(currentGen.Hydro);
-      const storage = getLatestMW(currentGen['Power Storage']);
-      const other = getLatestMW(currentGen.Other);
-      const total = wind + solar + gas + coal + nuclear + hydro + Math.max(0, storage) + other;
-      const renewablePct = total > 0 ? ((wind + solar + hydro) / total * 100) : 0;
+      // Count renewable plans
+      const renewablePlans = plansWithRates.filter((p: any) => (p.renewable_percent || 0) >= 50).length;
+      const renewablePercent = (renewablePlans / plansWithRates.length) * 100;
+
+      // Provider count
+      const providers = new Set(plansWithRates.map((p: any) => p.provider_id)).size;
 
       return {
-        grid_status: {
-          timestamp: current.interval || now,
-          current_demand_mw: Math.round(demand),
-          total_capacity_mw: Math.round(capacity),
-          available_reserve_mw: Math.round(available),
-          reserve_margin_percent: Math.round(margin * 10) / 10
-        },
-        fuel_mix: {
-          timestamp: now,
-          wind_mw: Math.round(wind),
-          solar_mw: Math.round(solar),
-          natural_gas_mw: Math.round(gas),
-          coal_mw: Math.round(coal),
-          nuclear_mw: Math.round(nuclear),
-          hydro_mw: Math.round(hydro),
-          storage_mw: Math.round(storage),
-          other_mw: Math.round(other),
-          total_mw: Math.round(total),
-          renewable_percent: Math.round(renewablePct * 10) / 10
-        },
-        zone_prices: {
-          timestamp: now,
-          lz_houston: 0,
-          lz_north: 0,
-          lz_south: 0,
-          lz_west: 0,
-          hub_houston: 0,
-          hub_north: 0,
-          hub_west: 0,
-          hub_average: 0
-        },
-        last_updated: now,
-        data_source: 'ERCOT Public API (ercot.com)'
+        totalPlans: plansWithRates.length,
+        avgRate: avgRate.toFixed(2),
+        minRate: minRate.toFixed(2),
+        maxRate: maxRate.toFixed(2),
+        residential,
+        commercial,
+        renewablePercent: renewablePercent.toFixed(1),
+        providers,
+        lastUpdated: new Date().toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZoneName: 'short',
+        }),
       };
     }
   } catch (e) {
-    console.log('Direct ERCOT fetch failed:', e);
+    console.log('Failed to fetch market stats');
   }
-
-  // Throw error instead of returning fake data
-  throw new Error('Unable to fetch live ERCOT data');
-};
-
-const formatNumber = (num: number): string => {
-  if (num >= 1000) {
-    return `${(num / 1000).toFixed(1)}k`;
-  }
-  return num.toFixed(0);
+  return null;
 };
 
 const formatMW = (mw: number): string => {
@@ -184,50 +138,221 @@ const ErcotDashboard: React.FC = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['ercot-summary'],
     queryFn: fetchErcotSummary,
-    refetchInterval: 300000, // Refetch every 5 minutes
-    staleTime: 240000, // Consider data stale after 4 minutes
+    refetchInterval: 300000,
+    staleTime: 240000,
+    retry: 1,
   });
 
-  if (isLoading) {
-    return (
-      <div className="ercot-dashboard">
-        <div className="ercot-loading">
-          <div className="loading-spinner"></div>
-          <p>Loading ERCOT Grid Data...</p>
-        </div>
-      </div>
-    );
-  }
+  const { data: marketStats } = useQuery({
+    queryKey: ['market-stats'],
+    queryFn: fetchMarketStats,
+    staleTime: 60000,
+  });
 
-  // Show error state if data fetch failed
+  // Show Texas Market Stats when ERCOT is unavailable
   if (error || !data) {
+    if (isLoading) {
+      return (
+        <div className="ercot-dashboard">
+          <div className="ercot-loading">
+            <div className="loading-spinner"></div>
+            <p>Loading Grid Data...</p>
+          </div>
+        </div>
+      );
+    }
+
+    // Show market stats from our database
     return (
       <div className="ercot-dashboard">
-        <div className="ercot-error">
-          <h3>Unable to Load Live ERCOT Data</h3>
-          <p style={{ color: '#94a3b8', marginBottom: '16px' }}>
-            The ERCOT grid data API is temporarily unavailable. Please try again or visit ERCOT directly.
-          </p>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-            <button onClick={() => refetch()} className="retry-btn">Try Again</button>
+        <div className="ercot-header">
+          <div className="ercot-title-section">
+            <h2 className="ercot-title">Texas Electricity Market</h2>
+            <p className="ercot-subtitle">
+              Real-time market statistics from our plans database
+            </p>
+          </div>
+          <div className="ercot-meta">
+            <span className="last-updated">Updated: {marketStats?.lastUpdated || 'Just now'}</span>
             <a
               href="https://www.ercot.com/gridmktinfo/dashboards"
               target="_blank"
               rel="noopener noreferrer"
-              className="retry-btn"
-              style={{ textDecoration: 'none' }}
+              className="source-link"
             >
-              View on ERCOT.com
+              View ERCOT Grid: ercot.com
             </a>
           </div>
         </div>
+
+        {marketStats ? (
+          <>
+            <div className="grid-status-hero">
+              <div className="grid-health-indicator" style={{ borderColor: '#10b981' }}>
+                <span className="health-icon">●</span>
+                <span className="health-status" style={{ color: '#10b981' }}>Active</span>
+                <span className="health-label">Market Status</span>
+              </div>
+
+              <div className="grid-metrics">
+                <div className="metric-card demand">
+                  <div className="metric-content">
+                    <div className="metric-value">{marketStats.totalPlans}</div>
+                    <div className="metric-label">Active Plans</div>
+                  </div>
+                </div>
+
+                <div className="metric-card capacity">
+                  <div className="metric-content">
+                    <div className="metric-value">{marketStats.providers}</div>
+                    <div className="metric-label">Providers</div>
+                  </div>
+                </div>
+
+                <div className="metric-card reserves">
+                  <div className="metric-content">
+                    <div className="metric-value">{marketStats.minRate}¢</div>
+                    <div className="metric-label">Lowest Rate</div>
+                  </div>
+                </div>
+
+                <div className="metric-card margin">
+                  <div className="metric-content">
+                    <div className="metric-value">{marketStats.avgRate}¢</div>
+                    <div className="metric-label">Avg Rate</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="ercot-charts-row">
+              <div className="ercot-card fuel-mix-card">
+                <h3 className="card-title">Market Breakdown</h3>
+                <div className="fuel-mix-content">
+                  <div className="fuel-chart-container">
+                    <Doughnut
+                      data={{
+                        labels: ['Residential', 'Commercial'],
+                        datasets: [{
+                          data: [marketStats.residential, marketStats.commercial],
+                          backgroundColor: ['#3b82f6', '#10b981'],
+                          borderWidth: 0,
+                          hoverOffset: 8,
+                        }],
+                      }}
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '65%',
+                        plugins: {
+                          legend: {
+                            position: 'right',
+                            labels: {
+                              color: '#64748b',
+                              padding: 12,
+                              font: { size: 11 },
+                              usePointStyle: true,
+                              pointStyle: 'circle',
+                            },
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                  <div className="fuel-stats">
+                    <div className="fuel-stat renewable">
+                      <span className="fuel-stat-value">{marketStats.renewablePercent}%</span>
+                      <span className="fuel-stat-label">Green Plans</span>
+                    </div>
+                    <div className="fuel-stat total">
+                      <span className="fuel-stat-value">{marketStats.totalPlans}</span>
+                      <span className="fuel-stat-label">Total Plans</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="fuel-breakdown">
+                  <div className="fuel-item">
+                    <span className="fuel-dot" style={{ background: '#3b82f6' }}></span>
+                    <span className="fuel-name">Residential</span>
+                    <span className="fuel-value">{marketStats.residential} plans</span>
+                  </div>
+                  <div className="fuel-item">
+                    <span className="fuel-dot" style={{ background: '#10b981' }}></span>
+                    <span className="fuel-name">Commercial</span>
+                    <span className="fuel-value">{marketStats.commercial} plans</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="ercot-card prices-card">
+                <h3 className="card-title">Rate Range (¢/kWh at 1000 kWh)</h3>
+                <div className="prices-chart-container">
+                  <Bar
+                    data={{
+                      labels: ['Lowest', 'Average', 'Highest'],
+                      datasets: [{
+                        label: 'Rate (¢/kWh)',
+                        data: [
+                          parseFloat(marketStats.minRate),
+                          parseFloat(marketStats.avgRate),
+                          parseFloat(marketStats.maxRate)
+                        ],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f97316'],
+                        borderRadius: 6,
+                      }],
+                    }}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: { display: false },
+                      },
+                      scales: {
+                        x: {
+                          grid: { display: false },
+                          ticks: { color: '#64748b' },
+                        },
+                        y: {
+                          grid: { color: 'rgba(100, 116, 139, 0.1)' },
+                          ticks: { color: '#64748b' },
+                        },
+                      },
+                    }}
+                  />
+                </div>
+                <div className="price-summary">
+                  <div className="price-item">
+                    <span className="price-label">Rate Spread</span>
+                    <span className="price-value">{(parseFloat(marketStats.maxRate) - parseFloat(marketStats.minRate)).toFixed(1)}¢</span>
+                  </div>
+                  <div className="price-item">
+                    <span className="price-label">Best Value</span>
+                    <span className="price-value highlight">{marketStats.minRate}¢/kWh</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="ercot-info-banner">
+              <div className="info-content">
+                <strong>About This Data:</strong> These statistics are calculated from {marketStats.totalPlans} real electricity plans
+                currently available in the Texas deregulated market. Rates shown are at 1,000 kWh usage level.
+                For live ERCOT grid conditions, visit ercot.com.
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="ercot-error">
+            <h3>Loading Market Data...</h3>
+            <button onClick={() => refetch()} className="retry-btn">Refresh</button>
+          </div>
+        )}
       </div>
     );
   }
 
   const { grid_status, fuel_mix, zone_prices } = data;
 
-  // Calculate grid health indicator
   const getGridHealthStatus = () => {
     if (grid_status.reserve_margin_percent >= 20) return { status: 'Excellent', color: '#10b981', icon: '●' };
     if (grid_status.reserve_margin_percent >= 15) return { status: 'Good', color: '#22c55e', icon: '●' };
@@ -238,7 +363,6 @@ const ErcotDashboard: React.FC = () => {
 
   const gridHealth = getGridHealthStatus();
 
-  // Fuel mix chart data
   const fuelMixChartData = {
     labels: ['Natural Gas', 'Wind', 'Solar', 'Coal', 'Nuclear', 'Other'],
     datasets: [
@@ -252,12 +376,12 @@ const ErcotDashboard: React.FC = () => {
           fuel_mix.hydro_mw + fuel_mix.other_mw + Math.max(0, fuel_mix.storage_mw),
         ],
         backgroundColor: [
-          '#3b82f6', // Natural Gas - Blue
-          '#22c55e', // Wind - Green
-          '#facc15', // Solar - Yellow
-          '#6b7280', // Coal - Gray
-          '#a855f7', // Nuclear - Purple
-          '#06b6d4', // Other - Cyan
+          '#3b82f6',
+          '#22c55e',
+          '#facc15',
+          '#6b7280',
+          '#a855f7',
+          '#06b6d4',
         ],
         borderWidth: 0,
         hoverOffset: 8,
@@ -265,7 +389,6 @@ const ErcotDashboard: React.FC = () => {
     ],
   };
 
-  // Zone prices bar chart
   const zonePricesChartData = {
     labels: ['Houston', 'North', 'South', 'West'],
     datasets: [
@@ -294,9 +417,7 @@ const ErcotDashboard: React.FC = () => {
     <div className="ercot-dashboard">
       <div className="ercot-header">
         <div className="ercot-title-section">
-          <h2 className="ercot-title">
-            ERCOT Grid Status
-          </h2>
+          <h2 className="ercot-title">ERCOT Grid Status</h2>
           <p className="ercot-subtitle">
             Live data from the Electric Reliability Council of Texas
           </p>
@@ -314,7 +435,6 @@ const ErcotDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Grid Status Hero Section */}
       <div className="grid-status-hero">
         <div className="grid-health-indicator" style={{ borderColor: gridHealth.color }}>
           <span className="health-icon">{gridHealth.icon}</span>
@@ -353,12 +473,9 @@ const ErcotDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Fuel Mix and Prices Section */}
       <div className="ercot-charts-row">
         <div className="ercot-card fuel-mix-card">
-          <h3 className="card-title">
-            Generation Fuel Mix
-          </h3>
+          <h3 className="card-title">Generation Fuel Mix</h3>
           <div className="fuel-mix-content">
             <div className="fuel-chart-container">
               <Doughnut
@@ -428,9 +545,7 @@ const ErcotDashboard: React.FC = () => {
         </div>
 
         <div className="ercot-card prices-card">
-          <h3 className="card-title">
-            Real-Time Wholesale Prices ($/MWh)
-          </h3>
+          <h3 className="card-title">Real-Time Wholesale Prices ($/MWh)</h3>
           <div className="prices-chart-container">
             <Bar
               data={zonePricesChartData}
@@ -470,7 +585,6 @@ const ErcotDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Info Banner */}
       <div className="ercot-info-banner">
         <div className="info-content">
           <strong>About ERCOT:</strong> The Electric Reliability Council of Texas manages the flow of electric
