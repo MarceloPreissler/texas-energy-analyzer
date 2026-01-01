@@ -313,6 +313,81 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
     return `Based on ${summaryStats.totalPlans} plans, the best rate is ${lowestRate.toFixed(1)}¢/kWh from ${providerName} (${bestPlan?.plan_name || 'N/A'}). The market average is ${avgRate}¢/kWh. Switching from the highest-rate plan could save up to $${(potentialSavings * 12).toFixed(0)} per year.`;
   };
 
+  const downloadCSV = () => {
+    if (!processedPlans.length) return;
+
+    const headers = [
+      'Provider',
+      'Plan Name',
+      'Plan Type',
+      'Service Type',
+      'ZIP Code',
+      'TDU',
+      'Contract Months',
+      'Rate 500 kWh (cents)',
+      'Rate 1000 kWh (cents)',
+      'Rate 2000 kWh (cents)',
+      'Monthly Bill 1000 kWh',
+      'Monthly Bill 2000 kWh',
+      'Early Termination Fee',
+      'Cancellation Fee',
+      'Renewable Percent',
+      'Rate Start Date',
+      'Last Updated',
+      'Source',
+      'Plan URL'
+    ];
+
+    const rows = processedPlans.map((plan) => {
+      const providerName = getProviderName(plan);
+      const { source, tdu } = parseSpecialFeatures(plan.special_features);
+
+      return [
+        providerName,
+        plan.plan_name,
+        plan.plan_type || '',
+        plan.service_type || '',
+        plan.zip_code || '',
+        tdu,
+        plan.contract_months ?? '',
+        plan.rate_500_cents ?? '',
+        plan.rate_1000_cents ?? '',
+        plan.rate_2000_cents ?? '',
+        plan.monthly_bill_1000 ?? '',
+        plan.monthly_bill_2000 ?? '',
+        plan.early_termination_fee ?? '',
+        plan.cancellation_fee ?? '',
+        plan.renewable_percent ?? '',
+        plan.rate_start_date || '',
+        plan.last_updated || '',
+        source,
+        plan.plan_url || ''
+      ];
+    });
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => {
+        const cellStr = String(cell);
+        // Escape quotes and wrap in quotes if contains comma, quote, or newline
+        if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+          return `"${cellStr.replace(/"/g, '""')}"`;
+        }
+        return cellStr;
+      }).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `texas-energy-plans-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const tableRows = paginatedPlans.map((plan) => {
     const providerName = getProviderName(plan);
     const { source, sourceUrl, tdu } = parseSpecialFeatures(plan.special_features);
@@ -571,7 +646,16 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
       </div>
 
       <div className="card">
-        <h2 className="card-title">Available Plans ({processedPlans.length})</h2>
+        <div className="card-header-row">
+          <h2 className="card-title">Available Plans ({processedPlans.length})</h2>
+          <button
+            className="download-csv-btn"
+            onClick={downloadCSV}
+            disabled={processedPlans.length === 0}
+          >
+            Download CSV
+          </button>
+        </div>
         <div className="pagination-controls">
           <div>
             Page {currentPage} of {totalPages}
