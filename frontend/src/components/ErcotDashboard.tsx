@@ -188,9 +188,9 @@ const ErcotDashboard: React.FC = () => {
         {marketStats ? (
           <>
             <div className="grid-status-hero">
-              <div className="grid-health-indicator" style={{ borderColor: '#10b981' }}>
+              <div className="grid-health-indicator" style={{ borderColor: '#4ade80' }}>
                 <span className="health-icon">●</span>
-                <span className="health-status" style={{ color: '#10b981' }}>Active</span>
+                <span className="health-status" style={{ color: '#4ade80' }}>Active</span>
                 <span className="health-label">Market Status</span>
               </div>
 
@@ -235,7 +235,7 @@ const ErcotDashboard: React.FC = () => {
                         labels: ['Residential', 'Commercial'],
                         datasets: [{
                           data: [marketStats.residential, marketStats.commercial],
-                          backgroundColor: ['#3b82f6', '#10b981'],
+                          backgroundColor: ['#60a5fa', '#4ade80'],
                           borderWidth: 0,
                           hoverOffset: 8,
                         }],
@@ -248,7 +248,7 @@ const ErcotDashboard: React.FC = () => {
                           legend: {
                             position: 'right',
                             labels: {
-                              color: '#64748b',
+                              color: '#ffffff',
                               padding: 12,
                               font: { size: 11 },
                               usePointStyle: true,
@@ -272,12 +272,12 @@ const ErcotDashboard: React.FC = () => {
                 </div>
                 <div className="fuel-breakdown">
                   <div className="fuel-item">
-                    <span className="fuel-dot" style={{ background: '#3b82f6' }}></span>
+                    <span className="fuel-dot" style={{ background: '#60a5fa' }}></span>
                     <span className="fuel-name">Residential</span>
                     <span className="fuel-value">{marketStats.residential} plans</span>
                   </div>
                   <div className="fuel-item">
-                    <span className="fuel-dot" style={{ background: '#10b981' }}></span>
+                    <span className="fuel-dot" style={{ background: '#4ade80' }}></span>
                     <span className="fuel-name">Commercial</span>
                     <span className="fuel-value">{marketStats.commercial} plans</span>
                   </div>
@@ -297,7 +297,7 @@ const ErcotDashboard: React.FC = () => {
                           parseFloat(marketStats.avgRate),
                           parseFloat(marketStats.maxRate)
                         ],
-                        backgroundColor: ['#10b981', '#3b82f6', '#f97316'],
+                        backgroundColor: ['#4ade80', '#60a5fa', '#fb923c'],
                         borderRadius: 6,
                       }],
                     }}
@@ -310,11 +310,11 @@ const ErcotDashboard: React.FC = () => {
                       scales: {
                         x: {
                           grid: { display: false },
-                          ticks: { color: '#64748b' },
+                          ticks: { color: '#ffffff' },
                         },
                         y: {
-                          grid: { color: 'rgba(100, 116, 139, 0.1)' },
-                          ticks: { color: '#64748b' },
+                          grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                          ticks: { color: '#ffffff' },
                         },
                       },
                     }}
@@ -488,7 +488,7 @@ const ErcotDashboard: React.FC = () => {
                     legend: {
                       position: 'right',
                       labels: {
-                        color: '#64748b',
+                        color: '#ffffff',
                         padding: 12,
                         font: { size: 11 },
                         usePointStyle: true,
@@ -556,17 +556,17 @@ const ErcotDashboard: React.FC = () => {
                 plugins: {
                   legend: {
                     position: 'top',
-                    labels: { color: '#64748b', font: { size: 11 } },
+                    labels: { color: '#ffffff', font: { size: 11 } },
                   },
                 },
                 scales: {
                   x: {
-                    grid: { color: 'rgba(100, 116, 139, 0.1)' },
-                    ticks: { color: '#64748b' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    ticks: { color: '#ffffff' },
                   },
                   y: {
                     grid: { display: false },
-                    ticks: { color: '#64748b' },
+                    ticks: { color: '#ffffff' },
                   },
                 },
               }}
