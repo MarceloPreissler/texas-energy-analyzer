@@ -58,10 +58,59 @@ interface ErcotSummary {
 
 const API_BASE_URL = 'https://web-production-665ac.up.railway.app';
 
+// Fallback data based on typical ERCOT grid conditions
+const getFallbackData = (): ErcotSummary => {
+  const now = new Date().toISOString();
+  return {
+    grid_status: {
+      timestamp: now,
+      current_demand_mw: 45000,
+      total_capacity_mw: 85000,
+      available_reserve_mw: 40000,
+      reserve_margin_percent: 47.1
+    },
+    fuel_mix: {
+      timestamp: now,
+      wind_mw: 18000,
+      solar_mw: 8000,
+      natural_gas_mw: 25000,
+      coal_mw: 5000,
+      nuclear_mw: 5000,
+      hydro_mw: 200,
+      storage_mw: 500,
+      other_mw: 300,
+      total_mw: 62000,
+      renewable_percent: 42.3
+    },
+    zone_prices: {
+      timestamp: now,
+      lz_houston: 28.50,
+      lz_north: 27.20,
+      lz_south: 29.10,
+      lz_west: 25.80,
+      hub_houston: 28.00,
+      hub_north: 26.80,
+      hub_west: 25.50,
+      hub_average: 26.77
+    },
+    last_updated: now,
+    data_source: 'Typical ERCOT values (API temporarily unavailable)'
+  };
+};
+
 const fetchErcotSummary = async (): Promise<ErcotSummary> => {
-  const response = await fetch(`${API_BASE_URL}/ercot/summary`);
-  if (!response.ok) throw new Error('Failed to fetch ERCOT data');
-  return response.json();
+  try {
+    // Try our backend API first
+    const response = await fetch(`${API_BASE_URL}/ercot/summary`);
+    if (response.ok) {
+      return response.json();
+    }
+  } catch (e) {
+    console.log('Backend ERCOT API unavailable, using fallback data');
+  }
+
+  // Return fallback data if API is unavailable
+  return getFallbackData();
 };
 
 const formatNumber = (num: number): string => {
@@ -97,13 +146,13 @@ const ErcotDashboard: React.FC = () => {
     );
   }
 
-  if (error || !data) {
+  // With fallback data, we should always have data - but keep a minimal error handler just in case
+  if (!data) {
     return (
       <div className="ercot-dashboard">
         <div className="ercot-error">
-          <h3>ERCOT Data Temporarily Unavailable</h3>
-          <p>Unable to fetch real-time grid data. Please try again later.</p>
-          <button onClick={() => refetch()} className="retry-btn">Retry</button>
+          <h3>Loading ERCOT Data...</h3>
+          <button onClick={() => refetch()} className="retry-btn">Refresh</button>
         </div>
       </div>
     );
@@ -174,25 +223,31 @@ const ErcotDashboard: React.FC = () => {
     timeZoneName: 'short',
   });
 
+  const isFallbackData = data.data_source.includes('temporarily unavailable');
+
   return (
     <div className="ercot-dashboard">
       <div className="ercot-header">
         <div className="ercot-title-section">
           <h2 className="ercot-title">
             <span className="ercot-logo">⚡</span>
-            ERCOT Real-Time Grid Status
+            ERCOT Grid Status
           </h2>
-          <p className="ercot-subtitle">Live data from the Electric Reliability Council of Texas</p>
+          <p className="ercot-subtitle">
+            {isFallbackData
+              ? 'Typical grid values (live data temporarily unavailable)'
+              : 'Live data from the Electric Reliability Council of Texas'}
+          </p>
         </div>
         <div className="ercot-meta">
-          <span className="last-updated">Updated: {lastUpdated}</span>
+          <span className="last-updated">{isFallbackData ? 'Sample Data' : `Updated: ${lastUpdated}`}</span>
           <a
             href="https://www.ercot.com/gridmktinfo/dashboards"
             target="_blank"
             rel="noopener noreferrer"
             className="source-link"
           >
-            Source: ERCOT.com
+            View Live Data: ERCOT.com
           </a>
         </div>
       </div>
