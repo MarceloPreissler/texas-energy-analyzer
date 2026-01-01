@@ -58,59 +58,112 @@ interface ErcotSummary {
 
 const API_BASE_URL = 'https://web-production-665ac.up.railway.app';
 
-// Fallback data based on typical ERCOT grid conditions
-const getFallbackData = (): ErcotSummary => {
-  const now = new Date().toISOString();
-  return {
-    grid_status: {
-      timestamp: now,
-      current_demand_mw: 45000,
-      total_capacity_mw: 85000,
-      available_reserve_mw: 40000,
-      reserve_margin_percent: 47.1
-    },
-    fuel_mix: {
-      timestamp: now,
-      wind_mw: 18000,
-      solar_mw: 8000,
-      natural_gas_mw: 25000,
-      coal_mw: 5000,
-      nuclear_mw: 5000,
-      hydro_mw: 200,
-      storage_mw: 500,
-      other_mw: 300,
-      total_mw: 62000,
-      renewable_percent: 42.3
-    },
-    zone_prices: {
-      timestamp: now,
-      lz_houston: 28.50,
-      lz_north: 27.20,
-      lz_south: 29.10,
-      lz_west: 25.80,
-      hub_houston: 28.00,
-      hub_north: 26.80,
-      hub_west: 25.50,
-      hub_average: 26.77
-    },
-    last_updated: now,
-    data_source: 'Typical ERCOT values (API temporarily unavailable)'
-  };
-};
+// Direct ERCOT API URLs
+const ERCOT_SUPPLY_DEMAND_URL = 'https://www.ercot.com/api/1/services/read/dashboards/supply-demand.json';
+const ERCOT_FUEL_MIX_URL = 'https://www.ercot.com/api/1/services/read/dashboards/fuel-mix.json';
 
 const fetchErcotSummary = async (): Promise<ErcotSummary> => {
+  const now = new Date().toISOString();
+
+  // Try our backend API first
   try {
-    // Try our backend API first
     const response = await fetch(`${API_BASE_URL}/ercot/summary`);
     if (response.ok) {
-      return response.json();
+      const data = await response.json();
+      // Verify we got real data (not zeros)
+      if (data.grid_status?.current_demand_mw > 0) {
+        return data;
+      }
     }
   } catch (e) {
-    console.log('Backend ERCOT API unavailable, using fallback data');
+    console.log('Backend ERCOT API unavailable, trying direct ERCOT fetch');
   }
 
-  // Return fallback data if API is unavailable
-  return getFallbackData();
+  // Try direct ERCOT API fetch
+  try {
+    const [supplyRes, fuelRes] = await Promise.all([
+      fetch(ERCOT_SUPPLY_DEMAND_URL, {
+        headers: { 'User-Agent': 'TexasEnergyAnalyzer/1.0' },
+        mode: 'cors'
+      }),
+      fetch(ERCOT_FUEL_MIX_URL, {
+        headers: { 'User-Agent': 'TexasEnergyAnalyzer/1.0' },
+        mode: 'cors'
+      })
+    ]);
+
+    if (supplyRes.ok && fuelRes.ok) {
+      const supplyData = await supplyRes.json();
+      const fuelData = await fuelRes.json();
+
+      // Parse supply/demand
+      const records = supplyData.data || [];
+      let current = records.find((r: any) => r.forecast === 0) || records[records.length - 1] || {};
+      const capacity = parseFloat(current.capacity || 0);
+      const demand = parseFloat(current.demand || 0);
+      const available = capacity - demand;
+      const margin = capacity > 0 ? (available / capacity * 100) : 0;
+
+      // Parse fuel mix
+      const currentGen = fuelData.currentGen || {};
+      const getLatestMW = (arr: any[]) => {
+        if (!arr || !arr.length) return 0;
+        return parseFloat(arr[arr.length - 1]?.gen || 0);
+      };
+
+      const wind = getLatestMW(currentGen.Wind);
+      const solar = getLatestMW(currentGen.Solar);
+      const gas = getLatestMW(currentGen.Gas || currentGen['Natural Gas']);
+      const coal = getLatestMW(currentGen['Coal and Lignite'] || currentGen.Coal);
+      const nuclear = getLatestMW(currentGen.Nuclear);
+      const hydro = getLatestMW(currentGen.Hydro);
+      const storage = getLatestMW(currentGen['Power Storage']);
+      const other = getLatestMW(currentGen.Other);
+      const total = wind + solar + gas + coal + nuclear + hydro + Math.max(0, storage) + other;
+      const renewablePct = total > 0 ? ((wind + solar + hydro) / total * 100) : 0;
+
+      return {
+        grid_status: {
+          timestamp: current.interval || now,
+          current_demand_mw: Math.round(demand),
+          total_capacity_mw: Math.round(capacity),
+          available_reserve_mw: Math.round(available),
+          reserve_margin_percent: Math.round(margin * 10) / 10
+        },
+        fuel_mix: {
+          timestamp: now,
+          wind_mw: Math.round(wind),
+          solar_mw: Math.round(solar),
+          natural_gas_mw: Math.round(gas),
+          coal_mw: Math.round(coal),
+          nuclear_mw: Math.round(nuclear),
+          hydro_mw: Math.round(hydro),
+          storage_mw: Math.round(storage),
+          other_mw: Math.round(other),
+          total_mw: Math.round(total),
+          renewable_percent: Math.round(renewablePct * 10) / 10
+        },
+        zone_prices: {
+          timestamp: now,
+          lz_houston: 0,
+          lz_north: 0,
+          lz_south: 0,
+          lz_west: 0,
+          hub_houston: 0,
+          hub_north: 0,
+          hub_west: 0,
+          hub_average: 0
+        },
+        last_updated: now,
+        data_source: 'ERCOT Public API (ercot.com)'
+      };
+    }
+  } catch (e) {
+    console.log('Direct ERCOT fetch failed:', e);
+  }
+
+  // Throw error instead of returning fake data
+  throw new Error('Unable to fetch live ERCOT data');
 };
 
 const formatNumber = (num: number): string => {
@@ -146,13 +199,27 @@ const ErcotDashboard: React.FC = () => {
     );
   }
 
-  // With fallback data, we should always have data - but keep a minimal error handler just in case
-  if (!data) {
+  // Show error state if data fetch failed
+  if (error || !data) {
     return (
       <div className="ercot-dashboard">
         <div className="ercot-error">
-          <h3>Loading ERCOT Data...</h3>
-          <button onClick={() => refetch()} className="retry-btn">Refresh</button>
+          <h3>Unable to Load Live ERCOT Data</h3>
+          <p style={{ color: '#94a3b8', marginBottom: '16px' }}>
+            The ERCOT grid data API is temporarily unavailable. Please try again or visit ERCOT directly.
+          </p>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+            <button onClick={() => refetch()} className="retry-btn">Try Again</button>
+            <a
+              href="https://www.ercot.com/gridmktinfo/dashboards"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="retry-btn"
+              style={{ textDecoration: 'none' }}
+            >
+              View on ERCOT.com
+            </a>
+          </div>
         </div>
       </div>
     );
@@ -162,11 +229,11 @@ const ErcotDashboard: React.FC = () => {
 
   // Calculate grid health indicator
   const getGridHealthStatus = () => {
-    if (grid_status.reserve_margin_percent >= 20) return { status: 'Excellent', color: '#10b981', icon: '🟢' };
-    if (grid_status.reserve_margin_percent >= 15) return { status: 'Good', color: '#22c55e', icon: '🟢' };
-    if (grid_status.reserve_margin_percent >= 10) return { status: 'Moderate', color: '#eab308', icon: '🟡' };
-    if (grid_status.reserve_margin_percent >= 5) return { status: 'Tight', color: '#f97316', icon: '🟠' };
-    return { status: 'Critical', color: '#ef4444', icon: '🔴' };
+    if (grid_status.reserve_margin_percent >= 20) return { status: 'Excellent', color: '#10b981', icon: '●' };
+    if (grid_status.reserve_margin_percent >= 15) return { status: 'Good', color: '#22c55e', icon: '●' };
+    if (grid_status.reserve_margin_percent >= 10) return { status: 'Moderate', color: '#eab308', icon: '●' };
+    if (grid_status.reserve_margin_percent >= 5) return { status: 'Tight', color: '#f97316', icon: '●' };
+    return { status: 'Critical', color: '#ef4444', icon: '●' };
   };
 
   const gridHealth = getGridHealthStatus();
@@ -223,24 +290,19 @@ const ErcotDashboard: React.FC = () => {
     timeZoneName: 'short',
   });
 
-  const isFallbackData = data.data_source.includes('temporarily unavailable');
-
   return (
     <div className="ercot-dashboard">
       <div className="ercot-header">
         <div className="ercot-title-section">
           <h2 className="ercot-title">
-            <span className="ercot-logo">⚡</span>
             ERCOT Grid Status
           </h2>
           <p className="ercot-subtitle">
-            {isFallbackData
-              ? 'Typical grid values (live data temporarily unavailable)'
-              : 'Live data from the Electric Reliability Council of Texas'}
+            Live data from the Electric Reliability Council of Texas
           </p>
         </div>
         <div className="ercot-meta">
-          <span className="last-updated">{isFallbackData ? 'Sample Data' : `Updated: ${lastUpdated}`}</span>
+          <span className="last-updated">Updated: {lastUpdated}</span>
           <a
             href="https://www.ercot.com/gridmktinfo/dashboards"
             target="_blank"
@@ -299,7 +361,6 @@ const ErcotDashboard: React.FC = () => {
       <div className="ercot-charts-row">
         <div className="ercot-card fuel-mix-card">
           <h3 className="card-title">
-            <span className="title-icon">⚡</span>
             Generation Fuel Mix
           </h3>
           <div className="fuel-mix-content">

@@ -44,19 +44,19 @@ const App: React.FC = () => {
         </p>
         <ul className="data-source-list">
           <li>
-            <a href="https://www.ercot.com" target="_blank" rel="noopener noreferrer" style={{ color: '#2c5364' }}>
+            <a href="https://www.ercot.com" target="_blank" rel="noopener noreferrer">
               ERCOT.com
             </a>
             {' '}- Real-time grid status, wholesale prices, fuel mix, and demand/capacity data directly from the Electric Reliability Council of Texas public APIs.
           </li>
           <li>
-            <a href="https://www.powertochoose.org" target="_blank" rel="noopener noreferrer" style={{ color: '#2c5364' }}>
+            <a href="https://www.powertochoose.org" target="_blank" rel="noopener noreferrer">
               PowerToChoose.org
             </a>
             {' '}- Official PUCT (Public Utility Commission of Texas) retail electricity plan database via public API + HTML fallback.
           </li>
           <li>
-            <a href="https://www.electricityplans.com" target="_blank" rel="noopener noreferrer" style={{ color: '#2c5364' }}>
+            <a href="https://www.electricityplans.com" target="_blank" rel="noopener noreferrer">
               ElectricityPlans.com
             </a>
             {' '}- Commercial electricity rate data for business customers across Texas TDU service areas.
@@ -65,14 +65,14 @@ const App: React.FC = () => {
         <p className="data-integrity-note">
           All data is sourced directly from official and verified sources. No estimates, mock data, or fabricated values.
         </p>
-        <p style={{ marginTop: '10px' }}>
+        <p style={{ marginTop: '12px' }}>
           <strong>Refresh Rate:</strong> ERCOT grid data updates every 5 minutes. Retail plan data reflects current market offerings.
         </p>
-        <p style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #e0e0e0' }}>
+        <p style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(99, 179, 237, 0.15)' }}>
           <strong>Disclosure:</strong> This tool is for analysis and informational purposes. For enrollment and final
           rate verification, contact providers directly or visit their official websites.
         </p>
-        <p style={{ marginTop: '15px', fontSize: '0.75em', color: '#999', fontStyle: 'italic' }}>
+        <p style={{ marginTop: '16px', fontSize: '0.8em', color: '#64748b', fontStyle: 'italic' }}>
           Created by Marcelo Preissler with Claude Code
         </p>
       </div>

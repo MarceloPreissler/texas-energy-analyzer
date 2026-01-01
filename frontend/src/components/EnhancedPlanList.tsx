@@ -9,6 +9,7 @@ interface Plan {
   id: number;
   provider_id: number;
   plan_name: string;
+  plan_url?: string | null;
   plan_type?: string | null;
   service_type?: string | null;
   zip_code?: string | null;
@@ -22,7 +23,67 @@ interface Plan {
   cancellation_fee?: number | null;
   renewable_percent?: number | null;
   special_features?: string | null;
+  rate_start_date?: string | null;
+  last_updated?: string | null;
 }
+
+// Helper to format dates as MM/DD/YYYY
+const formatDate = (dateString: string | null | undefined): string => {
+  if (!dateString) return '-';
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '-';
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
+  } catch {
+    return '-';
+  }
+};
+
+// Helper to parse source and TDU from special_features
+const parseSpecialFeatures = (features: string | null | undefined): { source: string; sourceUrl: string; tdu: string } => {
+  if (!features) return { source: '-', sourceUrl: '', tdu: '-' };
+
+  let source = '-';
+  let sourceUrl = '';
+  let tdu = '-';
+
+  // Extract source site
+  if (features.includes('ElectricChoice.com')) {
+    source = 'ElectricChoice';
+    sourceUrl = 'https://www.electricchoice.com/electricity-prices-by-state/texas/business-electricity/';
+  } else if (features.includes('ElectricityPlans.com')) {
+    source = 'ElectricityPlans';
+    sourceUrl = 'https://www.electricityplans.com/texas/compare/business-electricity/';
+  } else if (features.includes('IndustrialControl')) {
+    source = 'IndustrialControl';
+    sourceUrl = 'https://industrialcontrolacademy.com/texas-commercial-power-rates-2025-bill-calculator/';
+  } else if (features.includes('PowerToChoose')) {
+    source = 'PowerToChoose';
+    sourceUrl = 'https://www.powertochoose.org/';
+  }
+
+  // Extract TDU info
+  const tduPatterns = [
+    { pattern: /Oncor|Dallas/i, name: 'Oncor' },
+    { pattern: /CenterPoint|Houston/i, name: 'CenterPoint' },
+    { pattern: /AEP.*Central|Corpus/i, name: 'AEP Central' },
+    { pattern: /AEP.*North|Abilene/i, name: 'AEP North' },
+    { pattern: /TNMP|Midland/i, name: 'TNMP' },
+    { pattern: /Lubbock/i, name: 'Lubbock P&L' },
+  ];
+
+  for (const { pattern, name } of tduPatterns) {
+    if (pattern.test(features)) {
+      tdu = name;
+      break;
+    }
+  }
+
+  return { source, sourceUrl, tdu };
+};
 
 interface Provider {
   id: number;
@@ -51,13 +112,13 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
 
   const [tempProviderFilter, setTempProviderFilter] = useState('');
   const [tempPlanTypeFilter, setTempPlanTypeFilter] = useState('');
-  const [tempServiceTypeFilter, setTempServiceTypeFilter] = useState('Residential');
+  const [tempServiceTypeFilter, setTempServiceTypeFilter] = useState('Commercial');
   const [tempZipCodeFilter, setTempZipCodeFilter] = useState('');
   const [tempContractFilter, setTempContractFilter] = useState('');
 
   const [providerFilter, setProviderFilter] = useState<string | undefined>(undefined);
   const [planTypeFilter, setPlanTypeFilter] = useState<string | undefined>(undefined);
-  const [serviceTypeFilter, setServiceTypeFilter] = useState<string | undefined>('Residential');
+  const [serviceTypeFilter, setServiceTypeFilter] = useState<string | undefined>('Commercial');
   const [zipCodeFilter, setZipCodeFilter] = useState<string | undefined>(undefined);
   const [contractFilter, setContractFilter] = useState<number | undefined>(undefined);
 
@@ -130,12 +191,12 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
   const handleReset = () => {
     setTempProviderFilter('');
     setTempPlanTypeFilter('');
-    setTempServiceTypeFilter('Residential');
+    setTempServiceTypeFilter('Commercial');
     setTempZipCodeFilter('');
     setTempContractFilter('');
     setProviderFilter(undefined);
     setPlanTypeFilter(undefined);
-    setServiceTypeFilter('Residential');
+    setServiceTypeFilter('Commercial');
     setZipCodeFilter(undefined);
     setContractFilter(undefined);
     setPlanNameSearch('');
@@ -254,6 +315,7 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
 
   const tableRows = paginatedPlans.map((plan) => {
     const providerName = getProviderName(plan);
+    const { source, sourceUrl, tdu } = parseSpecialFeatures(plan.special_features);
     const rowClass = [
       plan.plan_type?.toLowerCase().includes('time') ? 'plan-row time-of-use' : '',
       (plan.renewable_percent || 0) >= 90 ? 'plan-row renewable' : '',
@@ -277,7 +339,7 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {providerName} 🔗
+              {providerName}
             </a>
           ) : (
             <strong>{providerName}</strong>
@@ -286,7 +348,7 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
         <td>
           {plan.plan_url ? (
             <a href={plan.plan_url} target="_blank" rel="noopener noreferrer">
-              {plan.plan_name} 🔗
+              {plan.plan_name}
             </a>
           ) : (
             plan.plan_name
@@ -299,16 +361,25 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
           )}
         </td>
         <td>{plan.plan_type || '-'}</td>
+        <td>{tdu}</td>
         <td>{plan.contract_months ?? '-'}</td>
-        <td className={getRateClass(plan.rate_500_cents)}>{plan.rate_500_cents ? `${plan.rate_500_cents.toFixed(2)}¢` : '-'}</td>
         <td className={getRateClass(plan.rate_1000_cents)}>{plan.rate_1000_cents ? `${plan.rate_1000_cents.toFixed(2)}¢` : '-'}</td>
-        <td className={getRateClass(plan.rate_2000_cents)}>{plan.rate_2000_cents ? `${plan.rate_2000_cents.toFixed(2)}¢` : '-'}</td>
         <td>{plan.renewable_percent != null ? `${plan.renewable_percent}%` : '-'}</td>
         <td>{plan.cancellation_fee != null ? `$${plan.cancellation_fee.toFixed(0)}` : '-'}</td>
         <td>
           {plan.rate_1000_cents ? `$${calculateMonthlyCost(plan.rate_1000_cents).toFixed(2)}` : '-'}
         </td>
-        <td style={{ fontSize: '0.85em' }}>{plan.special_features || '-'}</td>
+        <td>
+          {sourceUrl ? (
+            <a href={sourceUrl} target="_blank" rel="noopener noreferrer" className="source-link-btn">
+              {source}
+            </a>
+          ) : (
+            source
+          )}
+        </td>
+        <td style={{ fontSize: '0.85em', color: '#64748b' }}>{formatDate(plan.rate_start_date)}</td>
+        <td style={{ fontSize: '0.85em', color: '#64748b' }}>{formatDate(plan.last_updated)}</td>
       </tr>
     );
   });
@@ -336,7 +407,7 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
         {summaryStats && (
           <>
             <div className="card">
-              <h2 className="card-title">📊 Market Overview</h2>
+              <h2 className="card-title">Market Overview</h2>
               <div className="summary-stat">
                 <div>Lowest Rate</div>
                 <strong>{summaryStats.lowestRate.toFixed(1)}¢/kWh</strong>
@@ -352,7 +423,7 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
             </div>
 
             <div className="card">
-              <h2 className="card-title">💰 Savings Potential</h2>
+              <h2 className="card-title">Savings Potential</h2>
               <div className="summary-stat">
                 <div>Monthly Savings</div>
                 <strong>${summaryStats.potentialSavings.toFixed(0)}</strong>
@@ -364,17 +435,40 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
             </div>
 
             <div className="card">
-              <h2 className="card-title">🔍 Best Plan</h2>
-              <p><strong>Provider:</strong> {summaryStats.bestPlan ? getProviderName(summaryStats.bestPlan) : 'Unknown'}</p>
-              <p><strong>Plan:</strong> {summaryStats.bestPlan?.plan_name}</p>
-              <p><strong>Rate:</strong> {summaryStats.lowestRate.toFixed(1)}¢/kWh</p>
+              <h2 className="card-title">Best Plan</h2>
+              {summaryStats.bestPlan ? (
+                <>
+                  <div className="summary-stat">
+                    <div>Provider</div>
+                    <strong>{getProviderName(summaryStats.bestPlan)}</strong>
+                  </div>
+                  <div className="summary-stat">
+                    <div>Plan</div>
+                    <strong style={{ fontSize: '1em' }}>{summaryStats.bestPlan.plan_name}</strong>
+                  </div>
+                  <div className="summary-stat">
+                    <div>Rate</div>
+                    <strong>{summaryStats.lowestRate.toFixed(1)}¢/kWh</strong>
+                  </div>
+                  {summaryStats.bestPlan.contract_months && (
+                    <div className="summary-stat">
+                      <div>Term</div>
+                      <strong>{summaryStats.bestPlan.contract_months} months</strong>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="summary-stat">
+                  <div style={{ color: '#94a3b8' }}>No plans with rate data available</div>
+                </div>
+              )}
             </div>
           </>
         )}
       </div>
 
       <div className="card zip-card">
-        <h2 className="card-title">⚡ PowerToChoose Live Import</h2>
+        <h2 className="card-title">PowerToChoose Live Import</h2>
         <div className="zip-actions">
           <input
             type="text"
@@ -477,7 +571,7 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
       </div>
 
       <div className="card">
-        <h2 className="card-title">📋 Available Plans ({processedPlans.length})</h2>
+        <h2 className="card-title">Available Plans ({processedPlans.length})</h2>
         <div className="pagination-controls">
           <div>
             Page {currentPage} of {totalPages}
@@ -509,14 +603,15 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
                 <th>Provider</th>
                 <th>Plan</th>
                 <th>Type</th>
+                <th>TDU</th>
                 <th>Term</th>
-                <th>500 kWh</th>
-                <th>1,000 kWh</th>
-                <th>2,000 kWh</th>
+                <th>Rate (1k kWh)</th>
                 <th>Renewable</th>
-                <th>Cancellation</th>
+                <th>Cancel Fee</th>
                 <th>Est. Bill</th>
-                <th>Features</th>
+                <th>Source</th>
+                <th>Rate Start</th>
+                <th>Last Scraped</th>
               </tr>
             </thead>
             <tbody>{tableRows}</tbody>
@@ -529,54 +624,56 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
 
       {selectedPlans.length > 0 && <PlanComparison plans={selectedPlans} />}
 
-      <div className="card calculator-section">
-        <h2 className="card-title">🧮 Cost Calculator</h2>
-        <div className="input-group">
-          <label>Monthly Usage (kWh)</label>
-          <input type="number" value={usage} onChange={(e) => setUsage(Number(e.target.value))} min="0" max="5000" />
-        </div>
-        <div className="input-group">
-          <label>Base Fee Calculation</label>
-          <select value={useCustomBaseFee ? 'custom' : 'estimated'} onChange={(e) => setUseCustomBaseFee(e.target.value === 'custom')}>
-            <option value="estimated">Estimated ($9.95/month)</option>
-            <option value="custom">Custom Base Fee</option>
-          </select>
-        </div>
-        {useCustomBaseFee && (
+      <div className="calculator-summary-row">
+        <div className="card calculator-section">
+          <h2 className="card-title">Cost Calculator</h2>
           <div className="input-group">
-            <label>Custom Base Fee ($/month)</label>
-            <input type="number" value={baseFee} onChange={(e) => setBaseFee(Number(e.target.value))} min="0" max="50" step="0.01" />
+            <label>Monthly Usage (kWh)</label>
+            <input type="number" value={usage} onChange={(e) => setUsage(Number(e.target.value))} min="0" max="5000" />
+          </div>
+          <div className="input-group">
+            <label>Base Fee Calculation</label>
+            <select value={useCustomBaseFee ? 'custom' : 'estimated'} onChange={(e) => setUseCustomBaseFee(e.target.value === 'custom')}>
+              <option value="estimated">Estimated ($9.95/month)</option>
+              <option value="custom">Custom Base Fee</option>
+            </select>
+          </div>
+          {useCustomBaseFee && (
+            <div className="input-group">
+              <label>Custom Base Fee ($/month)</label>
+              <input type="number" value={baseFee} onChange={(e) => setBaseFee(Number(e.target.value))} min="0" max="50" step="0.01" />
+            </div>
+          )}
+        </div>
+
+        {summaryStats && (
+          <div className="card summary-section">
+            <h2 className="card-title">Your Personalized Summary</h2>
+            <div className="summary-grid">
+              <div className="summary-item">
+                <p className="summary-label">Plans Analyzed</p>
+                <p className="summary-value">{summaryStats.totalPlans}</p>
+              </div>
+              <div className="summary-item">
+                <p className="summary-label">Best Rate</p>
+                <p className="summary-value">{summaryStats.lowestRate.toFixed(1)}¢</p>
+              </div>
+              <div className="summary-item">
+                <p className="summary-label">Market Average</p>
+                <p className="summary-value">{summaryStats.avgRate}¢</p>
+              </div>
+              <div className="summary-item">
+                <p className="summary-label">Potential Savings</p>
+                <p className="summary-value">${(summaryStats.potentialSavings * 12).toFixed(0)}/yr</p>
+              </div>
+            </div>
+            <div className="recommendations">
+              <h3>Recommendations</h3>
+              <p>{getRecommendations()}</p>
+            </div>
           </div>
         )}
       </div>
-
-      {summaryStats && (
-        <div className="card summary-section">
-          <h2 className="card-title">📋 Your Personalized Summary</h2>
-          <div className="summary-grid">
-            <div className="summary-item">
-              <p className="summary-label">Plans Analyzed</p>
-              <p className="summary-value">{summaryStats.totalPlans}</p>
-            </div>
-            <div className="summary-item">
-              <p className="summary-label">Best Rate</p>
-              <p className="summary-value">{summaryStats.lowestRate.toFixed(1)}¢</p>
-            </div>
-            <div className="summary-item">
-              <p className="summary-label">Market Average</p>
-              <p className="summary-value">{summaryStats.avgRate}¢</p>
-            </div>
-            <div className="summary-item">
-              <p className="summary-label">Potential Savings</p>
-              <p className="summary-value">${(summaryStats.potentialSavings * 12).toFixed(0)}/yr</p>
-            </div>
-          </div>
-          <div className="recommendations">
-            <h3>💡 Recommendations</h3>
-            <p>{getRecommendations()}</p>
-          </div>
-        </div>
-      )}
 
       {plans && plans.length > 0 && providers && <PriceAnalytics plans={plans} providers={providers} />}
 

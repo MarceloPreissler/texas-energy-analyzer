@@ -278,7 +278,6 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
   return (
     <div className="price-analytics-section">
       <h2 className="section-title">
-        <span className="icon">📈</span>
         Retail Plan Analytics
       </h2>
       <p className="section-subtitle">
@@ -325,16 +324,6 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
           </div>
         </div>
 
-        <div className="analytics-card glass wide">
-          <h3 className="analytics-card-title">Provider Rate Comparison (Top 12)</h3>
-          <div className="chart-wrapper-tall">
-            <Bar data={providerComparisonData} options={horizontalChartOptions} />
-          </div>
-          <p className="chart-footnote">
-            Rates shown in ¢/kWh at 1,000 kWh usage level
-          </p>
-        </div>
-
         <div className="analytics-card glass">
           <h3 className="analytics-card-title">Service Type Distribution</h3>
           <div className="chart-wrapper-doughnut">
@@ -350,6 +339,16 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
               <span className="service-label">Commercial</span>
             </div>
           </div>
+        </div>
+
+        <div className="analytics-card glass full-width">
+          <h3 className="analytics-card-title">Provider Rate Comparison (Top 12)</h3>
+          <div className="chart-wrapper-tall">
+            <Bar data={providerComparisonData} options={horizontalChartOptions} />
+          </div>
+          <p className="chart-footnote">
+            Rates shown in ¢/kWh at 1,000 kWh usage level
+          </p>
         </div>
       </div>
     </div>

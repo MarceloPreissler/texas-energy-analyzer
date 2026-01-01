@@ -37,6 +37,7 @@ interface Plan {
   contract_months?: number | null;
   rate_1000_cents?: number | null;
   renewable_percent?: number | null;
+  cancellation_fee?: number | null;
   special_features?: string | null;
 }
 
@@ -95,28 +96,71 @@ const MarketAnalytics: React.FC<Props> = ({ plans, providers }) => {
     const fixed = plansWithRates.filter((p) => p.plan_type?.toLowerCase().includes('fixed'));
     const variable = plansWithRates.filter((p) => p.plan_type?.toLowerCase().includes('variable'));
 
-    // Provider stats
-    const providerStats = new Map<string, { count: number; total: number; min: number }>();
+    // Renewable Energy Premium Analysis
+    const greenPlans = plansWithRates.filter((p) => (p.renewable_percent || 0) >= 90);
+    const nonGreenPlans = plansWithRates.filter((p) => (p.renewable_percent || 0) < 50);
+    const greenAvg = greenPlans.length
+      ? greenPlans.reduce((a, p) => a + (p.rate_1000_cents || 0), 0) / greenPlans.length
+      : 0;
+    const nonGreenAvg = nonGreenPlans.length
+      ? nonGreenPlans.reduce((a, p) => a + (p.rate_1000_cents || 0), 0) / nonGreenPlans.length
+      : 0;
+    const greenPremium = greenAvg > 0 && nonGreenAvg > 0 ? ((greenAvg - nonGreenAvg) / nonGreenAvg) * 100 : 0;
+
+    // Cancellation fee analysis
+    const plansWithFees = plansWithRates.filter((p) => p.cancellation_fee && p.cancellation_fee > 0);
+    const feeRanges = [
+      { label: 'No Fee', count: plansWithRates.filter((p) => !p.cancellation_fee || p.cancellation_fee === 0).length },
+      { label: '$1-$100', count: plansWithFees.filter((p) => p.cancellation_fee! <= 100).length },
+      { label: '$101-$200', count: plansWithFees.filter((p) => p.cancellation_fee! > 100 && p.cancellation_fee! <= 200).length },
+      { label: '$201-$300', count: plansWithFees.filter((p) => p.cancellation_fee! > 200 && p.cancellation_fee! <= 300).length },
+      { label: '$300+', count: plansWithFees.filter((p) => p.cancellation_fee! > 300).length },
+    ];
+    const avgCancellationFee = plansWithFees.length
+      ? plansWithFees.reduce((a, p) => a + (p.cancellation_fee || 0), 0) / plansWithFees.length
+      : 0;
+
+    // Contract term vs rate analysis
+    const termRateAnalysis: Record<string, { count: number; totalRate: number; minRate: number }> = {};
     plansWithRates.forEach((plan) => {
-      const name = getProviderName(plan.provider_id);
-      const rate = plan.rate_1000_cents!;
-      const existing = providerStats.get(name) || { count: 0, total: 0, min: Infinity };
-      providerStats.set(name, {
-        count: existing.count + 1,
-        total: existing.total + rate,
-        min: Math.min(existing.min, rate),
-      });
+      const term = plan.contract_months || 0;
+      let termLabel: string;
+      if (term === 0) termLabel = 'MTM';
+      else if (term <= 6) termLabel = '1-6 mo';
+      else if (term <= 12) termLabel = '7-12 mo';
+      else if (term <= 24) termLabel = '13-24 mo';
+      else termLabel = '24+ mo';
+
+      if (!termRateAnalysis[termLabel]) {
+        termRateAnalysis[termLabel] = { count: 0, totalRate: 0, minRate: Infinity };
+      }
+      termRateAnalysis[termLabel].count++;
+      termRateAnalysis[termLabel].totalRate += plan.rate_1000_cents!;
+      termRateAnalysis[termLabel].minRate = Math.min(termRateAnalysis[termLabel].minRate, plan.rate_1000_cents!);
     });
 
-    const topProviders = Array.from(providerStats.entries())
-      .map(([name, data]) => ({
-        name,
-        count: data.count,
-        avgRate: data.total / data.count,
-        bestRate: data.min,
-      }))
-      .sort((a, b) => a.bestRate - b.bestRate)
-      .slice(0, 10);
+    // Provider rate consistency (std dev of rates per provider)
+    const providerConsistency: { name: string; avgRate: number; stdDev: number; count: number }[] = [];
+    const providerRates: Record<string, number[]> = {};
+    plansWithRates.forEach((plan) => {
+      const name = getProviderName(plan.provider_id);
+      if (!providerRates[name]) providerRates[name] = [];
+      providerRates[name].push(plan.rate_1000_cents!);
+    });
+
+    Object.entries(providerRates).forEach(([name, pRates]) => {
+      if (pRates.length >= 2) {
+        const avg = pRates.reduce((a, b) => a + b, 0) / pRates.length;
+        const variance = pRates.reduce((acc, val) => acc + Math.pow(val - avg, 2), 0) / pRates.length;
+        providerConsistency.push({
+          name,
+          avgRate: avg,
+          stdDev: Math.sqrt(variance),
+          count: pRates.length,
+        });
+      }
+    });
+    providerConsistency.sort((a, b) => a.stdDev - b.stdDev); // Most consistent first
 
     // Contract term distribution
     const termDistribution = new Map<number, number>();
@@ -142,7 +186,15 @@ const MarketAnalytics: React.FC<Props> = ({ plans, providers }) => {
       commercialAvg,
       fixed: fixed.length,
       variable: variable.length,
-      topProviders,
+      greenPlans: greenPlans.length,
+      nonGreenPlans: nonGreenPlans.length,
+      greenAvg,
+      nonGreenAvg,
+      greenPremium,
+      feeRanges,
+      avgCancellationFee,
+      termRateAnalysis,
+      providerConsistency: providerConsistency.slice(0, 8),
       termDistribution: Array.from(termDistribution.entries()).sort((a, b) => a[0] - b[0]),
       rateSpread: max - min,
     };
@@ -156,71 +208,73 @@ const MarketAnalytics: React.FC<Props> = ({ plans, providers }) => {
     );
   }
 
-  // Price distribution histogram
-  const priceHistogram = useMemo(() => {
-    const plansWithRates = plans.filter((p) => p.rate_1000_cents);
-    const buckets = [
-      { label: '<6¢', min: 0, max: 6, count: 0, color: '#10b981' },
-      { label: '6-8¢', min: 6, max: 8, count: 0, color: '#22c55e' },
-      { label: '8-10¢', min: 8, max: 10, count: 0, color: '#84cc16' },
-      { label: '10-12¢', min: 10, max: 12, count: 0, color: '#eab308' },
-      { label: '12-15¢', min: 12, max: 15, count: 0, color: '#f97316' },
-      { label: '>15¢', min: 15, max: Infinity, count: 0, color: '#ef4444' },
-    ];
+  // Renewable vs Non-Renewable chart
+  const renewableComparisonData = {
+    labels: ['90%+ Renewable', 'Under 50% Renewable'],
+    datasets: [
+      {
+        label: 'Average Rate (¢/kWh)',
+        data: [stats.greenAvg, stats.nonGreenAvg],
+        backgroundColor: ['rgba(16, 185, 129, 0.8)', 'rgba(100, 116, 139, 0.6)'],
+        borderRadius: 8,
+      },
+    ],
+  };
 
-    plansWithRates.forEach((plan) => {
-      const rate = plan.rate_1000_cents!;
-      const bucket = buckets.find((b) => rate >= b.min && rate < b.max);
-      if (bucket) bucket.count++;
-    });
+  // Cancellation fee distribution chart
+  const feeDistributionData = {
+    labels: stats.feeRanges.map((r) => r.label),
+    datasets: [
+      {
+        data: stats.feeRanges.map((r) => r.count),
+        backgroundColor: ['#10b981', '#3b82f6', '#f97316', '#ef4444', '#7c3aed'],
+        borderWidth: 0,
+      },
+    ],
+  };
 
-    return {
-      labels: buckets.map((b) => b.label),
-      datasets: [
-        {
-          label: 'Number of Plans',
-          data: buckets.map((b) => b.count),
-          backgroundColor: buckets.map((b) => b.color),
-          borderRadius: 8,
-        },
-      ],
-    };
-  }, [plans]);
+  // Contract term vs rate chart
+  const termOrder = ['MTM', '1-6 mo', '7-12 mo', '13-24 mo', '24+ mo'];
+  const orderedTermAnalysis = termOrder
+    .filter((t) => stats.termRateAnalysis[t])
+    .map((t) => ({ label: t, ...stats.termRateAnalysis[t] }));
 
-  // Provider comparison chart
-  const providerChart = useMemo(() => {
-    return {
-      labels: stats.topProviders.map((p) => p.name),
-      datasets: [
-        {
-          label: 'Best Rate (¢/kWh)',
-          data: stats.topProviders.map((p) => p.bestRate),
-          backgroundColor: 'rgba(16, 185, 129, 0.8)',
-          borderRadius: 6,
-        },
-        {
-          label: 'Average Rate (¢/kWh)',
-          data: stats.topProviders.map((p) => p.avgRate),
-          backgroundColor: 'rgba(59, 130, 246, 0.6)',
-          borderRadius: 6,
-        },
-      ],
-    };
-  }, [stats]);
+  const termRateData = {
+    labels: orderedTermAnalysis.map((t) => t.label),
+    datasets: [
+      {
+        label: 'Avg Rate',
+        data: orderedTermAnalysis.map((t) => t.totalRate / t.count),
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+        fill: true,
+        tension: 0.4,
+      },
+      {
+        label: 'Best Rate',
+        data: orderedTermAnalysis.map((t) => t.minRate),
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  };
 
-  // Service type comparison
-  const serviceTypeChart = useMemo(() => {
-    return {
-      labels: ['Residential', 'Commercial'],
-      datasets: [
-        {
-          data: [stats.residential, stats.commercial],
-          backgroundColor: ['rgba(59, 130, 246, 0.8)', 'rgba(16, 185, 129, 0.8)'],
-          borderWidth: 0,
-        },
-      ],
-    };
-  }, [stats]);
+  // Provider consistency chart
+  const consistencyData = {
+    labels: stats.providerConsistency.map((p) => p.name),
+    datasets: [
+      {
+        label: 'Rate Variability (±¢/kWh)',
+        data: stats.providerConsistency.map((p) => p.stdDev),
+        backgroundColor: stats.providerConsistency.map((_, i) =>
+          i < 3 ? 'rgba(16, 185, 129, 0.8)' : i < 6 ? 'rgba(251, 191, 36, 0.8)' : 'rgba(239, 68, 68, 0.8)'
+        ),
+        borderRadius: 6,
+      },
+    ],
+  };
 
   const chartOptions = {
     responsive: true,
@@ -228,17 +282,29 @@ const MarketAnalytics: React.FC<Props> = ({ plans, providers }) => {
     plugins: {
       legend: {
         position: 'top' as const,
-        labels: { color: '#64748b', font: { size: 12 } },
+        labels: { color: '#94a3b8', font: { size: 12 } },
       },
     },
     scales: {
       x: {
         grid: { display: false },
-        ticks: { color: '#64748b' },
+        ticks: { color: '#94a3b8' },
       },
       y: {
         grid: { color: 'rgba(100, 116, 139, 0.1)' },
-        ticks: { color: '#64748b' },
+        ticks: { color: '#94a3b8' },
+      },
+    },
+  };
+
+  const doughnutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '55%',
+    plugins: {
+      legend: {
+        position: 'right' as const,
+        labels: { color: '#94a3b8', font: { size: 11 }, padding: 12 },
       },
     },
   };
@@ -246,45 +312,14 @@ const MarketAnalytics: React.FC<Props> = ({ plans, providers }) => {
   return (
     <div className="analytics-dashboard">
       <h2 className="section-title">
-        <span className="icon">📊</span> Market Analytics Dashboard
+        Advanced Market Insights
       </h2>
-
-      {/* KPI Cards */}
-      <div className="kpi-grid">
-        <div className="kpi-card glass green">
-          <div className="kpi-icon">💰</div>
-          <div className="kpi-content">
-            <div className="kpi-value">{stats.min.toFixed(2)}¢</div>
-            <div className="kpi-label">Lowest Rate</div>
-          </div>
-        </div>
-        <div className="kpi-card glass blue">
-          <div className="kpi-icon">📈</div>
-          <div className="kpi-content">
-            <div className="kpi-value">{stats.mean.toFixed(2)}¢</div>
-            <div className="kpi-label">Average Rate</div>
-          </div>
-        </div>
-        <div className="kpi-card glass purple">
-          <div className="kpi-icon">📊</div>
-          <div className="kpi-content">
-            <div className="kpi-value">{stats.median.toFixed(2)}¢</div>
-            <div className="kpi-label">Median Rate</div>
-          </div>
-        </div>
-        <div className="kpi-card glass orange">
-          <div className="kpi-icon">📉</div>
-          <div className="kpi-content">
-            <div className="kpi-value">{stats.max.toFixed(2)}¢</div>
-            <div className="kpi-label">Highest Rate</div>
-          </div>
-        </div>
-      </div>
+      <p className="section-subtitle">Deep analysis of {stats.total} electricity plans</p>
 
       {/* Statistical Summary */}
       <div className="stats-grid">
         <div className="analytics-card glass">
-          <h3 className="card-header">📐 Statistical Summary</h3>
+          <h3 className="card-header">Statistical Summary</h3>
           <div className="stat-rows">
             <div className="stat-row">
               <span className="stat-label">Total Plans Analyzed</span>
@@ -318,63 +353,37 @@ const MarketAnalytics: React.FC<Props> = ({ plans, providers }) => {
         </div>
 
         <div className="analytics-card glass">
-          <h3 className="card-header">🏠 Residential vs Commercial</h3>
+          <h3 className="card-header">Green Energy Premium</h3>
           <div className="comparison-grid">
-            <div className="comparison-item residential">
-              <div className="comparison-value">{stats.residential}</div>
-              <div className="comparison-label">Residential Plans</div>
-              <div className="comparison-avg">{stats.residentialAvg.toFixed(2)}¢ avg</div>
+            <div className="comparison-item" style={{ background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05))', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+              <div className="comparison-value" style={{ fontSize: '2em' }}>{stats.greenPlans}</div>
+              <div className="comparison-label">90%+ Renewable</div>
+              <div className="comparison-avg">{stats.greenAvg.toFixed(2)}¢ avg</div>
             </div>
             <div className="comparison-divider">vs</div>
-            <div className="comparison-item commercial">
-              <div className="comparison-value">{stats.commercial}</div>
-              <div className="comparison-label">Commercial Plans</div>
-              <div className="comparison-avg">{stats.commercialAvg.toFixed(2)}¢ avg</div>
+            <div className="comparison-item" style={{ background: 'linear-gradient(135deg, rgba(100, 116, 139, 0.15), rgba(100, 116, 139, 0.05))', border: '1px solid rgba(100, 116, 139, 0.3)' }}>
+              <div className="comparison-value" style={{ fontSize: '2em' }}>{stats.nonGreenPlans}</div>
+              <div className="comparison-label">Under 50% Renewable</div>
+              <div className="comparison-avg">{stats.nonGreenAvg.toFixed(2)}¢ avg</div>
             </div>
           </div>
-          <div className="chart-container small">
-            <Doughnut
-              data={serviceTypeChart}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: { position: 'bottom', labels: { color: '#64748b' } },
-                },
-              }}
-            />
+          <div style={{ textAlign: 'center', marginTop: '16px', padding: '12px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '8px' }}>
+            <span style={{ color: stats.greenPremium > 0 ? '#f97316' : '#10b981', fontWeight: 600, fontSize: '1.1em' }}>
+              {stats.greenPremium > 0 ? `+${stats.greenPremium.toFixed(1)}%` : `${stats.greenPremium.toFixed(1)}%`}
+            </span>
+            <span style={{ color: '#94a3b8', marginLeft: '8px' }}>
+              {stats.greenPremium > 0 ? 'green premium' : 'green discount'}
+            </span>
           </div>
         </div>
 
         <div className="analytics-card glass">
-          <h3 className="card-header">📋 Plan Type Breakdown</h3>
-          <div className="type-breakdown">
-            <div className="type-item">
-              <div className="type-bar" style={{ width: `${(stats.fixed / stats.total) * 100}%` }}>
-                <span className="type-count">{stats.fixed}</span>
-              </div>
-              <span className="type-label">Fixed Rate</span>
-            </div>
-            <div className="type-item">
-              <div
-                className="type-bar variable"
-                style={{ width: `${(stats.variable / stats.total) * 100}%` }}
-              >
-                <span className="type-count">{stats.variable}</span>
-              </div>
-              <span className="type-label">Variable Rate</span>
-            </div>
-            <div className="type-item">
-              <div
-                className="type-bar other"
-                style={{
-                  width: `${((stats.total - stats.fixed - stats.variable) / stats.total) * 100}%`,
-                }}
-              >
-                <span className="type-count">{stats.total - stats.fixed - stats.variable}</span>
-              </div>
-              <span className="type-label">Other Types</span>
-            </div>
+          <h3 className="card-header">Cancellation Fee Analysis</h3>
+          <div className="chart-wrapper-doughnut">
+            <Doughnut data={feeDistributionData} options={doughnutOptions} />
+          </div>
+          <div style={{ textAlign: 'center', marginTop: '12px', color: '#94a3b8' }}>
+            Average fee: <strong style={{ color: '#f1f5f9' }}>${stats.avgCancellationFee.toFixed(0)}</strong>
           </div>
         </div>
       </div>
@@ -382,58 +391,76 @@ const MarketAnalytics: React.FC<Props> = ({ plans, providers }) => {
       {/* Charts Row */}
       <div className="charts-grid">
         <div className="analytics-card glass wide">
-          <h3 className="card-header">📊 Price Distribution</h3>
+          <h3 className="card-header">Contract Length vs Rate</h3>
           <div className="chart-container">
-            <Bar data={priceHistogram} options={chartOptions} />
+            <Line data={termRateData} options={chartOptions} />
           </div>
+          <p className="chart-footnote">
+            Longer terms often lock in better rates
+          </p>
         </div>
 
         <div className="analytics-card glass wide">
-          <h3 className="card-header">🏆 Provider Comparison (Top 10)</h3>
+          <h3 className="card-header">Provider Rate Consistency</h3>
           <div className="chart-container">
             <Bar
-              data={providerChart}
+              data={consistencyData}
               options={{
                 ...chartOptions,
                 indexAxis: 'y' as const,
+                plugins: {
+                  ...chartOptions.plugins,
+                  legend: { display: false },
+                },
               }}
             />
           </div>
+          <p className="chart-footnote">
+            Lower variability = more consistent pricing across plans
+          </p>
         </div>
       </div>
 
-      {/* Provider Rankings */}
+      {/* Plan Type Breakdown */}
       <div className="analytics-card glass full-width">
-        <h3 className="card-header">🥇 Provider Performance Rankings</h3>
-        <div className="rankings-table">
-          <div className="rankings-header">
-            <span>Rank</span>
-            <span>Provider</span>
-            <span>Best Rate</span>
-            <span>Avg Rate</span>
-            <span>Plans</span>
-          </div>
-          {stats.topProviders.map((provider, index) => (
-            <div className="rankings-row" key={provider.name}>
-              <span className={`rank rank-${index + 1}`}>
-                {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
-              </span>
-              <span className="provider-name">{provider.name}</span>
-              <span className="best-rate">{provider.bestRate.toFixed(2)}¢</span>
-              <span className="avg-rate">{provider.avgRate.toFixed(2)}¢</span>
-              <span className="plan-count">{provider.count}</span>
+        <h3 className="card-header">Plan Type Breakdown</h3>
+        <div className="type-breakdown">
+          <div className="type-item">
+            <div className="type-bar" style={{ width: `${Math.max((stats.fixed / stats.total) * 100, 10)}%` }}>
+              <span className="type-count">{stats.fixed}</span>
             </div>
-          ))}
+            <span className="type-label">Fixed Rate</span>
+          </div>
+          <div className="type-item">
+            <div
+              className="type-bar variable"
+              style={{ width: `${Math.max((stats.variable / stats.total) * 100, 10)}%` }}
+            >
+              <span className="type-count">{stats.variable}</span>
+            </div>
+            <span className="type-label">Variable Rate</span>
+          </div>
+          <div className="type-item">
+            <div
+              className="type-bar other"
+              style={{
+                width: `${Math.max(((stats.total - stats.fixed - stats.variable) / stats.total) * 100, 10)}%`,
+              }}
+            >
+              <span className="type-count">{stats.total - stats.fixed - stats.variable}</span>
+            </div>
+            <span className="type-label">Other Types</span>
+          </div>
         </div>
       </div>
 
       {/* Contract Term Distribution */}
       <div className="analytics-card glass full-width">
-        <h3 className="card-header">📅 Contract Term Distribution</h3>
+        <h3 className="card-header">Contract Term Distribution</h3>
         <div className="term-distribution">
           {stats.termDistribution.map(([term, count]) => (
             <div className="term-item" key={term}>
-              <div className="term-bar" style={{ height: `${(count / stats.total) * 300}px` }}>
+              <div className="term-bar" style={{ height: `${Math.max((count / stats.total) * 300, 30)}px` }}>
                 <span className="term-count">{count}</span>
               </div>
               <span className="term-label">{term === 0 ? 'MTM' : `${term}mo`}</span>
