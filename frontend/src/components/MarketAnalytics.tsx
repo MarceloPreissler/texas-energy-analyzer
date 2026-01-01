@@ -12,7 +12,7 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
-import { Bar, Doughnut, Line } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 
 ChartJS.register(
   CategoryScale,
@@ -107,18 +107,26 @@ const MarketAnalytics: React.FC<Props> = ({ plans, providers }) => {
       : 0;
     const greenPremium = greenAvg > 0 && nonGreenAvg > 0 ? ((greenAvg - nonGreenAvg) / nonGreenAvg) * 100 : 0;
 
-    // Cancellation fee analysis
-    const plansWithFees = plansWithRates.filter((p) => p.cancellation_fee && p.cancellation_fee > 0);
-    const feeRanges = [
-      { label: 'No Fee', count: plansWithRates.filter((p) => !p.cancellation_fee || p.cancellation_fee === 0).length },
-      { label: '$1-$100', count: plansWithFees.filter((p) => p.cancellation_fee! <= 100).length },
-      { label: '$101-$200', count: plansWithFees.filter((p) => p.cancellation_fee! > 100 && p.cancellation_fee! <= 200).length },
-      { label: '$201-$300', count: plansWithFees.filter((p) => p.cancellation_fee! > 200 && p.cancellation_fee! <= 300).length },
-      { label: '$300+', count: plansWithFees.filter((p) => p.cancellation_fee! > 300).length },
-    ];
-    const avgCancellationFee = plansWithFees.length
-      ? plansWithFees.reduce((a, p) => a + (p.cancellation_fee || 0), 0) / plansWithFees.length
-      : 0;
+    // Provider Plan Portfolio Analysis (plan variety by provider)
+    const providerPlanCounts: Record<string, { total: number; fixed: number; variable: number; renewable: number }> = {};
+    plansWithRates.forEach((plan) => {
+      const name = getProviderName(plan.provider_id);
+      if (!providerPlanCounts[name]) {
+        providerPlanCounts[name] = { total: 0, fixed: 0, variable: 0, renewable: 0 };
+      }
+      providerPlanCounts[name].total++;
+      if (plan.plan_type?.toLowerCase().includes('fixed')) providerPlanCounts[name].fixed++;
+      if (plan.plan_type?.toLowerCase().includes('variable')) providerPlanCounts[name].variable++;
+      if ((plan.renewable_percent || 0) >= 90) providerPlanCounts[name].renewable++;
+    });
+
+    const providerPortfolio = Object.entries(providerPlanCounts)
+      .map(([name, counts]) => ({ name, ...counts }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 10); // Top 10 providers by plan count
+
+    const totalProviders = Object.keys(providerPlanCounts).length;
+    const avgPlansPerProvider = plansWithRates.length / totalProviders;
 
     // Contract term vs rate analysis
     const termRateAnalysis: Record<string, { count: number; totalRate: number; minRate: number }> = {};
@@ -191,8 +199,9 @@ const MarketAnalytics: React.FC<Props> = ({ plans, providers }) => {
       greenAvg,
       nonGreenAvg,
       greenPremium,
-      feeRanges,
-      avgCancellationFee,
+      providerPortfolio,
+      totalProviders,
+      avgPlansPerProvider,
       termRateAnalysis,
       providerConsistency: providerConsistency.slice(0, 8),
       termDistribution: Array.from(termDistribution.entries()).sort((a, b) => a[0] - b[0]),
@@ -221,14 +230,27 @@ const MarketAnalytics: React.FC<Props> = ({ plans, providers }) => {
     ],
   };
 
-  // Cancellation fee distribution chart
-  const feeDistributionData = {
-    labels: stats.feeRanges.map((r) => r.label),
+  // Provider Plan Portfolio chart (stacked bar)
+  const providerPortfolioData = {
+    labels: stats.providerPortfolio.map((p) => p.name),
     datasets: [
       {
-        data: stats.feeRanges.map((r) => r.count),
-        backgroundColor: ['#10b981', '#3b82f6', '#f97316', '#ef4444', '#7c3aed'],
-        borderWidth: 0,
+        label: 'Fixed Rate',
+        data: stats.providerPortfolio.map((p) => p.fixed),
+        backgroundColor: 'rgba(59, 130, 246, 0.85)',
+        borderRadius: 4,
+      },
+      {
+        label: 'Variable Rate',
+        data: stats.providerPortfolio.map((p) => p.variable),
+        backgroundColor: 'rgba(251, 146, 60, 0.85)',
+        borderRadius: 4,
+      },
+      {
+        label: 'Other',
+        data: stats.providerPortfolio.map((p) => p.total - p.fixed - p.variable),
+        backgroundColor: 'rgba(139, 92, 246, 0.85)',
+        borderRadius: 4,
       },
     ],
   };
@@ -293,18 +315,6 @@ const MarketAnalytics: React.FC<Props> = ({ plans, providers }) => {
       y: {
         grid: { color: 'rgba(100, 116, 139, 0.1)' },
         ticks: { color: '#94a3b8' },
-      },
-    },
-  };
-
-  const doughnutOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    cutout: '55%',
-    plugins: {
-      legend: {
-        position: 'right' as const,
-        labels: { color: '#94a3b8', font: { size: 11 }, padding: 12 },
       },
     },
   };
@@ -378,12 +388,43 @@ const MarketAnalytics: React.FC<Props> = ({ plans, providers }) => {
         </div>
 
         <div className="analytics-card glass">
-          <h3 className="card-header">Cancellation Fee Analysis</h3>
-          <div className="chart-wrapper-doughnut">
-            <Doughnut data={feeDistributionData} options={doughnutOptions} />
+          <h3 className="card-header">Provider Plan Portfolio (Top 10)</h3>
+          <div className="chart-container">
+            <Bar
+              data={providerPortfolioData}
+              options={{
+                ...chartOptions,
+                indexAxis: 'y' as const,
+                scales: {
+                  x: {
+                    stacked: true,
+                    grid: { color: 'rgba(100, 116, 139, 0.1)' },
+                    ticks: { color: '#94a3b8' },
+                  },
+                  y: {
+                    stacked: true,
+                    grid: { display: false },
+                    ticks: { color: '#94a3b8', font: { size: 10 } },
+                  },
+                },
+                plugins: {
+                  legend: {
+                    position: 'top' as const,
+                    labels: { color: '#94a3b8', font: { size: 10 }, padding: 8 },
+                  },
+                },
+              }}
+            />
           </div>
-          <div style={{ textAlign: 'center', marginTop: '12px', color: '#94a3b8' }}>
-            Average fee: <strong style={{ color: '#f1f5f9' }}>${stats.avgCancellationFee.toFixed(0)}</strong>
+          <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '12px', padding: '12px', background: 'rgba(15, 23, 42, 0.4)', borderRadius: '8px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ color: '#f1f5f9', fontWeight: 600, fontSize: '1.2em' }}>{stats.totalProviders}</div>
+              <div style={{ color: '#94a3b8', fontSize: '0.8em' }}>Active Providers</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ color: '#f1f5f9', fontWeight: 600, fontSize: '1.2em' }}>{stats.avgPlansPerProvider.toFixed(1)}</div>
+              <div style={{ color: '#94a3b8', fontSize: '0.8em' }}>Avg Plans/Provider</div>
+            </div>
           </div>
         </div>
       </div>
