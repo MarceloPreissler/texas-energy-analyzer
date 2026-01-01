@@ -318,7 +318,42 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
   const downloadCSV = () => {
     if (!processedPlans.length) return;
 
-    // All available data fields - comprehensive export
+    // Helper functions for formatting
+    const formatCsvDate = (dateString: string | null | undefined): string => {
+      if (!dateString) return '';
+      try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return '';
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${month}/${day}/${year}`;
+      } catch {
+        return '';
+      }
+    };
+
+    const formatCurrency = (value: number | null | undefined): string => {
+      if (value === null || value === undefined) return '';
+      return `$${value.toFixed(2)}`;
+    };
+
+    const formatRate = (value: number | null | undefined): string => {
+      if (value === null || value === undefined) return '';
+      return `${value.toFixed(2)}¢`;
+    };
+
+    const formatPercent = (value: number | null | undefined): string => {
+      if (value === null || value === undefined) return '';
+      return `${value}%`;
+    };
+
+    const formatMonths = (value: number | null | undefined): string => {
+      if (value === null || value === undefined) return '';
+      return `${value} months`;
+    };
+
+    // All available data fields - comprehensive export with user-friendly headers
     const headers = [
       // Identification
       'Plan ID',
@@ -335,17 +370,17 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
       'TDU Area',
 
       // Contract Details
-      'Contract Length (Months)',
+      'Contract Length',
 
-      // Rate Tiers (cents per kWh)
-      'Rate @ 500 kWh (cents)',
-      'Rate @ 1000 kWh (cents)',
-      'Rate @ 2000 kWh (cents)',
+      // Rate Tiers
+      'Rate @ 500 kWh',
+      'Rate @ 1000 kWh',
+      'Rate @ 2000 kWh',
 
       // Monthly Bill Estimates
-      'Est. Monthly Bill @ 1000 kWh',
-      'Est. Monthly Bill @ 2000 kWh',
-      'Calculated Bill @ Current Usage',
+      'Est. Bill @ 1000 kWh',
+      'Est. Bill @ 2000 kWh',
+      'Your Estimated Bill',
 
       // Fees
       'Base Monthly Fee',
@@ -353,7 +388,7 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
       'Cancellation Fee',
 
       // Green Energy
-      'Renewable Percent',
+      'Renewable Energy',
 
       // Dates
       'Rate Start Date',
@@ -361,7 +396,7 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
 
       // Source Information
       'Data Source',
-      'Special Features / Notes'
+      'Notes'
     ];
 
     const rows = processedPlans.map((plan) => {
@@ -369,6 +404,11 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
       const provider = providers?.find((p) => p.id === plan.provider_id);
       const { source, tdu } = parseSpecialFeatures(plan.special_features);
       const calculatedBill = plan.rate_1000_cents ? calculateMonthlyCost(plan.rate_1000_cents) : null;
+
+      // Clean up special features for notes - remove source info that's already captured
+      let notes = plan.special_features || '';
+      notes = notes.replace(/Source:?\s*(ElectricChoice\.com|ElectricityPlans\.com|IndustrialControl|PowerToChoose)[,;]?\s*/gi, '');
+      notes = notes.trim();
 
       return [
         // Identification
@@ -386,33 +426,33 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
         tdu,
 
         // Contract Details
-        plan.contract_months ?? '',
+        formatMonths(plan.contract_months),
 
-        // Rate Tiers
-        plan.rate_500_cents ?? '',
-        plan.rate_1000_cents ?? '',
-        plan.rate_2000_cents ?? '',
+        // Rate Tiers - formatted with cents symbol
+        formatRate(plan.rate_500_cents),
+        formatRate(plan.rate_1000_cents),
+        formatRate(plan.rate_2000_cents),
 
-        // Monthly Bill Estimates
-        plan.monthly_bill_1000 ?? '',
-        plan.monthly_bill_2000 ?? '',
-        calculatedBill ? calculatedBill.toFixed(2) : '',
+        // Monthly Bill Estimates - formatted as currency
+        formatCurrency(plan.monthly_bill_1000),
+        formatCurrency(plan.monthly_bill_2000),
+        calculatedBill ? formatCurrency(calculatedBill) : '',
 
-        // Fees
-        plan.base_monthly_fee ?? '',
-        plan.early_termination_fee ?? '',
-        plan.cancellation_fee ?? '',
+        // Fees - formatted as currency
+        formatCurrency(plan.base_monthly_fee),
+        formatCurrency(plan.early_termination_fee),
+        formatCurrency(plan.cancellation_fee),
 
-        // Green Energy
-        plan.renewable_percent ?? '',
+        // Green Energy - formatted as percentage
+        formatPercent(plan.renewable_percent),
 
-        // Dates
-        plan.rate_start_date || '',
-        plan.last_updated || '',
+        // Dates - formatted as MM/DD/YYYY
+        formatCsvDate(plan.rate_start_date),
+        formatCsvDate(plan.last_updated),
 
         // Source Information
         source,
-        plan.special_features || ''
+        notes
       ];
     });
 
