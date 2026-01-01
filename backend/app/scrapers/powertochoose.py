@@ -12,6 +12,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from .. import schemas
+from ..utils import validate_texas_zip, sanitize_zip
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +57,12 @@ class _APIError(RuntimeError):
 def scrape_power_to_choose(zip_code: str, estimated_use: int = 1000) -> List[schemas.PlanCreate]:
     """Fetch every available plan for ``zip_code`` from PowerToChoose."""
 
-    if not zip_code or len(zip_code) != 5 or not zip_code.isdigit():
-        raise ValueError("zip_code must be a valid 5-digit Texas ZIP code")
+    # Sanitize and validate the ZIP code
+    sanitized_zip = sanitize_zip(zip_code)
+    is_valid, error_msg = validate_texas_zip(sanitized_zip)
+    if not is_valid:
+        raise ValueError(error_msg)
+    zip_code = sanitized_zip
 
     logger.info("Scraping PowerToChoose for ZIP %s", zip_code)
     try:

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy.orm import Session
 
 from .. import crud, models, schemas
@@ -17,6 +17,7 @@ from ..scraping import scraper
 from ..scrapers import scrape_power_to_choose
 from ..auth import verify_api_key
 from ..cache import cache_result
+from ..utils import validate_texas_zip, sanitize_zip
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/plans", tags=["plans"])
@@ -28,7 +29,16 @@ def read_providers(db: Session = Depends(get_db), skip: int = 0, limit: int = 10
 
 
 class PowerToChooseRequest(BaseModel):
-    zip_code: str = Field(..., pattern=r"^\d{5}$", description="Texas ZIP code")
+    zip_code: str = Field(..., min_length=5, max_length=5, description="Texas ZIP code (75xxx-79xxx)")
+
+    @field_validator('zip_code')
+    @classmethod
+    def validate_zip(cls, v: str) -> str:
+        sanitized = sanitize_zip(v)
+        is_valid, error_msg = validate_texas_zip(sanitized)
+        if not is_valid:
+            raise ValueError(error_msg)
+        return sanitized
 
 
 @router.get("/", response_model=list[schemas.Plan])
