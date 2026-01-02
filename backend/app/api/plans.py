@@ -23,6 +23,32 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/plans", tags=["plans"])
 
 
+@router.post("/refresh")
+def refresh_data():
+    """
+    Public endpoint to trigger a full data refresh.
+    Runs the scheduled scrape job to update all plans.
+    No API key required - use responsibly.
+    """
+    from ..scheduler import scrape_real_data_job
+    import threading
+
+    # Run scrape in background thread to avoid timeout
+    def run_scrape():
+        try:
+            scrape_real_data_job()
+        except Exception as e:
+            logger.error(f"Background scrape failed: {e}")
+
+    thread = threading.Thread(target=run_scrape)
+    thread.start()
+
+    return {
+        "status": "started",
+        "message": "Data refresh started in background. Check back in 2-3 minutes for fresh data."
+    }
+
+
 @router.get("/providers", response_model=list[schemas.Provider])
 def read_providers(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
     return crud.get_providers(db, skip=skip, limit=limit)
