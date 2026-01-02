@@ -1139,6 +1139,24 @@ body::before {
   margin-top: 4px;
 }
 
+/* Top Cards Row (System Status + Best Plan) */
+.top-cards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-unit);
+  margin-bottom: var(--spacing-unit);
+}
+
+.top-cards-row .card,
+.top-cards-row .system-health-card {
+  margin-bottom: 0;
+}
+
+.best-plan-card {
+  display: flex;
+  flex-direction: column;
+}
+
 /* ERCOT Charts Row */
 .ercot-charts-row {
   display: grid;
@@ -1242,6 +1260,109 @@ body::before {
   font-weight: 600;
   color: var(--text-primary);
   font-size: 0.9em;
+}
+
+/* Analyzer Breakdown - McKinsey Style */
+.analyzer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.analyzer-header .card-title {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.analyzer-stats-right {
+  display: flex;
+  gap: 24px;
+  text-align: right;
+}
+
+.analyzer-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.analyzer-stat-value {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.analyzer-stat-value.green {
+  color: var(--accent-green);
+}
+
+.analyzer-stat-label {
+  font-size: 0.75em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mckinsey-chart-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 0;
+}
+
+.mckinsey-pie-wrapper {
+  width: 180px;
+  height: 180px;
+  flex-shrink: 0;
+}
+
+.mckinsey-legend {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  justify-content: center;
+  width: 100%;
+}
+
+.mckinsey-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mckinsey-legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mckinsey-legend-text {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.mckinsey-legend-label {
+  font-size: 0.9em;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.mckinsey-legend-value {
+  font-size: 0.85em;
+  color: var(--text-muted);
+}
+
+.mckinsey-legend-percent {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 /* Prices Card */
@@ -1461,6 +1582,90 @@ body::before {
 
 .analytics-card.full-width {
   grid-column: 1 / -1;
+}
+
+/* Two-thirds / One-third layout for side-by-side charts */
+.analytics-charts-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--spacing-unit);
+  margin-bottom: var(--spacing-unit);
+}
+
+.analytics-card.two-thirds {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+.analytics-card.two-thirds .chart-wrapper {
+  flex: 1;
+  height: auto;
+  min-height: 280px;
+}
+
+.analytics-card.one-third {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* McKinsey-style pie chart */
+.mckinsey-pie-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.mckinsey-pie-chart {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 24px auto;
+}
+
+.mckinsey-legend-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  padding: 0 16px;
+}
+
+.mckinsey-legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+}
+
+.mckinsey-legend-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mckinsey-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mckinsey-legend-label {
+  color: var(--text-secondary);
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.mckinsey-legend-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.9em;
 }
 
 .card-header,
@@ -1774,6 +1979,34 @@ body::before {
   font-size: 0.85em;
 }
 
+/* TDU Stats */
+.tdu-stats {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.tdu-stat {
+  text-align: center;
+  min-width: 80px;
+}
+
+.tdu-count {
+  display: block;
+  font-size: 1.4em;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tdu-label {
+  color: var(--text-muted);
+  font-size: 0.8em;
+}
+
 /* Tab Navigation */
 .tab-navigation {
   display: flex;
@@ -1845,6 +2078,10 @@ body::before {
   .analytics-card.wide {
     grid-column: span 1;
   }
+
+  .analytics-charts-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1883,6 +2120,10 @@ body::before {
   }
 
   .ercot-charts-row {
+    grid-template-columns: 1fr;
+  }
+
+  .top-cards-row {
     grid-template-columns: 1fr;
   }
 

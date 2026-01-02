@@ -69,14 +69,17 @@ const SystemHealthStatus: React.FC = () => {
       const plansResponse = await fetch(`${API_BASE_URL}/plans/?limit=5000`);
       const plans = await plansResponse.json();
 
+      // Filter for plans with valid rates (consistent with Analyzer Breakdown)
+      const plansWithRates = plans.filter((p: any) => p.rate_1000_cents && p.rate_1000_cents > 0);
+
       // Get provider count
-      const providersResponse = await fetch(`${API_BASE_URL}/providers/`);
+      const providersResponse = await fetch(`${API_BASE_URL}/plans/providers`);
       const providers = await providersResponse.json();
 
       // Find most recent update
       let mostRecentUpdate: string | null = null;
-      if (plans && plans.length > 0) {
-        const updates = plans
+      if (plansWithRates && plansWithRates.length > 0) {
+        const updates = plansWithRates
           .map((p: any) => p.last_updated)
           .filter((d: any) => d)
           .sort((a: string, b: string) => new Date(b).getTime() - new Date(a).getTime());
@@ -88,8 +91,8 @@ const SystemHealthStatus: React.FC = () => {
       setHealth({
         apiStatus: 'healthy',
         apiLatency: latency,
-        databaseStatus: plans.length > 0 ? 'connected' : 'connected',
-        totalPlans: plans.length,
+        databaseStatus: plansWithRates.length > 0 ? 'connected' : 'connected',
+        totalPlans: plansWithRates.length,
         totalProviders: providers?.length || 0,
         lastUpdated: mostRecentUpdate,
         dataAge: calculateDataAge(mostRecentUpdate),

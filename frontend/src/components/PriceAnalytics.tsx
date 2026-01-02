@@ -39,7 +39,26 @@ interface Plan {
   contract_months?: number | null;
   rate_1000_cents?: number | null;
   renewable_percent?: number | null;
+  special_features?: string | null;
 }
+
+// TDU patterns for extraction
+const TDU_PATTERNS = [
+  { pattern: /Oncor|Dallas/i, name: 'Oncor' },
+  { pattern: /CenterPoint|Houston/i, name: 'CenterPoint' },
+  { pattern: /AEP.*Central|Corpus/i, name: 'AEP Central' },
+  { pattern: /AEP.*North|Abilene/i, name: 'AEP North' },
+  { pattern: /TNMP|Midland/i, name: 'TNMP' },
+  { pattern: /Lubbock/i, name: 'Lubbock P&L' },
+];
+
+const extractTDU = (features: string | null | undefined): string => {
+  if (!features) return 'Unknown';
+  for (const { pattern, name } of TDU_PATTERNS) {
+    if (pattern.test(features)) return name;
+  }
+  return 'Unknown';
+};
 
 interface Provider {
   id: number;
@@ -51,31 +70,34 @@ interface Props {
   providers: Provider[];
 }
 
-const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
-  // State for all plans (unfiltered) for Service Type Distribution
-  const [allPlansServiceTypes, setAllPlansServiceTypes] = useState<{ residential: number; commercial: number; total: number }>({
-    residential: 0,
-    commercial: 0,
-    total: 0,
-  });
+interface TDUDistribution {
+  [key: string]: number;
+}
 
-  // Fetch all plans for Service Type Distribution (ignores filters)
+const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
+  // State for TDU distribution (all plans)
+  const [tduDistribution, setTduDistribution] = useState<TDUDistribution>({});
+  const [totalPlansCount, setTotalPlansCount] = useState<number>(0);
+
+  // Fetch all plans for TDU Distribution (ignores filters)
   useEffect(() => {
     const fetchAllPlans = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/plans/?limit=10000`);
         if (response.ok) {
-          const allPlans = await response.json();
-          const residential = allPlans.filter((p: Plan) => p.service_type === 'Residential').length;
-          const commercial = allPlans.filter((p: Plan) => p.service_type === 'Commercial').length;
-          setAllPlansServiceTypes({
-            residential,
-            commercial,
-            total: allPlans.length,
+          const allPlans: Plan[] = await response.json();
+          const tduCounts: TDUDistribution = {};
+
+          allPlans.forEach((plan) => {
+            const tdu = extractTDU(plan.special_features);
+            tduCounts[tdu] = (tduCounts[tdu] || 0) + 1;
           });
+
+          setTduDistribution(tduCounts);
+          setTotalPlansCount(allPlans.length);
         }
       } catch (error) {
-        console.error('Failed to fetch all plans for service type distribution:', error);
+        console.error('Failed to fetch all plans for TDU distribution:', error);
       }
     };
 
@@ -232,13 +254,15 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
     ],
   };
 
-  // Use ALL plans for Service Type Distribution (not filtered)
-  const serviceTypeData = {
-    labels: ['Residential', 'Commercial'],
+  // TDU Distribution data (all plans)
+  const tduColors = ['#3b82f6', '#10b981', '#f97316', '#8b5cf6', '#ec4899', '#06b6d4', '#eab308'];
+  const tduLabels = Object.keys(tduDistribution).sort((a, b) => tduDistribution[b] - tduDistribution[a]);
+  const tduData = {
+    labels: tduLabels,
     datasets: [
       {
-        data: [allPlansServiceTypes.residential, allPlansServiceTypes.commercial],
-        backgroundColor: ['#3b82f6', '#10b981'],
+        data: tduLabels.map(label => tduDistribution[label]),
+        backgroundColor: tduColors.slice(0, tduLabels.length),
         borderWidth: 0,
         hoverOffset: 8,
       },
@@ -336,42 +360,60 @@ const PriceAnalytics: React.FC<Props> = ({ plans, providers }) => {
         </div>
       </div>
 
-      {/* Charts Grid */}
-      <div className="analytics-charts-grid">
-        <div className="analytics-card glass">
+      {/* Price Distribution (2/3) + TDU Distribution (1/3) */}
+      <div className="analytics-charts-row">
+        <div className="analytics-card glass two-thirds">
           <h3 className="analytics-card-title">Price Distribution</h3>
           <div className="chart-wrapper">
             <Bar data={priceDistributionData} options={chartOptions} />
           </div>
         </div>
 
-        <div className="analytics-card glass">
-          <h3 className="analytics-card-title">Plan Type Breakdown</h3>
-          <div className="chart-wrapper-doughnut">
-            <Doughnut data={planTypeData} options={doughnutOptions} />
+        <div className="analytics-card glass one-third">
+          <h3 className="analytics-card-title">TDU Distribution</h3>
+          <div className="mckinsey-pie-container">
+            <div className="mckinsey-pie-chart">
+              <Doughnut
+                data={tduData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: true,
+                  cutout: '0%',
+                  plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                      callbacks: {
+                        label: (context) => {
+                          const value = context.parsed;
+                          const percentage = ((value / totalPlansCount) * 100).toFixed(1);
+                          return `${context.label}: ${value} (${percentage}%)`;
+                        }
+                      }
+                    }
+                  },
+                }}
+              />
+            </div>
+            <div className="mckinsey-legend-vertical">
+              {tduLabels.map((tdu, index) => (
+                <div key={tdu} className="mckinsey-legend-item">
+                  <div className="mckinsey-legend-left">
+                    <span
+                      className="mckinsey-legend-dot"
+                      style={{ backgroundColor: tduColors[index % tduColors.length] }}
+                    />
+                    <span className="mckinsey-legend-label">{tdu}</span>
+                  </div>
+                  <span className="mckinsey-legend-value">{tduDistribution[tdu]}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="analytics-card glass">
-          <h3 className="analytics-card-title">Service Type Distribution (All Plans)</h3>
-          <div className="chart-wrapper-doughnut">
-            <Doughnut data={serviceTypeData} options={doughnutOptions} />
-          </div>
-          <div className="service-type-stats">
-            <div className="service-stat">
-              <span className="service-count">{allPlansServiceTypes.residential}</span>
-              <span className="service-label">Residential</span>
-            </div>
-            <div className="service-stat">
-              <span className="service-count">{allPlansServiceTypes.commercial}</span>
-              <span className="service-label">Commercial</span>
-            </div>
-          </div>
-          <p className="chart-footnote" style={{ marginTop: '8px', fontSize: '0.75em', color: 'var(--text-muted)' }}>
-            Shows all {allPlansServiceTypes.total} plans in database
-          </p>
-        </div>
-
+      {/* Provider Rate Comparison */}
+      <div className="analytics-charts-grid">
         <div className="analytics-card glass full-width">
           <h3 className="analytics-card-title">Provider Rate Comparison (Top 12)</h3>
           <div className="chart-wrapper-tall">

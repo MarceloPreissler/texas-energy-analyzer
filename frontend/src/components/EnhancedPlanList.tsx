@@ -4,7 +4,6 @@ import { fetchPlans, fetchProviders, triggerScrape, scrapePowerToChoose } from '
 import PlanComparison from './PlanComparison';
 import PriceAnalytics from './PriceAnalytics';
 import MarketAnalytics from './MarketAnalytics';
-import SystemHealthStatus from './SystemHealthStatus';
 import { validateTexasZip, sanitizeZipInput, getZipErrorMessage, ZipValidationResult } from '../utils/zipCodeValidation';
 
 interface Plan {
@@ -612,57 +611,6 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
   return (
     <>
       {noResultsMessage}
-
-      <div className="dashboard">
-        {summaryStats && (
-          <>
-            <SystemHealthStatus />
-
-            {/* Savings Potential - Hidden for now, will be part of future Personalized Summary tab */}
-            {/* <div className="card">
-              <h2 className="card-title">Savings Potential</h2>
-              <div className="summary-stat">
-                <div>Monthly Savings</div>
-                <strong>${summaryStats.potentialSavings.toFixed(0)}</strong>
-              </div>
-              <div className="summary-stat">
-                <div>Annual Savings</div>
-                <strong>${(summaryStats.potentialSavings * 12).toFixed(0)}</strong>
-              </div>
-            </div> */}
-
-            <div className="card">
-              <h2 className="card-title">Best Plan</h2>
-              {summaryStats.bestPlan ? (
-                <>
-                  <div className="summary-stat">
-                    <div>Provider</div>
-                    <strong>{getProviderName(summaryStats.bestPlan)}</strong>
-                  </div>
-                  <div className="summary-stat">
-                    <div>Plan</div>
-                    <strong style={{ fontSize: '1em' }}>{summaryStats.bestPlan.plan_name}</strong>
-                  </div>
-                  <div className="summary-stat">
-                    <div>Rate</div>
-                    <strong>{summaryStats.lowestRate.toFixed(1)}¢/kWh</strong>
-                  </div>
-                  {summaryStats.bestPlan.contract_months && (
-                    <div className="summary-stat">
-                      <div>Term</div>
-                      <strong>{summaryStats.bestPlan.contract_months} months</strong>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="summary-stat">
-                  <div style={{ color: '#94a3b8' }}>No plans with rate data available</div>
-                </div>
-              )}
-            </div>
-          </>
-        )}
-      </div>
 
       {/* PowerToChoose Live Import - Shelved for now, will revisit after design cleanup */}
       {/* <div className="card zip-card">

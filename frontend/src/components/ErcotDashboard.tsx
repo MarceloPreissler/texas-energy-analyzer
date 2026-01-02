@@ -11,6 +11,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
+import SystemHealthStatus from './SystemHealthStatus';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -81,9 +82,21 @@ const fetchErcotSummary = async (): Promise<ErcotSummary> => {
 // Fetch market stats from our plans database
 const fetchMarketStats = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/plans/?limit=5000`);
-    if (response.ok) {
-      const plans = await response.json();
+    // Fetch plans and providers in parallel
+    const [plansResponse, providersResponse] = await Promise.all([
+      fetch(`${API_BASE_URL}/plans/?limit=5000`),
+      fetch(`${API_BASE_URL}/plans/providers`)
+    ]);
+
+    if (plansResponse.ok) {
+      const plans = await plansResponse.json();
+      const providersData = providersResponse.ok ? await providersResponse.json() : [];
+
+      // Create provider lookup map
+      const providerMap: Record<number, string> = {};
+      providersData.forEach((p: any) => {
+        providerMap[p.id] = p.name;
+      });
 
       // Calculate real statistics from our database
       const plansWithRates = plans.filter((p: any) => p.rate_1000_cents && p.rate_1000_cents > 0);
@@ -94,6 +107,12 @@ const fetchMarketStats = async () => {
       const minRate = Math.min(...rates);
       const maxRate = Math.max(...rates);
 
+      // Find best plan (lowest rate)
+      const bestPlan = plansWithRates.reduce((best: any, plan: any) => {
+        if (!best || plan.rate_1000_cents < best.rate_1000_cents) return plan;
+        return best;
+      }, null);
+
       // Count by service type
       const residential = plansWithRates.filter((p: any) => p.service_type === 'Residential').length;
       const commercial = plansWithRates.filter((p: any) => p.service_type === 'Commercial').length;
@@ -102,8 +121,11 @@ const fetchMarketStats = async () => {
       const renewablePlans = plansWithRates.filter((p: any) => (p.renewable_percent || 0) >= 50).length;
       const renewablePercent = (renewablePlans / plansWithRates.length) * 100;
 
-      // Provider count
-      const providers = new Set(plansWithRates.map((p: any) => p.provider_id)).size;
+      // Provider count - filter out null/undefined provider_ids
+      const providerIds = plansWithRates
+        .map((p: any) => p.provider_id)
+        .filter((id: any) => id != null && id !== undefined);
+      const providers = new Set(providerIds).size;
 
       return {
         totalPlans: plansWithRates.length,
@@ -114,6 +136,12 @@ const fetchMarketStats = async () => {
         commercial,
         renewablePercent: renewablePercent.toFixed(1),
         providers,
+        bestPlan: bestPlan ? {
+          planName: bestPlan.plan_name,
+          providerName: providerMap[bestPlan.provider_id] || 'Unknown',
+          rate: bestPlan.rate_1000_cents,
+          contractMonths: bestPlan.contract_months,
+        } : null,
         lastUpdated: new Date().toLocaleTimeString('en-US', {
           hour: '2-digit',
           minute: '2-digit',
@@ -187,99 +215,114 @@ const ErcotDashboard: React.FC = () => {
 
         {marketStats ? (
           <>
-            <div className="grid-status-hero">
-              <div className="grid-health-indicator" style={{ borderColor: '#4ade80' }}>
-                <span className="health-icon">●</span>
-                <span className="health-status" style={{ color: '#4ade80' }}>Active</span>
-                <span className="health-label">Market Status</span>
-              </div>
+            {/* Top Row: System Status and Best Plan */}
+            <div className="top-cards-row">
+              <SystemHealthStatus />
 
-              <div className="grid-metrics">
-                <div className="metric-card demand">
-                  <div className="metric-content">
-                    <div className="metric-value">{marketStats.totalPlans}</div>
-                    <div className="metric-label">Active Plans</div>
+              <div className="card best-plan-card">
+                <h2 className="card-title">Best Plan</h2>
+                {marketStats.bestPlan ? (
+                  <>
+                    <div className="summary-stat">
+                      <div>Provider</div>
+                      <strong>{marketStats.bestPlan.providerName}</strong>
+                    </div>
+                    <div className="summary-stat">
+                      <div>Plan</div>
+                      <strong style={{ fontSize: '1em' }}>{marketStats.bestPlan.planName}</strong>
+                    </div>
+                    <div className="summary-stat">
+                      <div>Rate</div>
+                      <strong>{marketStats.bestPlan.rate.toFixed(1)}¢/kWh</strong>
+                    </div>
+                    {marketStats.bestPlan.contractMonths && (
+                      <div className="summary-stat">
+                        <div>Term</div>
+                        <strong>{marketStats.bestPlan.contractMonths} months</strong>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="summary-stat">
+                    <div style={{ color: '#94a3b8' }}>No plans with rate data available</div>
                   </div>
-                </div>
-
-                <div className="metric-card capacity">
-                  <div className="metric-content">
-                    <div className="metric-value">{marketStats.providers}</div>
-                    <div className="metric-label">Providers</div>
-                  </div>
-                </div>
-
-                <div className="metric-card reserves">
-                  <div className="metric-content">
-                    <div className="metric-value">{marketStats.minRate}¢</div>
-                    <div className="metric-label">Lowest Rate</div>
-                  </div>
-                </div>
-
-                <div className="metric-card margin">
-                  <div className="metric-content">
-                    <div className="metric-value">{marketStats.avgRate}¢</div>
-                    <div className="metric-label">Avg Rate</div>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
 
             <div className="ercot-charts-row">
               <div className="ercot-card fuel-mix-card">
-                <h3 className="card-title">Market Breakdown</h3>
-                <div className="fuel-mix-content">
-                  <div className="fuel-chart-container">
+                <div className="analyzer-header">
+                  <h3 className="card-title">Analyzer Breakdown</h3>
+                  <div className="analyzer-stats-right">
+                    <div className="analyzer-stat">
+                      <span className="analyzer-stat-value green">{marketStats.renewablePercent}%</span>
+                      <span className="analyzer-stat-label">Green Plans</span>
+                    </div>
+                    <div className="analyzer-stat">
+                      <span className="analyzer-stat-value">{marketStats.totalPlans}</span>
+                      <span className="analyzer-stat-label">Total Plans</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="mckinsey-chart-container">
+                  <div className="mckinsey-pie-wrapper">
                     <Doughnut
                       data={{
                         labels: ['Residential', 'Commercial'],
                         datasets: [{
                           data: [marketStats.residential, marketStats.commercial],
-                          backgroundColor: ['#60a5fa', '#4ade80'],
-                          borderWidth: 0,
-                          hoverOffset: 8,
+                          backgroundColor: ['#3B82F6', '#10B981'],
+                          borderColor: 'rgba(3, 8, 6, 0.97)',
+                          borderWidth: 3,
+                          hoverBorderWidth: 0,
+                          hoverOffset: 4,
                         }],
                       }}
                       options={{
                         responsive: true,
                         maintainAspectRatio: false,
-                        cutout: '65%',
+                        cutout: '0%',
                         plugins: {
                           legend: {
-                            position: 'right',
-                            labels: {
-                              color: '#ffffff',
-                              padding: 12,
-                              font: { size: 11 },
-                              usePointStyle: true,
-                              pointStyle: 'circle',
-                            },
+                            display: false,
+                          },
+                          tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: { size: 12, weight: '600' },
+                            bodyFont: { size: 11 },
+                            padding: 10,
+                            cornerRadius: 6,
                           },
                         },
                       }}
                     />
                   </div>
-                  <div className="fuel-stats">
-                    <div className="fuel-stat renewable">
-                      <span className="fuel-stat-value">{marketStats.renewablePercent}%</span>
-                      <span className="fuel-stat-label">Green Plans</span>
+                  <div className="mckinsey-legend">
+                    <div className="mckinsey-legend-item">
+                      <div className="mckinsey-legend-color" style={{ background: '#3B82F6' }}></div>
+                      <div className="mckinsey-legend-text">
+                        <span className="mckinsey-legend-label">Residential</span>
+                        <span className="mckinsey-legend-value">{marketStats.residential} plans</span>
+                        <span className="mckinsey-legend-percent">
+                          {marketStats.totalPlans > 0
+                            ? Math.round((marketStats.residential / marketStats.totalPlans) * 100)
+                            : 0}%
+                        </span>
+                      </div>
                     </div>
-                    <div className="fuel-stat total">
-                      <span className="fuel-stat-value">{marketStats.totalPlans}</span>
-                      <span className="fuel-stat-label">Total Plans</span>
+                    <div className="mckinsey-legend-item">
+                      <div className="mckinsey-legend-color" style={{ background: '#10B981' }}></div>
+                      <div className="mckinsey-legend-text">
+                        <span className="mckinsey-legend-label">Commercial</span>
+                        <span className="mckinsey-legend-value">{marketStats.commercial} plans</span>
+                        <span className="mckinsey-legend-percent">
+                          {marketStats.totalPlans > 0
+                            ? Math.round((marketStats.commercial / marketStats.totalPlans) * 100)
+                            : 0}%
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="fuel-breakdown">
-                  <div className="fuel-item">
-                    <span className="fuel-dot" style={{ background: '#60a5fa' }}></span>
-                    <span className="fuel-name">Residential</span>
-                    <span className="fuel-value">{marketStats.residential} plans</span>
-                  </div>
-                  <div className="fuel-item">
-                    <span className="fuel-dot" style={{ background: '#4ade80' }}></span>
-                    <span className="fuel-name">Commercial</span>
-                    <span className="fuel-value">{marketStats.commercial} plans</span>
                   </div>
                 </div>
               </div>
