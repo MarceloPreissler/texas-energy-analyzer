@@ -758,7 +758,7 @@ body::before {
    INFO BOX
    =============================================== */
 .info-box {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+  background: rgba(3, 8, 6, 0.97);
   border: 1px solid var(--border-accent);
   border-left: 4px solid var(--accent-primary);
   padding: 20px 24px;
@@ -2015,7 +2015,7 @@ body::before {
    SYSTEM HEALTH STATUS
    =============================================== */
 .system-health-card {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(5, 150, 105, 0.03));
+  background: rgba(3, 8, 6, 0.97);
   border: 1px solid rgba(16, 185, 129, 0.2);
   overflow: hidden;
 }

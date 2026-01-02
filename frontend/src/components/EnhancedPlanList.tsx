@@ -618,7 +618,8 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
           <>
             <SystemHealthStatus />
 
-            <div className="card">
+            {/* Savings Potential - Hidden for now, will be part of future Personalized Summary tab */}
+            {/* <div className="card">
               <h2 className="card-title">Savings Potential</h2>
               <div className="summary-stat">
                 <div>Monthly Savings</div>
@@ -628,7 +629,7 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
                 <div>Annual Savings</div>
                 <strong>${(summaryStats.potentialSavings * 12).toFixed(0)}</strong>
               </div>
-            </div>
+            </div> */}
 
             <div className="card">
               <h2 className="card-title">Best Plan</h2>
@@ -663,7 +664,8 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
         )}
       </div>
 
-      <div className="card zip-card">
+      {/* PowerToChoose Live Import - Shelved for now, will revisit after design cleanup */}
+      {/* <div className="card zip-card">
         <h2 className="card-title">PowerToChoose Live Import</h2>
         <div className="zip-actions">
           <div className="zip-input-wrapper">
@@ -735,7 +737,7 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
         <p className="helper-text" id="zip-helper">
           Enter a Texas ZIP code (75xxx-79xxx) to fetch residential plans from the official PowerToChoose.org database. Press Enter or click the button to search.
         </p>
-      </div>
+      </div> */}
 
       <div className="card">
         <h2 className="card-title">🔍 Filter Plans</h2>
@@ -905,7 +907,8 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
 
       {selectedPlans.length > 0 && <PlanComparison plans={selectedPlans} />}
 
-      <div className="calculator-summary-row">
+      {/* Cost Calculator & Personalized Summary - Hidden for now, could be a separate tab in the future */}
+      {/* <div className="calculator-summary-row">
         <div className="card calculator-section">
           <h2 className="card-title">Cost Calculator</h2>
           <div className="input-group">
@@ -954,7 +957,7 @@ const EnhancedPlanList: React.FC<Props> = ({ onRefresh }) => {
             </div>
           </div>
         )}
-      </div>
+      </div> */}
 
       {plans && plans.length > 0 && providers && <PriceAnalytics plans={plans} providers={providers} />}
 
