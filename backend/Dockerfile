@@ -1,5 +1,5 @@
 # Use official Playwright image which includes Python and pre-installed browsers
-# Version: 2026-01-01-v1 (force rebuild with ERCOT API)
+# Version: 2026-01-02-v1 (force rebuild - add refresh endpoint, fix scheduler)
 FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app
