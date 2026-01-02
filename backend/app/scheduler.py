@@ -386,10 +386,10 @@ def start_scheduler():
     """
     logger.info("[Scheduler] Starting automated REAL DATA scheduler...")
 
-    # Daily scrape at 3 AM - REAL DATA ONLY
+    # Daily scrape at 11 AM UTC (5 AM CST / 6 AM CDT) - REAL DATA ONLY
     scheduler.add_job(
         scrape_real_data_job,
-        trigger=CronTrigger(hour=3, minute=0),
+        trigger=CronTrigger(hour=11, minute=0),
         id="daily_real_data_scrape",
         name="Daily REAL Data Scrape (Residential + Commercial)",
         replace_existing=True,
@@ -397,7 +397,7 @@ def start_scheduler():
 
     # Start scheduler
     scheduler.start()
-    logger.info("[Scheduler] [OK] Daily job scheduled: 3:00 AM scrape REAL data")
+    logger.info("[Scheduler] [OK] Daily job scheduled: 11:00 AM UTC (5 AM CST) scrape REAL data")
     
     # Schedule an immediate scrape (2 minutes from now) to ensure fresh data on deployment
     run_date = datetime.now()
