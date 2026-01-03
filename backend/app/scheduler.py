@@ -1,28 +1,26 @@
 """
 Automated scraping scheduler - REAL DATA ONLY.
 
-Runs daily scraping of REAL data from live sources:
-- Residential: PowerChoiceTexas sites (68+ plans)
-- Commercial: EnergyBot JSON-LD (5+ plans)
+Runs comprehensive scraping from ALL available sources:
+- Residential: PowerToChoose API (official PUCT marketplace)
+- Commercial: ElectricityPlans, ComparePower, EnergyBot Enhanced
 
-NO SAMPLE DATA. NO FALLBACK DATA.
+NO SAMPLE DATA. NO FALLBACK DATA. NO FAKE DATA.
+All data is validated before insertion.
 """
 from __future__ import annotations
 
 import os
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from sqlalchemy.orm import Session
 
-from .database import SessionLocal
-from .scraping import scraper, energybot_scraper_v2, energybot_business_enhanced  # REAL data scrapers
 from .database import SessionLocal, engine
-from .scraping import scraper, energybot_scraper_v2, powertochoose_scraper  # REAL data scrapers
-from .scraping.provider_urls import get_plan_url
 from . import crud, schemas, models
+from .scraping.provider_urls import get_plan_url
 from .data_validation import validate_plan_batch, log_validation_summary, get_data_quality_score
 
 # Configure logging
@@ -32,291 +30,189 @@ logger = logging.getLogger(__name__)
 # Initialize scheduler
 scheduler = BackgroundScheduler()
 
-# Check which commercial scraper to use
-USE_ENHANCED_ENERGYBOT = os.getenv("USE_ENHANCED_ENERGYBOT", "true").lower() == "true"
 
-
-def scrape_real_data_job():
+def scrape_all_sources_job():
     """
-    Background job to scrape REAL electricity plans from live sources.
+    Comprehensive background job to scrape REAL electricity plans from ALL live sources.
 
     NO SAMPLE DATA - ONLY LIVE SCRAPED PLANS.
+    NO FAKE DATA - ALL DATA IS VALIDATED.
 
-    Sources:
-    - Residential: Legacy scraper (PowerChoiceTexas, provider sites)
-    - Commercial: EnergyBot v2 (JSON-LD structured data)
+    Sources scraped:
+    1. Residential: PowerToChoose (official PUCT marketplace)
+    2. Commercial: ElectricityPlans.com (Playwright + stealth)
+    3. Commercial: ComparePower.com (Playwright + stealth)
+    4. Commercial: EnergyBot.com Enhanced (full navigation flow)
     """
-    logger.info(f"[Scheduler] Starting REAL DATA scrape at {datetime.now()}")
-    logger.info("[Scheduler] NO SAMPLE DATA - ONLY LIVE SOURCES")
+    logger.info("=" * 80)
+    logger.info(f"[Scheduler] Starting COMPREHENSIVE REAL DATA scrape at {datetime.now()}")
+    logger.info("[Scheduler] NO SAMPLE DATA - NO FAKE DATA - ONLY LIVE SOURCES")
+    logger.info("=" * 80)
 
     db: Session = SessionLocal()
     total_added = 0
     total_updated = 0
+    all_raw_plans = []
+    all_valid_plans = []
+    all_rejected_plans = []
 
     try:
-        # Ensure database tables exist (in case app started while DB was paused)
+        # Ensure database tables exist
         try:
             models.Base.metadata.create_all(bind=engine)
-            logger.info("[Scheduler] Verified/Created database tables")
+            logger.info("[Scheduler] Verified database tables")
         except Exception as db_err:
             logger.error(f"[Scheduler] Warning: Failed to verify tables: {db_err}")
 
-        # 1. Scrape REAL residential plans
-        logger.info("[Scheduler] Scraping REAL residential plans from PowerChoiceTexas...")
-        residential_plans_raw = scraper.scrape_all()
-        logger.info(f"[Scheduler] Retrieved {len(residential_plans_raw)} raw residential plans")
+        # ================================================================
+        # SOURCE 1: PowerToChoose (Official PUCT Marketplace)
+        # ================================================================
+        logger.info("\n" + "=" * 60)
+        logger.info("[Scheduler] SOURCE 1: PowerToChoose (PUCT Official)")
+        logger.info("=" * 60)
 
-        # VALIDATE: Remove any fake/estimated data
-        residential_plans, rejected_residential = validate_plan_batch(residential_plans_raw, strict=True)
-        logger.info(f"[Scheduler] Validated: {len(residential_plans)} REAL residential plans accepted")
-        if rejected_residential:
-            logger.warning(f"[Scheduler] Rejected {len(rejected_residential)} residential plans with fake data markers")
+        try:
+            from .scraping import powertochoose_scraper
+            ptc_plans_raw = powertochoose_scraper.scrape_powertochoose(zip_code="75001", service_type="Residential")
+            logger.info(f"[Scheduler] PowerToChoose: Retrieved {len(ptc_plans_raw)} raw plans")
+            all_raw_plans.extend(ptc_plans_raw)
 
-        for plan_data in residential_plans:
-            try:
-                # Get or create provider
-                provider_name = plan_data.get("provider_name")
-                if not provider_name:
-                    continue
+            # Validate
+            ptc_valid, ptc_rejected = validate_plan_batch(ptc_plans_raw, strict=True)
+            logger.info(f"[Scheduler] PowerToChoose: {len(ptc_valid)} valid, {len(ptc_rejected)} rejected")
+            all_valid_plans.extend(ptc_valid)
+            all_rejected_plans.extend(ptc_rejected)
 
-                provider = crud.get_provider_by_name(db, provider_name)
-                if not provider:
-                    provider = crud.create_provider(
-                        db, schemas.ProviderCreate(name=provider_name)
-                    )
+            # Process valid plans
+            for plan_data in ptc_valid:
+                added, updated = _process_plan(db, plan_data, "Residential")
+                total_added += added
+                total_updated += updated
 
-                # Get plan URL
-                plan_url = get_plan_url(provider_name, plan_data.get("plan_name"))
+        except Exception as e:
+            logger.error(f"[Scheduler] PowerToChoose scraper failed: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
 
-                # Create plan object
-                plan_create = schemas.PlanCreate(
-                    provider_id=provider.id,
-                    plan_name=plan_data["plan_name"],
-                    plan_url=plan_url,
-                    plan_type=plan_data.get("plan_type", "Fixed"),
-                    service_type=plan_data.get("service_type", "Residential"),
-                    zip_code=plan_data.get("zip_code", "75001"),
-                    contract_months=plan_data.get("contract_months"),
-                    rate_500_cents=plan_data.get("rate_500_cents"),
-                    rate_1000_cents=plan_data.get("rate_1000_cents"),
-                    rate_2000_cents=plan_data.get("rate_2000_cents"),
-                    monthly_bill_1000=plan_data.get("monthly_bill_1000"),
-                    monthly_bill_2000=plan_data.get("monthly_bill_2000"),
-                    early_termination_fee=plan_data.get("early_termination_fee", 0.0),
-                    base_monthly_fee=plan_data.get("base_monthly_fee", 0.0),
-                    renewable_percent=plan_data.get("renewable_percent", 0.0),
-                    special_features=plan_data.get("special_features", "")
-                )
+        # ================================================================
+        # SOURCE 2: ElectricityPlans.com (Commercial)
+        # ================================================================
+        logger.info("\n" + "=" * 60)
+        logger.info("[Scheduler] SOURCE 2: ElectricityPlans.com (Commercial)")
+        logger.info("=" * 60)
 
-                # Check if plan exists
-                from .models import Plan
-                existing = db.query(Plan).filter(
-                    Plan.provider_id == provider.id,
-                    Plan.plan_name == plan_create.plan_name
-                ).first()
+        try:
+            from .scraping import electricityplans_commercial
+            ep_plans_raw = electricityplans_commercial.scrape_electricityplans_all_texas()
+            logger.info(f"[Scheduler] ElectricityPlans: Retrieved {len(ep_plans_raw)} raw commercial plans")
+            all_raw_plans.extend(ep_plans_raw)
 
-                if existing:
-                    # Update existing plan
-                    for key, value in plan_create.dict(exclude={'provider_id'}).items():
-                        setattr(existing, key, value)
-                    existing.last_updated = datetime.utcnow()  # Force update timestamp
-                    total_updated += 1
-                else:
-                    # Create new plan
-                    crud.create_or_update_plan(db, provider.id, plan_create)
-                    total_added += 1
+            # Validate
+            ep_valid, ep_rejected = validate_plan_batch(ep_plans_raw, strict=True)
+            logger.info(f"[Scheduler] ElectricityPlans: {len(ep_valid)} valid, {len(ep_rejected)} rejected")
+            all_valid_plans.extend(ep_valid)
+            all_rejected_plans.extend(ep_rejected)
 
-            except Exception as e:
-                logger.error(f"[Scheduler] Error processing residential plan '{plan_data.get('plan_name', 'Unknown')}': {e}")
-                import traceback
-                logger.error(f"[Scheduler] Traceback: {traceback.format_exc()}")
-                continue
+            # Process valid plans
+            for plan_data in ep_valid:
+                added, updated = _process_plan(db, plan_data, "Commercial")
+                total_added += added
+                total_updated += updated
 
-        logger.info(f"[Scheduler] Residential: {total_added} added, {total_updated} updated")
+        except Exception as e:
+            logger.error(f"[Scheduler] ElectricityPlans scraper failed: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
 
-        # 2. Scrape REAL commercial plans
-        if USE_ENHANCED_ENERGYBOT:
-            logger.info("[Scheduler] Scraping REAL commercial plans from EnergyBot ENHANCED (full navigation)...")
-            try:
-                commercial_plans = energybot_business_enhanced.scrape_energybot_all_texas_enhanced()
-                logger.info(f"[Scheduler] Retrieved {len(commercial_plans)} REAL commercial plans (enhanced)")
-            except Exception as scraper_error:
-                logger.error(f"[Scheduler] EnergyBot Enhanced scraper failed: {scraper_error}")
-                import traceback
-                logger.error(f"[Scheduler] EnergyBot Enhanced traceback: {traceback.format_exc()}")
-                commercial_plans = []  # Continue with empty list
-                logger.warning("[Scheduler] Continuing with 0 commercial plans due to enhanced scraper failure")
-        else:
-            logger.info("[Scheduler] Scraping REAL commercial plans from EnergyBot v2 (JSON-LD only)...")
-            try:
-                commercial_plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
-                logger.info(f"[Scheduler] Retrieved {len(commercial_plans)} REAL commercial plans (v2)")
-            except Exception as scraper_error:
-                logger.error(f"[Scheduler] EnergyBot v2 scraper failed: {scraper_error}")
-                import traceback
-                logger.error(f"[Scheduler] EnergyBot v2 traceback: {traceback.format_exc()}")
-                commercial_plans = []  # Continue with empty list
-                logger.warning("[Scheduler] Continuing with 0 commercial plans due to v2 scraper failure")
-        logger.info("[Scheduler] Scraping REAL commercial plans from EnergyBot...")
-        commercial_plans_raw = energybot_scraper_v2.scrape_energybot_all_texas_v2()
-        logger.info(f"[Scheduler] Retrieved {len(commercial_plans_raw)} raw commercial plans")
+        # ================================================================
+        # SOURCE 3: ComparePower.com (Commercial)
+        # ================================================================
+        logger.info("\n" + "=" * 60)
+        logger.info("[Scheduler] SOURCE 3: ComparePower.com (Commercial)")
+        logger.info("=" * 60)
 
-        # VALIDATE: Remove any fake/estimated data
-        commercial_plans, rejected_commercial = validate_plan_batch(commercial_plans_raw, strict=True)
-        logger.info(f"[Scheduler] Validated: {len(commercial_plans)} REAL commercial plans accepted")
-        if rejected_commercial:
-            logger.warning(f"[Scheduler] Rejected {len(rejected_commercial)} commercial plans with fake data markers")
+        try:
+            from .scraping import comparepower_commercial
+            cp_plans_raw = comparepower_commercial.scrape_comparepower_all_texas()
+            logger.info(f"[Scheduler] ComparePower: Retrieved {len(cp_plans_raw)} raw commercial plans")
+            all_raw_plans.extend(cp_plans_raw)
 
-        for plan_data in commercial_plans:
-            try:
-                # Get or create provider
-                provider_name = plan_data.get("provider_name")
-                if not provider_name:
-                    continue
+            # Validate
+            cp_valid, cp_rejected = validate_plan_batch(cp_plans_raw, strict=True)
+            logger.info(f"[Scheduler] ComparePower: {len(cp_valid)} valid, {len(cp_rejected)} rejected")
+            all_valid_plans.extend(cp_valid)
+            all_rejected_plans.extend(cp_rejected)
 
-                provider = crud.get_provider_by_name(db, provider_name)
-                if not provider:
-                    provider = crud.create_provider(
-                        db, schemas.ProviderCreate(name=provider_name)
-                    )
+            # Process valid plans
+            for plan_data in cp_valid:
+                added, updated = _process_plan(db, plan_data, "Commercial")
+                total_added += added
+                total_updated += updated
 
-                # Get plan URL
-                plan_url = get_plan_url(provider_name, plan_data.get("plan_name"))
+        except Exception as e:
+            logger.error(f"[Scheduler] ComparePower scraper failed: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
 
-                # Create plan object
-                plan_create = schemas.PlanCreate(
-                    provider_id=provider.id,
-                    plan_name=plan_data["plan_name"],
-                    plan_url=plan_url,
-                    plan_type=plan_data.get("plan_type", "Fixed"),
-                    service_type="Commercial",
-                    zip_code=plan_data.get("zip_code", "75001"),
-                    contract_months=plan_data.get("contract_months"),
-                    rate_500_cents=plan_data.get("rate_500_cents"),
-                    rate_1000_cents=plan_data.get("rate_1000_cents"),
-                    rate_2000_cents=plan_data.get("rate_2000_cents"),
-                    monthly_bill_1000=plan_data.get("monthly_bill_1000"),
-                    monthly_bill_2000=plan_data.get("monthly_bill_2000"),
-                    early_termination_fee=plan_data.get("early_termination_fee", 0.0),
-                    base_monthly_fee=plan_data.get("base_monthly_fee", 0.0),
-                    renewable_percent=plan_data.get("renewable_percent", 0.0),
-                    special_features=plan_data.get("special_features", "")
-                )
+        # ================================================================
+        # SOURCE 4: EnergyBot Enhanced (Commercial - Full Navigation)
+        # ================================================================
+        logger.info("\n" + "=" * 60)
+        logger.info("[Scheduler] SOURCE 4: EnergyBot Enhanced (Commercial)")
+        logger.info("=" * 60)
 
-                # Check if plan exists
-                from .models import Plan
-                existing = db.query(Plan).filter(
-                    Plan.provider_id == provider.id,
-                    Plan.plan_name == plan_create.plan_name
-                ).first()
+        try:
+            from .scraping import energybot_business_enhanced
+            eb_plans_raw = energybot_business_enhanced.scrape_energybot_all_texas_enhanced()
+            logger.info(f"[Scheduler] EnergyBot Enhanced: Retrieved {len(eb_plans_raw)} raw commercial plans")
+            all_raw_plans.extend(eb_plans_raw)
 
-                if existing:
-                    # Update existing plan
-                    for key, value in plan_create.dict(exclude={'provider_id'}).items():
-                        setattr(existing, key, value)
-                    existing.last_updated = datetime.utcnow()  # Force update timestamp
-                    total_updated += 1
-                else:
-                    # Create new plan
-                    crud.create_or_update_plan(db, provider.id, plan_create)
-                    total_added += 1
+            # Validate
+            eb_valid, eb_rejected = validate_plan_batch(eb_plans_raw, strict=True)
+            logger.info(f"[Scheduler] EnergyBot Enhanced: {len(eb_valid)} valid, {len(eb_rejected)} rejected")
+            all_valid_plans.extend(eb_valid)
+            all_rejected_plans.extend(eb_rejected)
 
-            except Exception as e:
-                logger.error(f"[Scheduler] Error processing commercial plan '{plan_data.get('plan_name', 'Unknown')}': {e}")
-                import traceback
-                logger.error(f"[Scheduler] Traceback: {traceback.format_exc()}")
-                continue
+            # Process valid plans
+            for plan_data in eb_valid:
+                added, updated = _process_plan(db, plan_data, "Commercial")
+                total_added += added
+                total_updated += updated
 
-        logger.info(f"[Scheduler] Commercial: {total_added} added, {total_updated} updated")
+        except Exception as e:
+            logger.error(f"[Scheduler] EnergyBot Enhanced scraper failed: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
 
-        # 3. Scrape REAL PowerToChoose plans
-        logger.info("[Scheduler] Scraping REAL PowerToChoose plans...")
-        ptc_plans_raw = powertochoose_scraper.scrape_powertochoose(zip_code="75001", service_type="Residential")
-        logger.info(f"[Scheduler] Retrieved {len(ptc_plans_raw)} raw PowerToChoose plans")
-
-        # VALIDATE: Remove any fake/estimated data
-        ptc_plans, rejected_ptc = validate_plan_batch(ptc_plans_raw, strict=True)
-        logger.info(f"[Scheduler] Validated: {len(ptc_plans)} REAL PowerToChoose plans accepted")
-        if rejected_ptc:
-            logger.warning(f"[Scheduler] Rejected {len(rejected_ptc)} PowerToChoose plans with fake data markers")
-
-        for plan_data in ptc_plans:
-            try:
-                # Get or create provider
-                provider_name = plan_data.get("provider_name")
-                if not provider_name:
-                    continue
-
-                provider = crud.get_provider_by_name(db, provider_name)
-                if not provider:
-                    provider = crud.create_provider(
-                        db, schemas.ProviderCreate(name=provider_name)
-                    )
-
-                # Get plan URL
-                plan_url = plan_data.get("fact_sheet_url") or get_plan_url(provider_name, plan_data.get("plan_name"))
-
-                # Create plan object
-                plan_create = schemas.PlanCreate(
-                    provider_id=provider.id,
-                    plan_name=plan_data["plan_name"],
-                    plan_url=plan_url,
-                    plan_type=plan_data.get("plan_type", "Fixed"),
-                    service_type="Residential",
-                    zip_code=plan_data.get("zip_code", "75001"),
-                    contract_months=plan_data.get("contract_months"),
-                    rate_500_cents=plan_data.get("rate_500_cents"),
-                    rate_1000_cents=plan_data.get("rate_1000_cents"),
-                    rate_2000_cents=plan_data.get("rate_2000_cents"),
-                    monthly_bill_1000=plan_data.get("monthly_bill_1000"),
-                    monthly_bill_2000=plan_data.get("monthly_bill_2000"),
-                    early_termination_fee=plan_data.get("early_termination_fee", 0.0),
-                    base_monthly_fee=plan_data.get("base_monthly_fee", 0.0),
-                    renewable_percent=plan_data.get("renewable_percent", 0.0),
-                    special_features=plan_data.get("special_features", "")
-                )
-
-                # Check if plan exists
-                from .models import Plan
-                existing = db.query(Plan).filter(
-                    Plan.provider_id == provider.id,
-                    Plan.plan_name == plan_create.plan_name
-                ).first()
-
-                if existing:
-                    # Update existing plan
-                    for key, value in plan_create.dict(exclude={'provider_id'}).items():
-                        setattr(existing, key, value)
-                    existing.last_updated = datetime.utcnow()  # Force update timestamp
-                    total_updated += 1
-                else:
-                    # Create new plan
-                    crud.create_or_update_plan(db, provider.id, plan_create)
-                    total_added += 1
-
-            except Exception as e:
-                logger.error(f"[Scheduler] Error processing PowerToChoose plan: {e}")
-                continue
-
-        logger.info(f"[Scheduler] PowerToChoose: {total_added} added (cumulative), {total_updated} updated (cumulative)")
-
+        # ================================================================
+        # COMMIT AND LOG RESULTS
+        # ================================================================
         db.commit()
-        logger.info(f"[Scheduler] SUCCESS! Total: {total_added} added, {total_updated} updated")
-        logger.info(f"[Scheduler] ALL DATA IS REAL - NO SAMPLES")
+
+        logger.info("\n" + "=" * 80)
+        logger.info("[Scheduler] SCRAPE COMPLETE - SUMMARY")
+        logger.info("=" * 80)
+        logger.info(f"[Scheduler] Total raw plans scraped: {len(all_raw_plans)}")
+        logger.info(f"[Scheduler] Total valid plans: {len(all_valid_plans)}")
+        logger.info(f"[Scheduler] Total rejected (fake/invalid): {len(all_rejected_plans)}")
+        logger.info(f"[Scheduler] Plans added: {total_added}")
+        logger.info(f"[Scheduler] Plans updated: {total_updated}")
+        logger.info("[Scheduler] ALL DATA IS REAL - NO SAMPLES - NO FAKES")
+        logger.info("=" * 80)
 
         # Log validation summary
         log_validation_summary(
-            plans_before=len(residential_plans_raw) + len(commercial_plans_raw) + len(ptc_plans_raw),
-            plans_after=len(residential_plans) + len(commercial_plans) + len(ptc_plans),
-            rejected=rejected_residential + rejected_commercial + rejected_ptc
+            plans_before=len(all_raw_plans),
+            plans_after=len(all_valid_plans),
+            rejected=all_rejected_plans
         )
 
         # Calculate and log data quality score
-        all_valid_plans = residential_plans + commercial_plans + ptc_plans
         if all_valid_plans:
             quality_metrics = get_data_quality_score(all_valid_plans)
             logger.info(f"[Scheduler] Data Quality Score: {quality_metrics['quality_score']}%")
-            logger.info(f"[Scheduler] Quality Issues: {', '.join(quality_metrics['issues'])}")
+            if quality_metrics['issues']:
+                logger.info(f"[Scheduler] Quality Issues: {', '.join(quality_metrics['issues'])}")
 
         # Send email notification after successful scrape
         logger.info("[Scheduler] Sending daily email report...")
@@ -329,47 +225,90 @@ def scrape_real_data_job():
                 logger.warning("[Scheduler] ⚠ Daily email report not sent (check REPORT_EMAIL config)")
         except Exception as email_error:
             logger.error(f"[Scheduler] Failed to send email report: {email_error}")
-            # Don't fail the whole scrape job if email fails
 
     except Exception as e:
         db.rollback()
-        logger.error(f"[Scheduler] Error during scrape: {e}")
+        logger.error(f"[Scheduler] Critical error during scrape: {e}")
         import traceback
         traceback.print_exc()
     finally:
         db.close()
 
 
-def delete_sample_data_and_load_real():
+def _process_plan(db: Session, plan_data: dict, default_service_type: str) -> tuple[int, int]:
     """
-    ONE-TIME startup job: Delete all sample data and load real data.
+    Process a single validated plan and insert/update in database.
 
-    This runs once on application startup to ensure production
-    starts with REAL data only.
+    Returns:
+        Tuple of (added_count, updated_count) - one will be 1, other will be 0
     """
-    logger.info("[Startup] Deleting sample data and loading REAL plans...")
-
-    db: Session = SessionLocal()
-
     try:
-        # Delete ALL existing plans (sample data)
-        from .models import Plan
-        deleted_count = db.query(Plan).delete()
-        db.commit()
-        logger.info(f"[Startup] Deleted {deleted_count} sample plans")
+        # Get or create provider
+        provider_name = plan_data.get("provider_name")
+        if not provider_name:
+            return 0, 0
 
-        # Run the scraper to load real data
-        scrape_real_data_job()
+        provider = crud.get_provider_by_name(db, provider_name)
+        if not provider:
+            provider = crud.create_provider(
+                db, schemas.ProviderCreate(name=provider_name)
+            )
 
-        logger.info("[Startup] REAL data loaded successfully!")
+        # Get plan URL
+        plan_url = plan_data.get("plan_url") or plan_data.get("fact_sheet_url") or get_plan_url(provider_name, plan_data.get("plan_name"))
+
+        # Create plan object
+        service_type = plan_data.get("service_type", default_service_type)
+
+        # Add source info to special_features if not already present
+        special_features = plan_data.get("special_features", "")
+        source = plan_data.get("source", "")
+        if source and source not in str(special_features):
+            if special_features:
+                special_features = f"{special_features} (Source: {source})"
+            else:
+                special_features = f"Source: {source}"
+
+        plan_create = schemas.PlanCreate(
+            provider_id=provider.id,
+            plan_name=plan_data["plan_name"],
+            plan_url=plan_url,
+            plan_type=plan_data.get("plan_type", "Fixed"),
+            service_type=service_type,
+            zip_code=plan_data.get("zip_code", "75001"),
+            contract_months=plan_data.get("contract_months"),
+            rate_500_cents=plan_data.get("rate_500_cents"),
+            rate_1000_cents=plan_data.get("rate_1000_cents"),
+            rate_2000_cents=plan_data.get("rate_2000_cents"),
+            monthly_bill_1000=plan_data.get("monthly_bill_1000"),
+            monthly_bill_2000=plan_data.get("monthly_bill_2000"),
+            early_termination_fee=plan_data.get("early_termination_fee", 0.0),
+            base_monthly_fee=plan_data.get("base_monthly_fee", 0.0),
+            renewable_percent=plan_data.get("renewable_percent", 0.0),
+            special_features=special_features[:500] if special_features else None
+        )
+
+        # Check if plan exists
+        existing = db.query(models.Plan).filter(
+            models.Plan.provider_id == provider.id,
+            models.Plan.plan_name == plan_create.plan_name
+        ).first()
+
+        if existing:
+            # Update existing plan
+            for key, value in plan_create.dict(exclude={'provider_id'}).items():
+                if value is not None:  # Only update non-None values
+                    setattr(existing, key, value)
+            existing.last_updated = datetime.utcnow()
+            return 0, 1
+        else:
+            # Create new plan
+            crud.create_or_update_plan(db, provider.id, plan_create)
+            return 1, 0
 
     except Exception as e:
-        db.rollback()
-        logger.error(f"[Startup] Error during initialization: {e}")
-        import traceback
-        traceback.print_exc()
-    finally:
-        db.close()
+        logger.error(f"[Scheduler] Error processing plan '{plan_data.get('plan_name', 'Unknown')}': {e}")
+        return 0, 0
 
 
 def start_scheduler():
@@ -377,40 +316,38 @@ def start_scheduler():
     Start the background scheduler.
 
     Schedule:
-    - DAILY at 3:00 AM: Scrape fresh real data
+    - DAILY at 5:00 AM CST (11:00 UTC): Comprehensive scrape from ALL sources
 
-    NOTE: Startup scraping is DISABLED to prevent Railway healthcheck timeouts.
-    Use the /admin/delete-fake-commercial-plans endpoint or /plans/scrape for manual data loading.
-
-    All data is REAL - NO SAMPLES, NO FALLBACKS.
+    All data is REAL - NO SAMPLES, NO FALLBACKS, NO FAKES.
+    All data is VALIDATED before insertion.
     """
-    logger.info("[Scheduler] Starting automated REAL DATA scheduler...")
+    logger.info("[Scheduler] Starting COMPREHENSIVE REAL DATA scheduler...")
+    logger.info("[Scheduler] Sources: PowerToChoose, ElectricityPlans, ComparePower, EnergyBot")
 
-    # Daily scrape at 11 AM UTC (5 AM CST / 6 AM CDT) - REAL DATA ONLY
+    # Daily comprehensive scrape at 11 AM UTC (5 AM CST / 6 AM CDT)
     scheduler.add_job(
-        scrape_real_data_job,
+        scrape_all_sources_job,
         trigger=CronTrigger(hour=11, minute=0),
-        id="daily_real_data_scrape",
-        name="Daily REAL Data Scrape (Residential + Commercial)",
+        id="daily_comprehensive_scrape",
+        name="Daily Comprehensive Scrape (ALL Sources)",
         replace_existing=True,
     )
 
     # Start scheduler
     scheduler.start()
-    logger.info("[Scheduler] [OK] Daily job scheduled: 11:00 AM UTC (5 AM CST) scrape REAL data")
-    
-    # Schedule an immediate scrape (2 minutes from now) to ensure fresh data on deployment
-    run_date = datetime.now()
-    from datetime import timedelta
-    run_date += timedelta(minutes=2)
+    logger.info("[Scheduler] ✓ Daily job scheduled: 11:00 AM UTC (5 AM CST)")
+    logger.info("[Scheduler] ✓ Sources: PowerToChoose + ElectricityPlans + ComparePower + EnergyBot")
+
+    # Schedule startup scrape (2 minutes from now) to ensure fresh data on deployment
+    run_date = datetime.now() + timedelta(minutes=2)
     scheduler.add_job(
-        scrape_real_data_job,
+        scrape_all_sources_job,
         'date',
         run_date=run_date,
-        id='startup_scrape',
-        name='Startup Data Refresh'
+        id='startup_comprehensive_scrape',
+        name='Startup Comprehensive Data Refresh'
     )
-    logger.info(f"[Scheduler] [INFO] Scheduled startup data refresh for {run_date}")
+    logger.info(f"[Scheduler] ✓ Startup scrape scheduled for {run_date}")
 
 
 def stop_scheduler():
