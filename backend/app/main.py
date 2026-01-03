@@ -98,16 +98,6 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS - read from environment variable or use defaults
 import os
-default_allowed_origins = ",".join(
-    [
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "https://texasenergyanalyzer.com",
-        "https://www.texasenergyanalyzer.com",
-    ]
-)
-allowed_origins_str = os.getenv("ALLOWED_ORIGINS", default_allowed_origins)
-allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
 allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "")
 if not allowed_origins_str or allowed_origins_str == "*":
     # Fallback if not set or if set to wildcard (which fails with allow_credentials=True)
@@ -116,7 +106,8 @@ if not allowed_origins_str or allowed_origins_str == "*":
         "http://localhost:3000",
         "https://www.texasenergyanalyzer.com",
         "https://texasenergyanalyzer.com",
-        "https://texas-energy-analyzer.vercel.app"
+        "https://texas-energy-analyzer.vercel.app",
+        "https://texas-energy-analyzer-marcelopreisslers-projects.vercel.app",
     ]
 else:
     allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
@@ -125,8 +116,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST"],  # Only allow needed methods
-    allow_headers=["Content-Type", "Authorization"],
+    allow_methods=["*"],  # Allow all methods including OPTIONS preflight
+    allow_headers=["*"],  # Allow all headers
 )
 
 # Prevent host header attacks - allow Railway domains
