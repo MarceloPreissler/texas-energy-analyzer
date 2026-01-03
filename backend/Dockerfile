@@ -1,11 +1,8 @@
 # Use official Playwright image which includes Python and pre-installed browsers
-# Version: 2026-01-02-v1 (force rebuild - add refresh endpoint, fix scheduler)
+# Version: 2026-01-03-v1 (fix Playwright browser path for commercial scraping)
 FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app
-
-# Set Playwright browser path to use the pre-installed browsers
-ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 # Install system dependencies for psycopg2 and other packages
 RUN apt-get update && apt-get install -y \
@@ -22,8 +19,17 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Ensure Playwright browsers are installed (image has them, but verify)
+# Install Playwright browsers to default location AND set up symlinks
+# This ensures browsers are found regardless of which path Playwright checks
 RUN playwright install chromium && playwright install-deps chromium
+
+# Create symlink from default cache location to /ms-playwright if needed
+RUN if [ -d "/ms-playwright" ]; then \
+        ln -sf /ms-playwright /root/.cache/ms-playwright 2>/dev/null || true; \
+    fi
+
+# Also set env var for runtime (some Playwright versions check this)
+ENV PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright
 
 # Copy application code
 COPY . .
@@ -34,5 +40,5 @@ RUN mkdir -p /app/data
 # Expose port
 EXPOSE 8000
 
-# Run the application with browser check/install at startup
-CMD sh -c "playwright install chromium 2>/dev/null || true && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+# Run the application - browsers should already be installed
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
