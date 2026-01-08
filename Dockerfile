@@ -46,3 +46,4 @@ EXPOSE 8000
 # Run the application - browsers should already be installed
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 # Railway build trigger: Fri Jan  2 20:49:26 CST 2026
+# Build trigger: Thu Jan  8 06:21:26 CST 2026
