@@ -12,7 +12,7 @@ import re
 from typing import List, Dict
 from datetime import datetime, timezone
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
-from playwright_stealth import stealth_sync
+from playwright_stealth.stealth import Stealth
 
 
 def scrape_electricityplans_commercial(zip_code: str = "75001", max_plans: int = 100) -> List[Dict]:
@@ -44,7 +44,7 @@ def scrape_electricityplans_commercial(zip_code: str = "75001", max_plans: int =
         page = context.new_page()
 
         # STEALTH MODE: Makes browser undetectable as automation
-        stealth_sync(page)
+        Stealth().apply_stealth_sync(page)
         print("[ElectricityPlans] Stealth mode activated - bypassing bot detection")
 
         try:

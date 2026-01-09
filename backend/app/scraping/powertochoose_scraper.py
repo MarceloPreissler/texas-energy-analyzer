@@ -2,19 +2,16 @@
 Live PowerToChoose.org scraper using Playwright for real-time pricing data.
 
 This scraper uses browser automation to fetch current electricity plans
-directly from the official PUCT website, ensuring data is always to-date.
+directly from the official PUCT website, ensuring data is always up-to-date.
 """
 from __future__ import annotations
 
 import re
-import logging
-import os
 from typing import List, Dict
-from datetime import datetime, timezone
+from datetime import datetime
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
+from playwright_stealth.stealth import Stealth
 
-# Configure logging
-logger = logging.getLogger(__name__)
 
 def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residential", max_plans: int = 100) -> List[Dict]:
     """
@@ -30,45 +27,37 @@ def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residenti
     """
     plans: List[Dict] = []
 
-    # Ensure logs directory exists
-    if not os.path.exists("logs"):
-        os.makedirs("logs")
-
     with sync_playwright() as p:
-        # Launch browser in headless mode for production reliability
-        # Use env var HEADLESS=false for local debugging if needed
-        headless = os.getenv("HEADLESS", "true").lower() == "true"
-        browser = p.chromium.launch(headless=headless)
+        # Launch browser in headless mode
+        browser = p.chromium.launch(
+            headless=True,
+            args=['--disable-blink-features=AutomationControlled']
+        )
         context = browser.new_context(
             viewport={'width': 1920, 'height': 1080},
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         )
         page = context.new_page()
-        
-        # Add stealth mode if available (optional but recommended)
-        try:
-            from playwright_stealth import stealth_sync
-            stealth_sync(page)
-        except ImportError:
-            pass
+
+        # Apply stealth mode to bypass bot detection
+        Stealth().apply_stealth_sync(page)
+        print("[PowerToChoose] Stealth mode activated")
 
         try:
             print(f"[PowerToChoose] Navigating to site...")
-            # Use 'load' instead of 'networkidle' for faster loading
-            page.goto("https://www.powertochoose.org/", wait_until="load", timeout=45000)
-            logger.info(f"[PowerToChoose] Navigating to site...")
-            page.goto("https://www.powertochoose.org/", wait_until="domcontentloaded", timeout=60000)
+            page.goto("https://www.powertochoose.org/", wait_until="domcontentloaded", timeout=45000)
+            page.wait_for_timeout(3000)  # Wait for dynamic content
 
             # Accept cookies if present
             try:
-                page.click('button:has-text("Accept")', timeout=5000)
+                page.click('button:has-text("Accept")', timeout=2000)
             except:
                 pass
 
             # Select service type (Residential or Commercial)
             try:
                 if service_type == "Commercial":
-                    logger.info(f"[PowerToChoose] Selecting Commercial service type...")
+                    print(f"[PowerToChoose] Selecting Commercial service type...")
                     # Try multiple selectors for Commercial
                     selectors = [
                         'input[value="Commercial"]',
@@ -82,196 +71,98 @@ def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residenti
                         try:
                             page.click(selector, timeout=2000)
                             clicked = True
-                            logger.info(f"[PowerToChoose] Successfully selected Commercial")
+                            print(f"[PowerToChoose] Successfully selected Commercial")
                             break
                         except:
                             continue
                     if not clicked:
-                        logger.warning(f"[PowerToChoose] Could not find Commercial selector, using default")
+                        print(f"[PowerToChoose] Could not find Commercial selector, using default")
             except Exception as e:
-                logger.error(f"[PowerToChoose] Error selecting Commercial: {e}")
+                print(f"[PowerToChoose] Error selecting Commercial: {e}")
 
-            # Enter zip code - try multiple selectors
-            print(f"[PowerToChoose] Entering zip code: {zip_code}")
-            zip_selectors = [
-                'input[name="zip_code"]',
-                'input[name="zipCode"]',
-                'input[id="zip"]',
-                'input[placeholder*="ZIP"]',
-                'input[placeholder*="zip"]',
-                'input[type="text"]',  # Fallback to first text input
-            ]
-            filled = False
-            for selector in zip_selectors:
-                try:
-                    page.fill(selector, zip_code, timeout=3000)
-                    filled = True
-                    print(f"[PowerToChoose] Zip code entered using: {selector}")
-                    break
-                except:
-                    continue
-
-            if not filled:
-                print(f"[PowerToChoose] WARNING: Could not find zip code input")
-                return []
-
-            # Click search button - try multiple selectors
-            search_selectors = [
-                'button[type="submit"]:has-text("Shop")',
-                'button:has-text("Shop")',
-                'button:has-text("Search")',
-                'button:has-text("Find Plans")',
-                'input[type="submit"]',
-                'button[type="submit"]',
-            ]
-            clicked = False
-            for selector in search_selectors:
-                try:
-                    page.click(selector, timeout=3000)
-                    clicked = True
-                    print(f"[PowerToChoose] Search clicked using: {selector}")
-                    break
-                except:
-                    continue
-
-            if not clicked:
-                print(f"[PowerToChoose] WARNING: Could not find search button")
-                return []
-
-            # Wait for results to load - try multiple strategies
-            print(f"[PowerToChoose] Waiting for results...")
-            try:
-                # Try waiting for common result selectors
-                page.wait_for_selector('table.table tbody tr, .plan-result, .plan-card, .plan-details', timeout=20000)
-            except PlaywrightTimeout:
-                print(f"[PowerToChoose] Timeout waiting for results, checking page content...")
-                # Continue anyway - maybe results are already there
             # Enter zip code
-            logger.info(f"[PowerToChoose] Entering zip code: {zip_code}")
+            print(f"[PowerToChoose] Entering zip code: {zip_code}")
             page.fill('input[name="zip_code"]', zip_code)
-            
-            # Small delay
-            page.wait_for_timeout(2000)
 
-            # Save HTML for inspection (debug only)
-            # with open('ptc_debug.html', 'w', encoding='utf-8') as f:
-            #     f.write(page.content())
-            # logger.debug("[PowerToChoose] Saved HTML to ptc_debug.html")
+            # Click search button
+            page.click('button[type="submit"]:has-text("Shop")', timeout=5000)
 
-            # Submit form directly via JS to avoid click issues
-            logger.info("[PowerToChoose] Submitting form directly...")
-            page.evaluate('document.getElementById("planForm").submit()')
-
-            # Wait for navigation to results page
-            try:
-                page.wait_for_url("**/Plan/Results", timeout=15000)
-                logger.info(f"[PowerToChoose] Navigated to: {page.url}")
-            except:
-                logger.warning(f"[PowerToChoose] URL did not change to /Plan/Results. Current: {page.url}")
-
-            # Check for distributor selection modal (it might appear after submit if JS intercepts?)
-            # Actually, if we submitted the form, we might be on the new page or the same page if validation failed.
-            
             # Wait for results to load
-            logger.info(f"[PowerToChoose] Waiting for results...")
-            try:
-                page.wait_for_selector('#dataTable tr.row', timeout=30000)
-            except PlaywrightTimeout:
-                logger.error("[PowerToChoose] Timeout waiting for plan selectors.")
-                # Save HTML for inspection
-                with open('logs/ptc_results_debug.html', 'w', encoding='utf-8') as f:
-                    f.write(page.content())
-                logger.info("[PowerToChoose] Saved results page HTML to logs/ptc_results_debug.html")
-                raise # Re-raise to trigger the outer exception handler (screenshot)
+            print(f"[PowerToChoose] Waiting for results...")
+            page.wait_for_selector('.plan-details, .plan-result, table tr', timeout=15000)
 
             # Give extra time for dynamic content
-            page.wait_for_timeout(3000)
+            page.wait_for_timeout(2000)
 
-            # Parse results
-            plan_rows = page.query_selector_all('#dataTable tbody tr.row')
-            logger.info(f"[PowerToChoose] Found {len(plan_rows)} plans")
+            # Try multiple selector strategies
+            plan_rows = page.query_selector_all('table.table tbody tr')
+
+            if not plan_rows:
+                plan_rows = page.query_selector_all('.plan-result, .plan-card')
+
+            print(f"[PowerToChoose] Found {len(plan_rows)} plans")
 
             for idx, row in enumerate(plan_rows[:max_plans]):
                 try:
-                    # Provider Name
-                    provider_el = row.query_selector('td.td-company .logotype a')
-                    provider_name = "Unknown"
-                    if provider_el:
-                        title = provider_el.get_attribute('title')
-                        if title:
-                            provider_name = title.replace("External link to company website for ", "").strip()
-                        else:
-                            img_el = row.query_selector('td.td-company .logotype img')
-                            if img_el:
-                                alt = img_el.get_attribute('alt')
-                                if alt:
-                                    provider_name = alt.replace("logo for ", "").strip()
+                    # Extract text content
+                    text = row.inner_text()
 
-                    # Plan Name
-                    plan_name_el = row.query_selector('td.td-plan ul.plan-info li:first-child')
-                    plan_name = plan_name_el.inner_text().strip() if plan_name_el else "Unknown Plan"
+                    # Parse provider name (usually first or in bold)
+                    provider_match = re.search(r'^([A-Za-z\s&]+)', text)
+                    provider_name = provider_match.group(1).strip() if provider_match else "Unknown"
 
-                    # Rate
-                    rate_el = row.query_selector('td.td-price .price')
-                    rate = 0.0
-                    if rate_el:
-                        rate_text = rate_el.inner_text().strip()
-                        # Remove '¢' and convert to float
-                        rate = float(re.sub(r'[^\d.]', '', rate_text))
+                    # Parse plan name (usually after provider)
+                    plan_lines = text.split('\n')
+                    plan_name = plan_lines[1] if len(plan_lines) > 1 else plan_lines[0]
 
-                    # Contract Term & Plan Type
-                    contract_months = None
+                    # Parse rate (look for patterns like "10.5¢", "10.5 cents", "0.105")
+                    rate_match = re.search(r'(\d+\.?\d*)\s*[¢c]|(\d+\.\d+)\s+cents?', text, re.IGNORECASE)
+                    rate = None
+                    if rate_match:
+                        rate = float(rate_match.group(1) or rate_match.group(2))
+                        # If rate is like 0.105, convert to cents
+                        if rate < 1:
+                            rate = rate * 100
+
+                    # Parse contract term
+                    term_match = re.search(r'(\d+)\s*(?:mo|month|mos)', text, re.IGNORECASE)
+                    contract_months = int(term_match.group(1)) if term_match else None
+
+                    # Determine plan type
                     plan_type = "Fixed"
-                    
-                    info_lis = row.query_selector_all('td.td-plan ul.plan-info li.grid-element')
-                    for li in info_lis:
-                        text = li.inner_text().strip()
-                        if "Month" in text:
-                            match = re.search(r'(\d+)', text)
-                            if match:
-                                contract_months = int(match.group(1))
-                        elif "Fixed" in text:
-                            plan_type = "Fixed"
-                        elif "Variable" in text:
-                            plan_type = "Variable"
-                        elif "Indexed" in text:
-                            plan_type = "Indexed"
-
-                    # Fact Sheet URL
-                    fact_sheet_el = row.query_selector('a#el_fact_sheet')
-                    fact_sheet_url = fact_sheet_el.get_attribute('href') if fact_sheet_el else None
+                    if "variable" in text.lower():
+                        plan_type = "Variable"
+                    elif "solar" in text.lower() or "renewable" in text.lower():
+                        plan_type = "Solar"
+                    elif "free nights" in text.lower() or "free weekends" in text.lower():
+                        plan_type = "Free Nights/Weekends"
 
                     # Only add if we have at least provider and rate
-                    if provider_name != "Unknown" and rate > 0:
+                    if provider_name != "Unknown" and rate:
                         plans.append({
                             "provider_name": provider_name,
-                            "plan_name": plan_name,
+                            "plan_name": plan_name[:200],  # Limit length
                             "plan_type": plan_type,
-                            "service_type": service_type,
-                            "zip_code": zip_code,
+                            "service_type": service_type,  # Store service type
+                            "zip_code": zip_code,  # Store zip code
                             "contract_months": contract_months,
                             "rate_1000_cents": rate,
                             "special_features": None,
-                            "fact_sheet_url": fact_sheet_url,
-                            "last_updated": datetime.now(timezone.utc),
+                            "last_updated": datetime.utcnow(),
                         })
 
                 except Exception as e:
-                    logger.error(f"[PowerToChoose] Error parsing row {idx}: {e}")
+                    print(f"[PowerToChoose] Error parsing row {idx}: {e}")
                     continue
 
         except PlaywrightTimeout:
-            logger.error("[PowerToChoose] Timeout - site may be slow or down")
-            page.screenshot(path="logs/ptc_timeout.png")
-            logger.info("[PowerToChoose] Saved screenshot to logs/ptc_timeout.png")
+            print("[PowerToChoose] Timeout - site may be slow or down")
         except Exception as e:
-            logger.error(f"[PowerToChoose] Error: {e}")
-            page.screenshot(path="logs/ptc_error.png")
-            logger.info("[PowerToChoose] Saved screenshot to logs/ptc_error.png")
+            print(f"[PowerToChoose] Error: {e}")
         finally:
             browser.close()
 
-    logger.info(f"[PowerToChoose] Successfully scraped {len(plans)} plans")
+    print(f"[PowerToChoose] Successfully scraped {len(plans)} plans")
     return plans
 
 
@@ -297,7 +188,7 @@ def scrape_powertochoose_all_texas(service_type: str = "Residential") -> List[Di
     seen_plans = set()
 
     for zip_code in zip_codes:
-        logger.info(f"[PowerToChoose] Scraping {service_type} plans for zip code: {zip_code}")
+        print(f"[PowerToChoose] Scraping {service_type} plans for zip code: {zip_code}")
         plans = scrape_powertochoose(zip_code, service_type=service_type, max_plans=50)
 
         # Deduplicate by provider + plan name + rate + service_type
@@ -307,5 +198,5 @@ def scrape_powertochoose_all_texas(service_type: str = "Residential") -> List[Di
                 seen_plans.add(key)
                 all_plans.append(plan)
 
-    logger.info(f"[PowerToChoose] Total unique {service_type} plans: {len(all_plans)}")
+    print(f"[PowerToChoose] Total unique {service_type} plans: {len(all_plans)}")
     return all_plans
