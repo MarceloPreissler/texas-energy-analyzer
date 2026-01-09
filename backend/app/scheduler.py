@@ -354,3 +354,7 @@ def stop_scheduler():
     """Stop the background scheduler."""
     scheduler.shutdown()
     logger.info("[Scheduler] Background scheduler stopped")
+
+
+# Alias for backward compatibility with refresh endpoint
+scrape_real_data_job = scrape_all_sources_job
