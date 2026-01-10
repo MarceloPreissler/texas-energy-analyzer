@@ -10,7 +10,7 @@ import re
 from typing import List, Dict
 from datetime import datetime
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
-from playwright_stealth import stealth_sync
+from playwright_stealth.stealth import Stealth
 
 
 def scrape_reliant_commercial(zip_code: str = "75001", max_plans: int = 50) -> List[Dict]:
@@ -38,7 +38,7 @@ def scrape_reliant_commercial(zip_code: str = "75001", max_plans: int = 50) -> L
         page = context.new_page()
 
         # STEALTH MODE: Makes browser undetectable as automation
-        stealth_sync(page)
+        Stealth().apply_stealth_sync(page)
         print("[Reliant Business] Stealth mode activated - bypassing bot detection")
 
         try:
@@ -155,6 +155,13 @@ def scrape_reliant_commercial(zip_code: str = "75001", max_plans: int = 50) -> L
 
                     # Only add if we have meaningful data
                     if rate and "Unknown" not in plan_name:
+                        # Determine TDU based on zip code
+                        tdu = "Oncor"  # Default for Dallas
+                        if zip_code.startswith("77"):
+                            tdu = "CenterPoint"
+                        elif zip_code.startswith("78"):
+                            tdu = "AEP Texas Central"
+
                         plans.append({
                             "provider_name": "Reliant Energy",
                             "plan_name": plan_name[:200],
@@ -163,7 +170,10 @@ def scrape_reliant_commercial(zip_code: str = "75001", max_plans: int = 50) -> L
                             "zip_code": zip_code,
                             "contract_months": contract_months,
                             "rate_1000_cents": round(rate, 3),
-                            "special_features": None,
+                            "tdu": tdu,
+                            "source": "Reliant Business",
+                            "source_url": "https://shop.reliant.com/business",
+                            "special_features": f"Source: shop.reliant.com/business | TDU: {tdu}",
                             "last_updated": datetime.utcnow(),
                         })
                         print(f"[Reliant Business] Found plan: {plan_name} - {rate}¢/kWh")

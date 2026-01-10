@@ -11,6 +11,11 @@ Combined, this provides 60+ unique commercial plans with real pricing data.
 
 Author: Texas Energy Analyzer
 Last Updated: January 2026
+
+Data tracked per plan:
+- Provider name, plan name, rate, contract term
+- TDU (Oncor, CenterPoint, etc.) when available
+- Source URL for data verification
 """
 from __future__ import annotations
 
@@ -19,6 +24,21 @@ from typing import List, Dict
 from datetime import datetime, timezone
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 from playwright_stealth.stealth import Stealth
+
+# Texas TDU mapping by zip code prefix and region
+TDU_ZIP_MAPPING = {
+    "75": "Oncor",      # Dallas-Fort Worth area
+    "76": "Oncor",      # Fort Worth, Waco area
+    "77": "CenterPoint", # Houston area
+    "78": "AEP Texas Central",  # San Antonio, Austin, Corpus Christi
+    "79": "Oncor",      # West Texas (some areas)
+}
+
+# Source URLs for verification
+SOURCES = {
+    "ElectricChoice": "https://www.electricchoice.com/electricity-prices-by-state/texas/business-electricity/",
+    "ElectricityPlans": "https://electricityplans.com/texas/compare/business-electricity/",
+}
 
 
 def scrape_electricchoice_commercial() -> List[Dict]:
@@ -91,8 +111,10 @@ def scrape_electricchoice_commercial() -> List[Dict]:
                                 "zip_code": None,  # Statewide rates
                                 "contract_months": term_months,
                                 "rate_1000_cents": rate,
-                                "special_features": None,
+                                "tdu": "All Texas TDUs",  # ElectricChoice shows statewide rates
                                 "source": "ElectricChoice",
+                                "source_url": SOURCES["ElectricChoice"],
+                                "special_features": f"Source: ElectricChoice.com | Statewide commercial rate",
                                 "last_updated": datetime.now(timezone.utc),
                             })
 
@@ -196,8 +218,10 @@ def scrape_electricityplans_commercial() -> List[Dict]:
                                 "zip_code": None,
                                 "contract_months": term_months,
                                 "rate_1000_cents": rate,
-                                "special_features": None,
+                                "tdu": "Multiple TDUs",  # ElectricityPlans shows rates by region
                                 "source": "ElectricityPlans",
+                                "source_url": SOURCES["ElectricityPlans"],
+                                "special_features": f"Source: ElectricityPlans.com | Texas commercial rate",
                                 "last_updated": datetime.now(timezone.utc),
                             })
 

@@ -23,16 +23,14 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Verify browsers are available at /ms-playwright (pre-installed in base image)
-# Also install deps to ensure all system libraries are present
-RUN playwright install-deps chromium
+# Install Playwright browsers to match the installed pip package version
+# This ensures the browser version matches what playwright-stealth expects
+RUN playwright install chromium && \
+    playwright install-deps chromium
 
-# Create symlinks to ensure both paths work (belt and suspenders)
-RUN mkdir -p /root/.cache && \
-    ln -sf /ms-playwright /root/.cache/ms-playwright 2>/dev/null || true && \
-    echo "Playwright browsers path: $PLAYWRIGHT_BROWSERS_PATH" && \
-    ls -la /ms-playwright/ 2>/dev/null || echo "Checking /ms-playwright..." && \
-    playwright --version
+# Verify installation
+RUN echo "Playwright version:" && playwright --version && \
+    echo "Browsers installed at:" && ls -la /root/.cache/ms-playwright/ 2>/dev/null || ls -la /ms-playwright/ 2>/dev/null || echo "Checking paths..."
 
 # Copy application code
 COPY . .

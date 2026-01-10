@@ -139,6 +139,13 @@ def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residenti
 
                     # Only add if we have at least provider and rate
                     if provider_name != "Unknown" and rate:
+                        # Determine TDU based on zip code prefix
+                        tdu = "Oncor"  # Default
+                        if zip_code.startswith("77"):
+                            tdu = "CenterPoint"
+                        elif zip_code.startswith("78"):
+                            tdu = "AEP Texas Central"
+
                         plans.append({
                             "provider_name": provider_name,
                             "plan_name": plan_name[:200],  # Limit length
@@ -147,7 +154,10 @@ def scrape_powertochoose(zip_code: str = "75001", service_type: str = "Residenti
                             "zip_code": zip_code,  # Store zip code
                             "contract_months": contract_months,
                             "rate_1000_cents": rate,
-                            "special_features": None,
+                            "tdu": tdu,
+                            "source": "PowerToChoose",
+                            "source_url": "https://www.powertochoose.org/",
+                            "special_features": f"Source: PowerToChoose.org (PUCT Official) | TDU: {tdu}",
                             "last_updated": datetime.utcnow(),
                         })
 

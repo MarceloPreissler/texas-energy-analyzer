@@ -24,6 +24,17 @@ from bs4 import BeautifulSoup
 
 logger = logging.getLogger(__name__)
 
+# Source URLs for each scraper
+SCRAPER_SOURCES = {
+    "gexa_txu": "https://www.choosetexaspower.org/electricity-providers/gexa-energy-vs-txu-energy-review/",
+    "direct_energy": "https://www.powerchoicetexas.org/providers/direct-energy",
+    "reliant": "https://www.powerchoicetexas.org/providers/reliant-energy",
+    "txu": "https://www.powerchoicetexas.org/providers/txu-energy",
+}
+
+# Default TDU for residential plans (most comparison sites show Oncor/DFW rates)
+DEFAULT_TDU = "Oncor"
+
 
 def _clean_float(text: str) -> float:
     """
@@ -86,10 +97,14 @@ def scrape_gexa_txu() -> List[Dict]:
                     "provider_name": provider_name,
                     "plan_name": plan_name,
                     "plan_type": "Fixed",  # sample comparison table only lists fixed plans
+                    "service_type": "Residential",
                     "contract_months": contract_months,
                     "rate_1000_cents": rate,
                     "monthly_bill_1000": monthly_bill,
-                    "special_features": special_features,
+                    "tdu": DEFAULT_TDU,
+                    "source": "ChooseTexasPower",
+                    "source_url": SCRAPER_SOURCES["gexa_txu"],
+                    "special_features": f"{special_features or ''} | Source: ChooseTexasPower.org".strip(" |"),
                 })
         except (AttributeError, IndexError, ValueError) as e:
             logger.warning(f"Skipping a row in Gexa/TXU scraper due to parsing error: {e}")
@@ -136,9 +151,13 @@ def scrape_direct_energy() -> List[Dict]:
                         "provider_name": "Direct Energy",
                         "plan_name": plan_name,
                         "plan_type": plan_type,
+                        "service_type": "Residential",
                         "contract_months": contract_months,
                         "rate_1000_cents": rate,
-                        "special_features": special_features,
+                        "tdu": DEFAULT_TDU,
+                        "source": "PowerChoiceTexas",
+                        "source_url": SCRAPER_SOURCES["direct_energy"],
+                        "special_features": f"{special_features or ''} | Source: PowerChoiceTexas.org".strip(" |"),
                         "early_termination_fee": 135.0 if plan_name == "Live Brighter 12" else None,
                     })
             except (AttributeError, IndexError, ValueError) as e:
@@ -180,8 +199,13 @@ def scrape_reliant() -> List[Dict]:
                         "provider_name": "Reliant Energy",
                         "plan_name": plan_name,
                         "plan_type": "Fixed",
+                        "service_type": "Residential",
                         "contract_months": contract_months,
                         "rate_1000_cents": rate,
+                        "tdu": DEFAULT_TDU,
+                        "source": "PowerChoiceTexas",
+                        "source_url": SCRAPER_SOURCES["reliant"],
+                        "special_features": "Source: PowerChoiceTexas.org",
                     })
             except (AttributeError, IndexError, ValueError) as e:
                 logger.warning(f"Skipping a row in Reliant scraper due to parsing error: {e}")
@@ -191,13 +215,21 @@ def scrape_reliant() -> List[Dict]:
         "provider_name": "Reliant Energy",
         "plan_name": "Truly Free Weekends",
         "plan_type": "Free Nights/Weekends",
-        "special_features": "Free electricity on weekends; higher weekday rates",
+        "service_type": "Residential",
+        "tdu": DEFAULT_TDU,
+        "source": "PowerChoiceTexas",
+        "source_url": SCRAPER_SOURCES["reliant"],
+        "special_features": "Free electricity on weekends; higher weekday rates | Source: PowerChoiceTexas.org",
     })
     plans.append({
         "provider_name": "Reliant Energy",
         "plan_name": "Truly Free Nights",
         "plan_type": "Free Nights/Weekends",
-        "special_features": "Free electricity at night; higher daytime rates",
+        "service_type": "Residential",
+        "tdu": DEFAULT_TDU,
+        "source": "PowerChoiceTexas",
+        "source_url": SCRAPER_SOURCES["reliant"],
+        "special_features": "Free electricity at night; higher daytime rates | Source: PowerChoiceTexas.org",
     })
     return plans
 
@@ -245,9 +277,13 @@ def scrape_txu() -> List[Dict]:
                         "provider_name": "TXU Energy",
                         "plan_name": plan_name,
                         "plan_type": plan_type,
+                        "service_type": "Residential",
                         "contract_months": contract_months,
                         "rate_1000_cents": rate,
-                        "special_features": special_features,
+                        "tdu": DEFAULT_TDU,
+                        "source": "PowerChoiceTexas",
+                        "source_url": SCRAPER_SOURCES["txu"],
+                        "special_features": f"{special_features or ''} | Source: PowerChoiceTexas.org".strip(" |"),
                     })
             except (AttributeError, IndexError, ValueError) as e:
                 logger.warning(f"Skipping a row in TXU scraper due to parsing error: {e}")

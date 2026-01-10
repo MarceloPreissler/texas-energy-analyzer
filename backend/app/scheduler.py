@@ -2,8 +2,8 @@
 Automated scraping scheduler - REAL DATA ONLY.
 
 Runs comprehensive scraping from ALL available sources:
-- Residential: PowerToChoose API (official PUCT marketplace)
-- Commercial: ElectricityPlans, ComparePower, EnergyBot Enhanced
+- Residential: PowerToChoose + Legacy scrapers (comparison sites)
+- Commercial: Commercial Aggregator (ElectricChoice + ElectricityPlans)
 
 NO SAMPLE DATA. NO FALLBACK DATA. NO FAKE DATA.
 All data is validated before insertion.
@@ -95,92 +95,94 @@ def scrape_all_sources_job():
             logger.error(traceback.format_exc())
 
         # ================================================================
-        # SOURCE 2: ElectricityPlans.com (Commercial)
+        # SOURCE 2: Legacy Scrapers (Residential Comparison Sites)
         # ================================================================
         logger.info("\n" + "=" * 60)
-        logger.info("[Scheduler] SOURCE 2: ElectricityPlans.com (Commercial)")
+        logger.info("[Scheduler] SOURCE 2: Legacy Residential Scrapers")
+        logger.info("[Scheduler] (Gexa, TXU, Direct Energy, Reliant)")
         logger.info("=" * 60)
 
         try:
-            from .scraping import electricityplans_commercial
-            ep_plans_raw = electricityplans_commercial.scrape_electricityplans_all_texas()
-            logger.info(f"[Scheduler] ElectricityPlans: Retrieved {len(ep_plans_raw)} raw commercial plans")
-            all_raw_plans.extend(ep_plans_raw)
+            from .scraping import scraper
+            legacy_plans_raw = scraper.scrape_all()
+            logger.info(f"[Scheduler] Legacy Scrapers: Retrieved {len(legacy_plans_raw)} raw residential plans")
+            all_raw_plans.extend(legacy_plans_raw)
 
             # Validate
-            ep_valid, ep_rejected = validate_plan_batch(ep_plans_raw, strict=True)
-            logger.info(f"[Scheduler] ElectricityPlans: {len(ep_valid)} valid, {len(ep_rejected)} rejected")
-            all_valid_plans.extend(ep_valid)
-            all_rejected_plans.extend(ep_rejected)
+            legacy_valid, legacy_rejected = validate_plan_batch(legacy_plans_raw, strict=True)
+            logger.info(f"[Scheduler] Legacy Scrapers: {len(legacy_valid)} valid, {len(legacy_rejected)} rejected")
+            all_valid_plans.extend(legacy_valid)
+            all_rejected_plans.extend(legacy_rejected)
 
             # Process valid plans
-            for plan_data in ep_valid:
-                added, updated = _process_plan(db, plan_data, "Commercial")
+            for plan_data in legacy_valid:
+                added, updated = _process_plan(db, plan_data, "Residential")
                 total_added += added
                 total_updated += updated
 
         except Exception as e:
-            logger.error(f"[Scheduler] ElectricityPlans scraper failed: {e}")
+            logger.error(f"[Scheduler] Legacy scrapers failed: {e}")
             import traceback
             logger.error(traceback.format_exc())
 
         # ================================================================
-        # SOURCE 3: ComparePower.com (Commercial)
+        # SOURCE 3: Commercial Aggregator (ElectricChoice + ElectricityPlans)
         # ================================================================
         logger.info("\n" + "=" * 60)
-        logger.info("[Scheduler] SOURCE 3: ComparePower.com (Commercial)")
+        logger.info("[Scheduler] SOURCE 3: Commercial Aggregator")
+        logger.info("[Scheduler] (ElectricChoice.com + ElectricityPlans.com)")
         logger.info("=" * 60)
 
         try:
-            from .scraping import comparepower_commercial
-            cp_plans_raw = comparepower_commercial.scrape_comparepower_all_texas()
-            logger.info(f"[Scheduler] ComparePower: Retrieved {len(cp_plans_raw)} raw commercial plans")
-            all_raw_plans.extend(cp_plans_raw)
+            from .scraping import commercial_aggregator
+            commercial_plans_raw = commercial_aggregator.scrape_all_commercial()
+            logger.info(f"[Scheduler] Commercial Aggregator: Retrieved {len(commercial_plans_raw)} raw commercial plans")
+            all_raw_plans.extend(commercial_plans_raw)
 
             # Validate
-            cp_valid, cp_rejected = validate_plan_batch(cp_plans_raw, strict=True)
-            logger.info(f"[Scheduler] ComparePower: {len(cp_valid)} valid, {len(cp_rejected)} rejected")
-            all_valid_plans.extend(cp_valid)
-            all_rejected_plans.extend(cp_rejected)
+            commercial_valid, commercial_rejected = validate_plan_batch(commercial_plans_raw, strict=True)
+            logger.info(f"[Scheduler] Commercial Aggregator: {len(commercial_valid)} valid, {len(commercial_rejected)} rejected")
+            all_valid_plans.extend(commercial_valid)
+            all_rejected_plans.extend(commercial_rejected)
 
             # Process valid plans
-            for plan_data in cp_valid:
+            for plan_data in commercial_valid:
                 added, updated = _process_plan(db, plan_data, "Commercial")
                 total_added += added
                 total_updated += updated
 
         except Exception as e:
-            logger.error(f"[Scheduler] ComparePower scraper failed: {e}")
+            logger.error(f"[Scheduler] Commercial Aggregator scraper failed: {e}")
             import traceback
             logger.error(traceback.format_exc())
 
         # ================================================================
-        # SOURCE 4: EnergyBot Enhanced (Commercial - Full Navigation)
+        # SOURCE 4: TXU Business Scraper (Additional Commercial)
         # ================================================================
         logger.info("\n" + "=" * 60)
-        logger.info("[Scheduler] SOURCE 4: EnergyBot Enhanced (Commercial)")
+        logger.info("[Scheduler] SOURCE 4: TXU Business Scraper")
         logger.info("=" * 60)
 
         try:
-            from .scraping import energybot_business_enhanced
-            eb_plans_raw = energybot_business_enhanced.scrape_energybot_all_texas_enhanced()
-            logger.info(f"[Scheduler] EnergyBot Enhanced: Retrieved {len(eb_plans_raw)} raw commercial plans")
-            all_raw_plans.extend(eb_plans_raw)
+            from .scraping import txu_business_scraper
+            txu_plans_raw = txu_business_scraper.scrape_txu_commercial(zip_code="75001")
+            logger.info(f"[Scheduler] TXU Business: Retrieved {len(txu_plans_raw)} raw commercial plans")
+            all_raw_plans.extend(txu_plans_raw)
 
             # Validate
-            eb_valid, eb_rejected = validate_plan_batch(eb_plans_raw, strict=True)
-            logger.info(f"[Scheduler] EnergyBot Enhanced: {len(eb_valid)} valid, {len(eb_rejected)} rejected")
-            all_valid_plans.extend(eb_valid)
-            all_rejected_plans.extend(eb_rejected)
+            txu_valid, txu_rejected = validate_plan_batch(txu_plans_raw, strict=True)
+            logger.info(f"[Scheduler] TXU Business: {len(txu_valid)} valid, {len(txu_rejected)} rejected")
+            all_valid_plans.extend(txu_valid)
+            all_rejected_plans.extend(txu_rejected)
 
             # Process valid plans
-            for plan_data in eb_valid:
+            for plan_data in txu_valid:
                 added, updated = _process_plan(db, plan_data, "Commercial")
                 total_added += added
                 total_updated += updated
 
         except Exception as e:
-            logger.error(f"[Scheduler] EnergyBot Enhanced scraper failed: {e}")
+            logger.error(f"[Scheduler] TXU Business scraper failed: {e}")
             import traceback
             logger.error(traceback.format_exc())
 

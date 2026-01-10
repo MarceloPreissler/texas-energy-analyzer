@@ -10,7 +10,7 @@ import re
 from typing import List, Dict
 from datetime import datetime, timezone
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
-from playwright_stealth import stealth_sync
+from playwright_stealth.stealth import Stealth
 
 
 def scrape_txu_commercial(zip_code: str = "75001", max_plans: int = 50) -> List[Dict]:
@@ -38,7 +38,7 @@ def scrape_txu_commercial(zip_code: str = "75001", max_plans: int = 50) -> List[
         page = context.new_page()
 
         # STEALTH MODE: Makes browser undetectable as automation
-        stealth_sync(page)
+        Stealth().apply_stealth_sync(page)
         print("[TXU Business] Stealth mode activated - bypassing bot detection")
 
         try:
@@ -155,6 +155,13 @@ def scrape_txu_commercial(zip_code: str = "75001", max_plans: int = 50) -> List[
 
                                 # Sanity check: commercial rates typically 5-20¢/kWh
                                 if 5 <= rate <= 20:
+                                    # Determine TDU based on zip code
+                                    tdu = "Oncor"  # Default for Dallas
+                                    if zip_code.startswith("77"):
+                                        tdu = "CenterPoint"
+                                    elif zip_code.startswith("78"):
+                                        tdu = "AEP Texas Central"
+
                                     plans.append({
                                         "provider_name": "TXU Energy",
                                         "plan_name": plan_info["name"],
@@ -163,7 +170,10 @@ def scrape_txu_commercial(zip_code: str = "75001", max_plans: int = 50) -> List[
                                         "zip_code": zip_code,
                                         "contract_months": plan_info["term"],
                                         "rate_1000_cents": round(rate, 3),
-                                        "special_features": "Business plan - call TXU for exact pricing",
+                                        "tdu": tdu,
+                                        "source": "TXU Business",
+                                        "source_url": "https://www.txu.com/business.aspx",
+                                        "special_features": f"Business plan | Source: txu.com/business | TDU: {tdu}",
                                         "last_updated": datetime.now(timezone.utc),
                                     })
                                     print(f"[TXU Business] Added plan: {plan_info['name']} at {rate}¢/kWh")
@@ -252,6 +262,13 @@ def scrape_txu_commercial(zip_code: str = "75001", max_plans: int = 50) -> List[
 
                     # Only add if we have meaningful data
                     if rate and 5 <= rate <= 20:
+                        # Determine TDU based on zip code
+                        tdu = "Oncor"  # Default for Dallas
+                        if zip_code.startswith("77"):
+                            tdu = "CenterPoint"
+                        elif zip_code.startswith("78"):
+                            tdu = "AEP Texas Central"
+
                         plans.append({
                             "provider_name": "TXU Energy",
                             "plan_name": plan_name[:200] if plan_name else "TXU Business Plan",
@@ -260,7 +277,10 @@ def scrape_txu_commercial(zip_code: str = "75001", max_plans: int = 50) -> List[
                             "zip_code": zip_code,
                             "contract_months": contract_months,
                             "rate_1000_cents": round(rate, 3),
-                            "special_features": special_features,
+                            "tdu": tdu,
+                            "source": "TXU Business",
+                            "source_url": "https://www.txu.com/business.aspx",
+                            "special_features": f"{special_features or ''} | Source: txu.com/business | TDU: {tdu}".strip(" |"),
                             "last_updated": datetime.now(timezone.utc),
                         })
                         print(f"[TXU Business] Found plan: {plan_name} - {rate}¢/kWh")
