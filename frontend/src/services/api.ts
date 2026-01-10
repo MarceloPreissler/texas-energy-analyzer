@@ -111,9 +111,9 @@ export async function triggerScrape(
   serviceType: string = 'Residential',
   zipCode?: string
 ): Promise<any> {
-  // Use the public /plans/refresh endpoint (no API key required)
-  // This triggers the comprehensive scrape job in the background
-  const res = await api.post('/plans/refresh');
+  // Use the /admin/emergency-fix endpoint which runs scrape and loads data
+  // This is a public endpoint that triggers a comprehensive data refresh
+  const res = await api.post('/admin/emergency-fix');
   return res.data;
 }
 
