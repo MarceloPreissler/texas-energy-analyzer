@@ -111,19 +111,9 @@ export async function triggerScrape(
   serviceType: string = 'Residential',
   zipCode?: string
 ): Promise<any> {
-  const params: Record<string, string> = {
-    source: 'powertochoose',
-    service_type: serviceType
-  };
-  if (zipCode) params.zip_code = zipCode;
-
-  const apiKey = import.meta.env.VITE_API_KEY;
-
-  const headers: Record<string, string> = {
-    'X-API-Key': apiKey,
-  };
-
-  const res = await api.post('/plans/scrape', null, { params, headers });
+  // Use the public /plans/refresh endpoint (no API key required)
+  // This triggers the comprehensive scrape job in the background
+  const res = await api.post('/plans/refresh');
   return res.data;
 }
 

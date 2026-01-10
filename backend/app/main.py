@@ -89,7 +89,8 @@ app = FastAPI(
     version="2.0.0",
     docs_url="/docs",  # Can disable in production
     redoc_url="/redoc",
-    lifespan=lifespan  # Enable background scheduler
+    lifespan=lifespan,  # Enable background scheduler
+    redirect_slashes=False  # Prevent 307 redirects that break POST requests
 )
 
 # Add rate limiting
