@@ -41,5 +41,6 @@ RUN mkdir -p /app/data
 # Expose port
 EXPOSE 8000
 
-# Run the application - browsers should already be installed
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the application - browsers should already be installed.
+# Bind to $PORT when the platform provides it (Render/Railway set PORT).
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

@@ -187,6 +187,50 @@ def scrape_all_sources_job():
             logger.error(traceback.format_exc())
 
         # ================================================================
+        # SOURCE 5: No-browser HTTP fallback sources
+        # These need only `requests` (no Playwright), so they keep data
+        # flowing even if Chromium is unavailable or every browser-based
+        # scraper above failed.
+        # ================================================================
+        logger.info("\n" + "=" * 60)
+        logger.info("[Scheduler] SOURCE 5: HTTP Fallback Sources (no browser)")
+        logger.info("[Scheduler] (PowerToChoose official API + EnergyBot JSON-LD)")
+        logger.info("=" * 60)
+
+        try:
+            from .scraping import http_fallback_sources
+
+            fallback_raw = []
+            try:
+                fallback_raw.extend(http_fallback_sources.fetch_powertochoose_api())
+            except Exception as e:
+                logger.error(f"[Scheduler] PowerToChoose API fallback failed: {e}")
+            try:
+                fallback_raw.extend(http_fallback_sources.fetch_energybot_jsonld())
+            except Exception as e:
+                logger.error(f"[Scheduler] EnergyBot JSON-LD fallback failed: {e}")
+
+            logger.info(f"[Scheduler] HTTP Fallback: Retrieved {len(fallback_raw)} raw plans")
+            all_raw_plans.extend(fallback_raw)
+
+            # Validate
+            fallback_valid, fallback_rejected = validate_plan_batch(fallback_raw, strict=True)
+            logger.info(f"[Scheduler] HTTP Fallback: {len(fallback_valid)} valid, {len(fallback_rejected)} rejected")
+            all_valid_plans.extend(fallback_valid)
+            all_rejected_plans.extend(fallback_rejected)
+
+            # Process valid plans (service_type is set per-plan by the source)
+            for plan_data in fallback_valid:
+                added, updated = _process_plan(db, plan_data, plan_data.get("service_type", "Residential"))
+                total_added += added
+                total_updated += updated
+
+        except Exception as e:
+            logger.error(f"[Scheduler] HTTP fallback sources failed: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+
+        # ================================================================
         # COMMIT AND LOG RESULTS
         # ================================================================
         db.commit()

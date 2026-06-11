@@ -61,28 +61,33 @@ def validate_plan_data(plan: Dict[str, Any], strict: bool = True) -> tuple[bool,
         if marker in plan_name:
             return False, f"Fake data marker in plan_name: '{marker}'"
 
-    # Check 4: Valid rate (commercial plans typically 5-20¢/kWh)
+    # Check 4: Valid rate.
+    # NOTE: rate_1000_cents is stored in HUNDREDTHS of a cent per kWh
+    # (e.g. 1390 = 13.9¢/kWh) - the convention used by the scrapers, database
+    # and frontend. Convert before range-checking, otherwise every real plan
+    # gets rejected and the database silently stops updating.
     rate = plan.get('rate_1000_cents')
     if rate:
         if rate <= 0:
-            return False, f"Invalid rate: {rate}¢/kWh (must be positive)"
+            return False, f"Invalid rate: {rate} (must be positive)"
 
+        cents_per_kwh = rate / 100.0
         service_type = plan.get('service_type', 'Residential')
         if service_type == 'Commercial':
-            # Commercial rates outside 5-20¢ are suspicious
-            if rate < 5 or rate > 20:
+            # Commercial rates outside 3-30¢/kWh are suspicious
+            if cents_per_kwh < 3 or cents_per_kwh > 30:
                 if strict:
-                    return False, f"Commercial rate {rate}¢/kWh outside expected range (5-20¢)"
+                    return False, f"Commercial rate {cents_per_kwh:.1f}¢/kWh outside expected range (3-30¢)"
                 else:
-                    logger.warning(f"Suspicious commercial rate: {rate}¢/kWh for {plan['plan_name']}")
+                    logger.warning(f"Suspicious commercial rate: {cents_per_kwh:.1f}¢/kWh for {plan['plan_name']}")
 
         elif service_type == 'Residential':
-            # Residential rates outside 8-25¢ are suspicious
-            if rate < 8 or rate > 25:
+            # Residential rates outside 5-35¢/kWh are suspicious
+            if cents_per_kwh < 5 or cents_per_kwh > 35:
                 if strict:
-                    return False, f"Residential rate {rate}¢/kWh outside expected range (8-25¢)"
+                    return False, f"Residential rate {cents_per_kwh:.1f}¢/kWh outside expected range (5-35¢)"
                 else:
-                    logger.warning(f"Suspicious residential rate: {rate}¢/kWh for {plan['plan_name']}")
+                    logger.warning(f"Suspicious residential rate: {cents_per_kwh:.1f}¢/kWh for {plan['plan_name']}")
 
     # Check 5: Suspiciously round numbers (often fake)
     if strict and plan.get('service_type') == 'Commercial':
