@@ -120,9 +120,9 @@ export async function triggerScrape(
   serviceType: string = 'Residential',
   zipCode?: string
 ): Promise<any> {
-  // Use the /admin/emergency-fix endpoint which runs scrape and loads data
+  // Use the /plans/refresh endpoint which runs scrape and loads data
   // This is a public endpoint that triggers a comprehensive data refresh
-  const res = await api.post('/admin/emergency-fix');
+  const res = await api.post('/plans/refresh');
   return res.data;
 }
 

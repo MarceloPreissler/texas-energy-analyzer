@@ -57,7 +57,7 @@ interface ErcotSummary {
   data_source: string;
 }
 
-const API_BASE_URL = 'https://web-production-665ac.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'https://texas-energy-backend.onrender.com';
 
 const fetchErcotSummary = async (): Promise<ErcotSummary> => {
   const now = new Date().toISOString();
