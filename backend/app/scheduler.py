@@ -284,15 +284,48 @@ def delete_sample_data_and_load_real():
         db.close()
 
 
+def scrape_if_data_stale(max_age_hours: int = 24):
+    """
+    Run a scrape only if the newest plan in the database is older than max_age_hours.
+
+    Free-tier hosts spin the service down when idle, so the 3 AM cron job may never
+    fire. This check runs shortly after every startup: whenever the service wakes up
+    with stale data, it refreshes itself automatically.
+    """
+    from datetime import timedelta
+    from .models import Plan
+
+    db: Session = SessionLocal()
+    try:
+        newest = db.query(Plan.last_updated).order_by(Plan.last_updated.desc()).first()
+    except Exception as e:
+        logger.error(f"[Scheduler] Staleness check failed: {e}")
+        newest = None
+    finally:
+        db.close()
+
+    if newest and newest[0]:
+        age = datetime.now() - newest[0].replace(tzinfo=None)
+        if age < timedelta(hours=max_age_hours):
+            logger.info(f"[Scheduler] Data is fresh ({age.total_seconds()/3600:.1f}h old) - skipping startup scrape")
+            return
+        logger.warning(f"[Scheduler] Data is STALE ({age.days} days old) - running startup scrape...")
+    else:
+        logger.warning("[Scheduler] No plan data found - running startup scrape...")
+
+    scrape_real_data_job()
+
+
 def start_scheduler():
     """
     Start the background scheduler.
 
     Schedule:
     - DAILY at 3:00 AM: Scrape fresh real data
+    - 2 minutes after startup: scrape only if data is stale (>24h old)
 
-    NOTE: Startup scraping is DISABLED to prevent Railway healthcheck timeouts.
-    Use the /admin/delete-fake-commercial-plans endpoint or /plans/scrape for manual data loading.
+    The startup job runs in the scheduler's background thread, so it does not
+    block application startup or healthchecks.
 
     All data is REAL - NO SAMPLES, NO FALLBACKS.
     """
@@ -307,11 +340,23 @@ def start_scheduler():
         replace_existing=True,
     )
 
+    # Self-healing: shortly after startup, refresh data if it has gone stale.
+    # Runs in the scheduler thread 2 minutes after boot so healthchecks pass first.
+    from datetime import timedelta as _td
+    scheduler.add_job(
+        scrape_if_data_stale,
+        trigger="date",
+        run_date=datetime.now() + _td(minutes=2),
+        id="startup_stale_check",
+        name="Startup staleness check (scrape if data >24h old)",
+        replace_existing=True,
+    )
+
     # Start scheduler
     scheduler.start()
     logger.info("[Scheduler] [OK] Daily job scheduled: 3:00 AM scrape REAL data")
+    logger.info("[Scheduler] [OK] Startup staleness check scheduled (runs in 2 minutes)")
     logger.info("[Scheduler] NO SAMPLE DATA - ONLY LIVE SOURCES")
-    logger.info("[Scheduler] [INFO] Startup scraping DISABLED - use /plans/scrape or /admin endpoints for initial data load")
 
 
 def stop_scheduler():

@@ -3,15 +3,17 @@
 
 services:
   # Backend API
+  # Docker runtime: the Dockerfile pre-installs Playwright Chromium + all system
+  # dependencies, which cannot be installed on Render's native Python runtime
+  # (playwright install-deps requires root). This is required for scrapers to work.
   - type: web
     name: texas-energy-backend
-    env: python
+    runtime: docker
     region: oregon
-    buildCommand: pip install -r backend/requirements.txt && playwright install chromium && playwright install-deps chromium
-    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.12.0
       - key: DATABASE_URL
         fromDatabase:
           name: texas-energy-db
