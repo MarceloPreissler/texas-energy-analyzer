@@ -27,7 +27,7 @@ const PlanList: React.FC = () => {
 
   const { data: plans, refetch } = useQuery({
     queryKey: ['plans', providerFilter, planTypeFilter, contractFilter],
-    queryFn: () => fetchPlans(providerFilter, planTypeFilter, contractFilter),
+    queryFn: () => fetchPlans(providerFilter, planTypeFilter, undefined, undefined, contractFilter),
   });
 
   const handleSelect = (plan: Plan) => {

@@ -7,7 +7,7 @@ services:
     name: texas-energy-backend
     env: python
     region: oregon
-    buildCommand: pip install -r backend/requirements.txt
+    buildCommand: pip install -r backend/requirements.txt && playwright install chromium && playwright install-deps chromium
     startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
@@ -16,8 +16,6 @@ services:
         fromDatabase:
           name: texas-energy-db
           property: connectionString
-      - key: RUN_MIGRATIONS
-        value: "false"
       - key: ALLOWED_ORIGINS
         value: "*"
     autoDeploy: true

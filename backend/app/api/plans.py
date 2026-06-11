@@ -89,8 +89,18 @@ def scrape_data(
         logger.info("Using EnergyBot scraper for commercial plans (REAL data only)")
         plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
     elif source == "commercial":
-        logger.warning("Redirecting to energybot_enhanced (recommended for commercial plans)")
-        plans = energybot_business_enhanced.scrape_energybot_all_texas_enhanced()
+        logger.info("Commercial cascade: EnergyBot Enhanced -> EnergyBot v2 fallback")
+        plans = []
+        try:
+            plans = energybot_business_enhanced.scrape_energybot_all_texas_enhanced()
+        except Exception as e:
+            logger.error(f"EnergyBot Enhanced failed: {e}")
+        if not plans:
+            logger.warning("Enhanced scraper returned 0 plans - falling back to EnergyBot v2")
+            try:
+                plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
+            except Exception as e:
+                logger.error(f"EnergyBot v2 fallback failed: {e}")
     else:
         logger.info("Using legacy scrapers for residential plans")
         plans = scraper.scrape_all()

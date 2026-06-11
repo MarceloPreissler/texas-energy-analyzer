@@ -117,29 +117,66 @@ def scrape_real_data_job():
 
         logger.info(f"[Scheduler] Residential: {total_added} added, {total_updated} updated")
 
-        # 2. Scrape REAL commercial plans
+        # 2. Scrape REAL commercial plans - CASCADE with automatic fallback
+        # Primary: EnergyBot Enhanced -> Fallback: EnergyBot v2
+        # Supplementary sources added on top, each isolated so one failure can't block the rest
+        commercial_plans = []
+
         if USE_ENHANCED_ENERGYBOT:
-            logger.info("[Scheduler] Scraping REAL commercial plans from EnergyBot ENHANCED (full navigation)...")
+            logger.info("[Scheduler] Scraping commercial plans from EnergyBot ENHANCED (primary)...")
             try:
                 commercial_plans = energybot_business_enhanced.scrape_energybot_all_texas_enhanced()
-                logger.info(f"[Scheduler] Retrieved {len(commercial_plans)} REAL commercial plans (enhanced)")
+                logger.info(f"[Scheduler] EnergyBot Enhanced: {len(commercial_plans)} plans")
             except Exception as scraper_error:
                 logger.error(f"[Scheduler] EnergyBot Enhanced scraper failed: {scraper_error}")
                 import traceback
                 logger.error(f"[Scheduler] EnergyBot Enhanced traceback: {traceback.format_exc()}")
-                commercial_plans = []  # Continue with empty list
-                logger.warning("[Scheduler] Continuing with 0 commercial plans due to enhanced scraper failure")
-        else:
-            logger.info("[Scheduler] Scraping REAL commercial plans from EnergyBot v2 (JSON-LD only)...")
+
+        # Fallback: if primary returned nothing, try the simpler JSON-LD scraper
+        if not commercial_plans:
+            logger.warning("[Scheduler] Primary commercial scraper returned 0 plans - falling back to EnergyBot v2...")
             try:
                 commercial_plans = energybot_scraper_v2.scrape_energybot_all_texas_v2()
-                logger.info(f"[Scheduler] Retrieved {len(commercial_plans)} REAL commercial plans (v2)")
+                logger.info(f"[Scheduler] EnergyBot v2 fallback: {len(commercial_plans)} plans")
             except Exception as scraper_error:
-                logger.error(f"[Scheduler] EnergyBot v2 scraper failed: {scraper_error}")
+                logger.error(f"[Scheduler] EnergyBot v2 fallback failed: {scraper_error}")
                 import traceback
                 logger.error(f"[Scheduler] EnergyBot v2 traceback: {traceback.format_exc()}")
-                commercial_plans = []  # Continue with empty list
-                logger.warning("[Scheduler] Continuing with 0 commercial plans due to v2 scraper failure")
+
+        # Supplementary source: PowerToChoose commercial (official PUCT data)
+        logger.info("[Scheduler] Scraping commercial plans from PowerToChoose.org...")
+        try:
+            from .scraping.powertochoose_scraper import scrape_powertochoose_all_texas
+            ptc_commercial = scrape_powertochoose_all_texas(service_type="Commercial")
+            logger.info(f"[Scheduler] PowerToChoose commercial: {len(ptc_commercial)} plans")
+            commercial_plans.extend(ptc_commercial)
+        except Exception as scraper_error:
+            logger.error(f"[Scheduler] PowerToChoose commercial failed (non-fatal): {scraper_error}")
+
+        # Supplementary source: TXU business plans (provider-direct)
+        logger.info("[Scheduler] Scraping TXU business plans...")
+        try:
+            from .scraping.txu_business_scraper import scrape_txu_all_texas
+            txu_plans = scrape_txu_all_texas()
+            logger.info(f"[Scheduler] TXU business: {len(txu_plans)} plans")
+            commercial_plans.extend(txu_plans)
+        except Exception as scraper_error:
+            logger.error(f"[Scheduler] TXU business failed (non-fatal): {scraper_error}")
+
+        # Supplementary source: Reliant business plans (provider-direct)
+        logger.info("[Scheduler] Scraping Reliant business plans...")
+        try:
+            from .scraping.reliant_business_scraper import scrape_reliant_commercial
+            reliant_plans = scrape_reliant_commercial()
+            logger.info(f"[Scheduler] Reliant business: {len(reliant_plans)} plans")
+            commercial_plans.extend(reliant_plans)
+        except Exception as scraper_error:
+            logger.error(f"[Scheduler] Reliant business failed (non-fatal): {scraper_error}")
+
+        if not commercial_plans:
+            logger.error("[Scheduler] ALL commercial scrapers returned 0 plans - check logs above")
+        else:
+            logger.info(f"[Scheduler] Total commercial plans collected: {len(commercial_plans)}")
 
         for plan_data in commercial_plans:
             try:

@@ -12,20 +12,22 @@ const isCustomDomain = hostname === 'texasenergyanalyzer.com' || hostname === 'w
 const isProduction = isCustomDomain || isVercelPreview || (!isLocalhost && !isNgrok && protocol === 'https:');
 
 // API base URL logic - explicit and clear
+// Priority: 1) VITE_API_URL env var (set in vercel.json), 2) environment detection
+const envApiUrl = (import.meta.env.VITE_API_URL || '').trim();
 let API_BASE_URL: string;
-if (isProduction || isVercelPreview || isCustomDomain) {
-  // Production: Use Railway backend (works 24/7, no computer needed)
-  API_BASE_URL = 'https://web-production-665ac.up.railway.app';
+if (isLocalhost) {
+  // Localhost: use Vite proxy (empty string for relative URLs)
+  API_BASE_URL = '';
 } else if (isNgrok) {
   // Ngrok tunnel: use local backend
   API_BASE_URL = 'http://10.0.0.16:8000';
-} else if (isLocalhost) {
-  // Localhost: use Vite proxy (empty string for relative URLs)
-  API_BASE_URL = '';
+} else if (envApiUrl) {
+  // Production: use the build-time configured backend (Render)
+  API_BASE_URL = envApiUrl;
 } else {
-  // Fallback: if we can't detect, assume production and use Railway
-  console.warn('Unable to detect environment, defaulting to production Railway');
-  API_BASE_URL = 'https://web-production-665ac.up.railway.app';
+  // Fallback: if env var missing, use Render backend
+  console.warn('VITE_API_URL not set, defaulting to Render backend');
+  API_BASE_URL = 'https://texas-energy-backend.onrender.com';
 }
 
 // Environment detection verified - uncomment for debugging if needed
