@@ -289,7 +289,7 @@ const ErcotDashboard: React.FC = () => {
                           },
                           tooltip: {
                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            titleFont: { size: 12, weight: '600' },
+                            titleFont: { size: 12, weight: 600 },
                             bodyFont: { size: 11 },
                             padding: 10,
                             cornerRadius: 6,

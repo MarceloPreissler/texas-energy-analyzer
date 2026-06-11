@@ -5,7 +5,13 @@ const hostname = window.location.hostname;
 const protocol = window.location.protocol;
 
 // Allow explicit overrides before running environment heuristics.
-const envApiBaseUrl = (import.meta as any)?.env?.VITE_API_BASE_URL;
+// Accept both VITE_API_BASE_URL and VITE_API_URL (the name used in .env.production
+// and vercel.json) so a naming mismatch can never silently fall through.
+const envApiBaseUrl = (
+  (import.meta as any)?.env?.VITE_API_BASE_URL ||
+  (import.meta as any)?.env?.VITE_API_URL ||
+  ''
+).trim();
 const windowApiOverride = (window as any)?.__API_BASE_URL;
 
 // More robust environment detection
@@ -22,8 +28,8 @@ if (envApiBaseUrl) {
 } else if (windowApiOverride) {
   API_BASE_URL = windowApiOverride;
 } else if (isProduction || isVercelPreview || isCustomDomain) {
-  // Production: Use Railway backend
-  API_BASE_URL = 'https://web-production-665ac.up.railway.app';
+  // Production: Use Render backend (Railway deployment is retired)
+  API_BASE_URL = 'https://texas-energy-backend.onrender.com';
 } else if (isNgrok) {
   // Ngrok tunnel: use local backend
   API_BASE_URL = 'http://10.0.0.16:8000';
@@ -31,9 +37,9 @@ if (envApiBaseUrl) {
   // Localhost: use Vite proxy
   API_BASE_URL = '';
 } else {
-  // Fallback: if we can't detect, assume production and use Railway
-  console.warn('Unable to detect environment, defaulting to production Railway');
-  API_BASE_URL = 'https://web-production-665ac.up.railway.app';
+  // Fallback: if we can't detect, assume production and use Render
+  console.warn('Unable to detect environment, defaulting to production Render backend');
+  API_BASE_URL = 'https://texas-energy-backend.onrender.com';
 }
 
 console.log('API Base URL:', API_BASE_URL); // Debug log
@@ -79,8 +85,11 @@ interface Plan {
   monthly_bill_2000?: number | null;
   early_termination_fee?: number | null;
   cancellation_fee?: number | null;
+  base_monthly_fee?: number | null;
   renewable_percent?: number | null;
   special_features?: string | null;
+  rate_start_date?: string | null;
+  last_updated?: string | null;
 }
 
 export async function fetchProviders(): Promise<Provider[]> {

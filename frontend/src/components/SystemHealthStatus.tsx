@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://web-production-665ac.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'https://texas-energy-backend.onrender.com';
 
 interface HealthData {
   apiStatus: 'healthy' | 'degraded' | 'offline';

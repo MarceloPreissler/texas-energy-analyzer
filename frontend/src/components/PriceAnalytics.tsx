@@ -28,7 +28,7 @@ ChartJS.register(
 );
 
 // API base URL for fetching all plans
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://web-production-665ac.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'https://texas-energy-backend.onrender.com';
 
 interface Plan {
   id: number;
