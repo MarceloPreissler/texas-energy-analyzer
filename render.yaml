@@ -7,8 +7,8 @@ services:
     name: texas-energy-backend
     env: docker
     region: oregon
-    dockerContext: backend
-    dockerfilePath: backend/Dockerfile
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
