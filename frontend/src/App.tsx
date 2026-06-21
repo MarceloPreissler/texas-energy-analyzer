@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import EnhancedPlanList from './components/EnhancedPlanList';
 import ErcotDashboard from './components/ErcotDashboard';
 import './App.css';
@@ -24,6 +25,7 @@ const App: React.FC = () => {
 
   return (
     <div className="app-container">
+      <SpeedInsights />
       {/* Top Banner */}
       <div className="top-banner">
         <div className="banner-content">
