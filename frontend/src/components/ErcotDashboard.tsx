@@ -60,9 +60,22 @@ interface ErcotSummary {
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'https://texas-energy-backend.onrender.com';
 
 const fetchErcotSummary = async (): Promise<ErcotSummary> => {
-  const now = new Date().toISOString();
+  // Source 1: same-origin Vercel serverless proxy (/api/ercot/summary).
+  // This pulls live data straight from ERCOT and does not depend on the
+  // Render backend, so grid data works even when the backend is down.
+  try {
+    const response = await fetch('/api/ercot/summary');
+    if (response.ok) {
+      const data = await response.json();
+      if (data.grid_status?.current_demand_mw > 0) {
+        return data;
+      }
+    }
+  } catch (e) {
+    console.log('Serverless ERCOT proxy unavailable, trying backend');
+  }
 
-  // Try our backend API first
+  // Source 2: the Render backend (works once it has the /ercot routes deployed).
   try {
     const response = await fetch(`${API_BASE_URL}/ercot/summary`);
     if (response.ok) {
